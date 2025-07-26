@@ -1,0 +1,323 @@
+{
+	"moveAnimations": {
+		"walkingAnimationConfig": {
+			"isEnabled": true,
+			"speedMultiplier": 1.0,
+			"fadeTime": 3,
+			"priority": 0
+		},
+		"walkingBackwardsAnimationConfig": {
+			"isEnabled": true,
+			"speedMultiplier": 1.0,
+			"fadeTime": 3,
+			"priority": 0
+		},
+		"walkingSneakAnimationConfig": {
+			"isEnabled": true,
+			"speedMultiplier": 1.0,
+			"fadeTime": 3,
+			"priority": 0
+		},
+		"walkingSneakBackwardsAnimationConfig": {
+			"isEnabled": true,
+			"speedMultiplier": 1.0,
+			"fadeTime": 3,
+			"priority": 0
+		},
+		"runningAnimationConfig": {
+			"isEnabled": true,
+			"speedMultiplier": 1.0,
+			"fadeTime": 10,
+			"priority": 0
+		},
+		"onFenceWalkAnimationConfig": {
+			"isEnabled": true,
+			"speedMultiplier": 1.0,
+			"fadeTime": 3,
+			"priority": 0
+		},
+		"animationMoveSpeedMultiplier": 4.0
+	},
+	"idleAnimations": {
+		"turnAnimations": {
+			"turningStandingAnimationConfig": {
+				"isEnabled": true,
+				"speedMultiplier": 1.0,
+				"fadeTime": 10,
+				"priority": 0
+			},
+			"turningSneakAnimationConfig": {
+				"isEnabled": true,
+				"speedMultiplier": 1.0,
+				"fadeTime": 10,
+				"priority": 0
+			}
+		},
+		"idleStandingAnimationConfig": {
+			"isEnabled": true,
+			"speedMultiplier": 1.0,
+			"fadeTime": 10,
+			"priority": 0
+		},
+		"idleSneakAnimationConfig": {
+			"isEnabled": true,
+			"speedMultiplier": 1.0,
+			"fadeTime": 10,
+			"priority": 0
+		},
+		"idleCreativeFlyingAnimationConfig": {
+			"isEnabled": true,
+			"speedMultiplier": 1.0,
+			"fadeTime": 10,
+			"priority": 0
+		},
+		"onFenceAnimationConfig": {
+			"isEnabled": true,
+			"speedMultiplier": 1.0,
+			"fadeTime": 10,
+			"priority": 0
+		},
+		"onEdgeAnimationConfig": {
+			"isEnabled": true,
+			"speedMultiplier": 1.0,
+			"fadeTime": 10,
+			"priority": 0
+		}
+	},
+	"inWaterAnimationsConfig": {
+		"inWaterUpAnimationConfig": {
+			"isEnabled": true,
+			"speedMultiplier": 1.0,
+			"fadeTime": 10,
+			"priority": 0
+		},
+		"inWaterSwimAnimationConfig": {
+			"isEnabled": true,
+			"speedMultiplier": 1.0,
+			"fadeTime": 10,
+			"priority": 0
+		},
+		"inWaterForwardAnimationConfig": {
+			"isEnabled": true,
+			"speedMultiplier": 1.0,
+			"fadeTime": 10,
+			"priority": 0
+		},
+		"inWaterBackwardsAnimationConfig": {
+			"isEnabled": true,
+			"speedMultiplier": 1.0,
+			"fadeTime": 10,
+			"priority": 0
+		},
+		"inWaterIdleAnimationConfig": {
+			"isEnabled": true,
+			"speedMultiplier": 1.0,
+			"fadeTime": 10,
+			"priority": 0
+		}
+	},
+	"deathAnimations": {
+		"deathBurnAnimationConfig": {
+			"isEnabled": true,
+			"speedMultiplier": 1.0,
+			"fadeTime": 10,
+			"priority": 0
+		},
+		"deathExplosionAnimationConfig": {
+			"isEnabled": true,
+			"speedMultiplier": 1.0,
+			"fadeTime": 10,
+			"priority": 0
+		},
+		"deathDrownAnimationConfig": {
+			"isEnabled": true,
+			"speedMultiplier": 1.0,
+			"fadeTime": 10,
+			"priority": 0
+		},
+		"isEnabled": false,
+		"speedMultiplier": 1.0,
+		"fadeTime": 10,
+		"priority": 0
+	},
+	"useItemAnimation": {
+		"bowAnimationsConfig": {
+			"isEnabled": true,
+			"speedMultiplier": 1.0,
+			"fadeTime": 10,
+			"priority": 0
+		},
+		"eatingAnimationsConfig": {
+			"isEnabled": true,
+			"speedMultiplier": 1.0,
+			"fadeTime": 10,
+			"priority": 0
+		},
+		"shieldAnimationConfig": {
+			"isEnabled": true,
+			"speedMultiplier": 1.0,
+			"fadeTime": 10,
+			"priority": 0
+		},
+		"tridentAnimationConfig": {
+			"isEnabled": true,
+			"speedMultiplier": 1.0,
+			"fadeTime": 10,
+			"priority": 0
+		}
+	},
+	"swordAnimations": {
+		"swordAttack1AnimationConfig": {
+			"speedMultiplier": 1.0,
+			"fadeTime": 10,
+			"priority": 0
+		},
+		"swordAttack2AnimationConfig": {
+			"speedMultiplier": 1.0,
+			"fadeTime": 10,
+			"priority": 0
+		},
+		"swordAttack3AnimationConfig": {
+			"speedMultiplier": 1.0,
+			"fadeTime": 10,
+			"priority": 0
+		},
+		"isEnabled": true
+	},
+	"toolsAnimations": {
+		"pickaxeAnimationsConfig": {
+			"isEnabled": true,
+			"speedMultiplier": 1.0,
+			"fadeTime": 10,
+			"priority": 0
+		},
+		"axeAnimationsConfig": {
+			"isEnabled": true,
+			"speedMultiplier": 1.0,
+			"fadeTime": 10,
+			"priority": 0
+		},
+		"shovelAnimationsConfig": {
+			"isEnabled": true,
+			"speedMultiplier": 1.0,
+			"fadeTime": 10,
+			"priority": 0
+		}
+	},
+	"specialAnimations": {
+		"upHandAnimationConfig": {
+			"isEnabled": true,
+			"speedMultiplier": 1.0,
+			"fadeTime": 10,
+			"priority": 0
+		},
+		"itemSwapAnimationConfig": {
+			"isEnabled": true,
+			"speedMultiplier": 1.5,
+			"fadeTime": 0,
+			"priority": 1
+		}
+	},
+	"extraAnimations": {
+		"fallingAnimationConfig": {
+			"isEnabled": true,
+			"speedMultiplier": 1.0,
+			"fadeTime": 10,
+			"priority": 0
+		},
+		"climbingAnimationsConfig": {
+			"isEnabled": true,
+			"speedMultiplier": 1.0,
+			"fadeTime": 10,
+			"priority": 0
+		},
+		"crawlingAnimationsConfig": {
+			"isEnabled": true,
+			"speedMultiplier": 1.0,
+			"fadeTime": 10,
+			"priority": 0
+		},
+		"elytraAnimationsConfig": {
+			"isEnabled": true,
+			"speedMultiplier": 1.0,
+			"fadeTime": 10,
+			"priority": 0
+		},
+		"sleepingAnimationsConfig": {
+			"isEnabled": true,
+			"speedMultiplier": 1.0,
+			"fadeTime": 10,
+			"priority": 0
+		}
+	},
+	"mountAnimations": {
+		"horseAnimationsConfig": {
+			"horseIdleAnimationConfig": {
+				"isEnabled": true,
+				"speedMultiplier": 1.0,
+				"fadeTime": 10,
+				"priority": 0
+			},
+			"horseRunningAnimationConfig": {
+				"isEnabled": true,
+				"speedMultiplier": 1.0,
+				"fadeTime": 10,
+				"priority": 0
+			},
+			"horseRunningBackwardsAnimationConfig": {
+				"isEnabled": true,
+				"speedMultiplier": 1.0,
+				"fadeTime": 10,
+				"priority": 0
+			}
+		},
+		"boatAnimations": {
+			"boatTurnAnimationConfig": {
+				"isEnabled": true,
+				"speedMultiplier": 1.0,
+				"fadeTime": 10,
+				"priority": 0
+			},
+			"boatForwardAnimationConfig": {
+				"isEnabled": true,
+				"speedMultiplier": 1.0,
+				"fadeTime": 10,
+				"priority": 0
+			},
+			"boatIdleAnimationConfig": {
+				"isEnabled": true,
+				"speedMultiplier": 1.0,
+				"fadeTime": 10,
+				"priority": 0
+			}
+		},
+		"minecartAnimationsConfig": {
+			"isEnabled": true,
+			"speedMultiplier": 1.0,
+			"fadeTime": 10,
+			"priority": 0
+		}
+	},
+	"isCustomFirstPersonEnable": false,
+	"animationsThatShowBothHand": [
+		"bow",
+		"trident",
+		"climbing",
+		"boat",
+		"horse",
+		"minecart",
+		"water",
+		"crawl"
+	],
+	"animationSpeedMultiplier": 1.0,
+	"upHandDisableAnimationIds": [
+		"bow",
+		"trident",
+		"water",
+		"boat_forward",
+		"boat_turn",
+		"climbing",
+		"sleep",
+		"crawl"
+	]
+}

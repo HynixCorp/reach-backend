@@ -1,0 +1,506 @@
+[
+  {
+    "url": "http://157.137.191.121:3000/files/uploads/instances/packages/688d1cc1-5db6-4112-8016-08e6f215fce6_dedshot/assets/v/1.mp4",
+    "size": 152914004,
+    "hash": "b80b8dda534bf3a079ddd7c1065e5d1b",
+    "path": "assets/v/1.mp4"
+  },
+  {
+    "url": "http://157.137.191.121:3000/files/uploads/instances/packages/688d1cc1-5db6-4112-8016-08e6f215fce6_dedshot/assets/v/2.mp4",
+    "size": 77739850,
+    "hash": "f570c31c24e5f6eadec625946d868296",
+    "path": "assets/v/2.mp4"
+  },
+  {
+    "url": "http://157.137.191.121:3000/files/uploads/instances/packages/688d1cc1-5db6-4112-8016-08e6f215fce6_dedshot/config/chat_heads.json5",
+    "size": 152,
+    "hash": "905bba7ea20ad0fb20e31869e21b2d13",
+    "path": "config/chat_heads.json5"
+  },
+  {
+    "url": "http://157.137.191.121:3000/files/uploads/instances/packages/688d1cc1-5db6-4112-8016-08e6f215fce6_dedshot/config/custom_player_animations/custom_player_animations.json5",
+    "size": 6346,
+    "hash": "b28dea7f0f1bf209afef21879201fbaf",
+    "path": "config/custom_player_animations/custom_player_animations.json5"
+  },
+  {
+    "url": "http://157.137.191.121:3000/files/uploads/instances/packages/688d1cc1-5db6-4112-8016-08e6f215fce6_dedshot/config/fabric/indigo-renderer.properties",
+    "size": 290,
+    "hash": "7693998dff240eb3494f47de4262b3c5",
+    "path": "config/fabric/indigo-renderer.properties"
+  },
+  {
+    "url": "http://157.137.191.121:3000/files/uploads/instances/packages/688d1cc1-5db6-4112-8016-08e6f215fce6_dedshot/config/fancymenu/assets/cuadro_negro.png",
+    "size": 17768,
+    "hash": "feff93d34ba3e785ba5637c3db7ba7b3",
+    "path": "config/fancymenu/assets/cuadro_negro.png"
+  },
+  {
+    "url": "http://157.137.191.121:3000/files/uploads/instances/packages/688d1cc1-5db6-4112-8016-08e6f215fce6_dedshot/config/fancymenu/assets/fondo.png",
+    "size": 1759108,
+    "hash": "a5833283e9cee7a90617551a2d218403",
+    "path": "config/fancymenu/assets/fondo.png"
+  },
+  {
+    "url": "http://157.137.191.121:3000/files/uploads/instances/packages/688d1cc1-5db6-4112-8016-08e6f215fce6_dedshot/config/fancymenu/assets/fondo_dedshot.png",
+    "size": 2016143,
+    "hash": "dc6c16711189d1e018b9551efa725d68",
+    "path": "config/fancymenu/assets/fondo_dedshot.png"
+  },
+  {
+    "url": "http://157.137.191.121:3000/files/uploads/instances/packages/688d1cc1-5db6-4112-8016-08e6f215fce6_dedshot/config/fancymenu/assets/jugar1.png",
+    "size": 467,
+    "hash": "d68b0865c6cca55f84dbff4b47e44374",
+    "path": "config/fancymenu/assets/jugar1.png"
+  },
+  {
+    "url": "http://157.137.191.121:3000/files/uploads/instances/packages/688d1cc1-5db6-4112-8016-08e6f215fce6_dedshot/config/fancymenu/assets/jugar2.png",
+    "size": 468,
+    "hash": "dec3a0ef73e2bb0bfca79c27d66bed0c",
+    "path": "config/fancymenu/assets/jugar2.png"
+  },
+  {
+    "url": "http://157.137.191.121:3000/files/uploads/instances/packages/688d1cc1-5db6-4112-8016-08e6f215fce6_dedshot/config/fancymenu/assets/opciones1.png",
+    "size": 610,
+    "hash": "ebb073f92c438bf2227afafbd4336659",
+    "path": "config/fancymenu/assets/opciones1.png"
+  },
+  {
+    "url": "http://157.137.191.121:3000/files/uploads/instances/packages/688d1cc1-5db6-4112-8016-08e6f215fce6_dedshot/config/fancymenu/assets/opciones2.png",
+    "size": 633,
+    "hash": "d3e0f22ee1524ee71f240117e4859a1c",
+    "path": "config/fancymenu/assets/opciones2.png"
+  },
+  {
+    "url": "http://157.137.191.121:3000/files/uploads/instances/packages/688d1cc1-5db6-4112-8016-08e6f215fce6_dedshot/config/fancymenu/assets/referencia.png",
+    "size": 1760242,
+    "hash": "a7a1358a00d75827bf64204031f0441c",
+    "path": "config/fancymenu/assets/referencia.png"
+  },
+  {
+    "url": "http://157.137.191.121:3000/files/uploads/instances/packages/688d1cc1-5db6-4112-8016-08e6f215fce6_dedshot/config/fancymenu/assets/salir1.png",
+    "size": 449,
+    "hash": "b1ce4c20884f9b94e1385be2d248691d",
+    "path": "config/fancymenu/assets/salir1.png"
+  },
+  {
+    "url": "http://157.137.191.121:3000/files/uploads/instances/packages/688d1cc1-5db6-4112-8016-08e6f215fce6_dedshot/config/fancymenu/assets/salir2.png",
+    "size": 455,
+    "hash": "585a4bbc594cb7e2a704cc2a245688ae",
+    "path": "config/fancymenu/assets/salir2.png"
+  },
+  {
+    "url": "http://157.137.191.121:3000/files/uploads/instances/packages/688d1cc1-5db6-4112-8016-08e6f215fce6_dedshot/config/fancymenu/assets/tirulo.png",
+    "size": 24493,
+    "hash": "01f172a158675ab64ac91bd0c146716d",
+    "path": "config/fancymenu/assets/tirulo.png"
+  },
+  {
+    "url": "http://157.137.191.121:3000/files/uploads/instances/packages/688d1cc1-5db6-4112-8016-08e6f215fce6_dedshot/config/fancymenu/customizablemenus.txt",
+    "size": 672,
+    "hash": "59cdd88829fd569460651abea42f310e",
+    "path": "config/fancymenu/customizablemenus.txt"
+  },
+  {
+    "url": "http://157.137.191.121:3000/files/uploads/instances/packages/688d1cc1-5db6-4112-8016-08e6f215fce6_dedshot/config/fancymenu/customization/accessibility_options_screen_layout.txt",
+    "size": 5558,
+    "hash": "ea928e710fc7d6cd6c936b8aaaa8ce39",
+    "path": "config/fancymenu/customization/accessibility_options_screen_layout.txt"
+  },
+  {
+    "url": "http://157.137.191.121:3000/files/uploads/instances/packages/688d1cc1-5db6-4112-8016-08e6f215fce6_dedshot/config/fancymenu/customization/chat_options_screen_layout.txt",
+    "size": 4043,
+    "hash": "465682b7d79d2208c2d2943349caba0b",
+    "path": "config/fancymenu/customization/chat_options_screen_layout.txt"
+  },
+  {
+    "url": "http://157.137.191.121:3000/files/uploads/instances/packages/688d1cc1-5db6-4112-8016-08e6f215fce6_dedshot/config/fancymenu/customization/confirm_link_screen_layout.txt",
+    "size": 5552,
+    "hash": "5a77daa38b3ca9942d7189070e1e340e",
+    "path": "config/fancymenu/customization/confirm_link_screen_layout.txt"
+  },
+  {
+    "url": "http://157.137.191.121:3000/files/uploads/instances/packages/688d1cc1-5db6-4112-8016-08e6f215fce6_dedshot/config/fancymenu/customization/connect_screen_layout.txt",
+    "size": 4033,
+    "hash": "c8ee6d023cb912b235fbbdd0cca82b27",
+    "path": "config/fancymenu/customization/connect_screen_layout.txt"
+  },
+  {
+    "url": "http://157.137.191.121:3000/files/uploads/instances/packages/688d1cc1-5db6-4112-8016-08e6f215fce6_dedshot/config/fancymenu/customization/controls_screen_layout.txt",
+    "size": 4039,
+    "hash": "1084c579f79af7a7ea4199914f78adba",
+    "path": "config/fancymenu/customization/controls_screen_layout.txt"
+  },
+  {
+    "url": "http://157.137.191.121:3000/files/uploads/instances/packages/688d1cc1-5db6-4112-8016-08e6f215fce6_dedshot/config/fancymenu/customization/credits_and_attribution_screen_layout.txt",
+    "size": 8566,
+    "hash": "135e325a4a0a36c0613209e950671655",
+    "path": "config/fancymenu/customization/credits_and_attribution_screen_layout.txt"
+  },
+  {
+    "url": "http://157.137.191.121:3000/files/uploads/instances/packages/688d1cc1-5db6-4112-8016-08e6f215fce6_dedshot/config/fancymenu/customization/generic_dirt_message_screen_layout.txt",
+    "size": 2542,
+    "hash": "64e744d52e6a8ce7cc8ef99c9dff7861",
+    "path": "config/fancymenu/customization/generic_dirt_message_screen_layout.txt"
+  },
+  {
+    "url": "http://157.137.191.121:3000/files/uploads/instances/packages/688d1cc1-5db6-4112-8016-08e6f215fce6_dedshot/config/fancymenu/customization/language_select_screen_layout.txt",
+    "size": 7055,
+    "hash": "575ae12715e3224a116ca219a24c3352",
+    "path": "config/fancymenu/customization/language_select_screen_layout.txt"
+  },
+  {
+    "url": "http://157.137.191.121:3000/files/uploads/instances/packages/688d1cc1-5db6-4112-8016-08e6f215fce6_dedshot/config/fancymenu/customization/level_loading_screen_layout.txt",
+    "size": 4044,
+    "hash": "55d9975c5c96937757cec7e0d61fcc95",
+    "path": "config/fancymenu/customization/level_loading_screen_layout.txt"
+  },
+  {
+    "url": "http://157.137.191.121:3000/files/uploads/instances/packages/688d1cc1-5db6-4112-8016-08e6f215fce6_dedshot/config/fancymenu/customization/mouse_settings_screen_layout.txt",
+    "size": 4045,
+    "hash": "831c963cf1c74b48aa355f6d784f57f5",
+    "path": "config/fancymenu/customization/mouse_settings_screen_layout.txt"
+  },
+  {
+    "url": "http://157.137.191.121:3000/files/uploads/instances/packages/688d1cc1-5db6-4112-8016-08e6f215fce6_dedshot/config/fancymenu/customization/net.minecraft.class_6599_layout.txt",
+    "size": 5553,
+    "hash": "f26454423f1d5ddcbae7fa1150f0a427",
+    "path": "config/fancymenu/customization/net.minecraft.class_6599_layout.txt"
+  },
+  {
+    "url": "http://157.137.191.121:3000/files/uploads/instances/packages/688d1cc1-5db6-4112-8016-08e6f215fce6_dedshot/config/fancymenu/customization/online_options_screen_layout.txt",
+    "size": 4045,
+    "hash": "80e6e75ef3ae799ea602fcff383c8bcb",
+    "path": "config/fancymenu/customization/online_options_screen_layout.txt"
+  },
+  {
+    "url": "http://157.137.191.121:3000/files/uploads/instances/packages/688d1cc1-5db6-4112-8016-08e6f215fce6_dedshot/config/fancymenu/customization/options_screen_layout.txt",
+    "size": 22095,
+    "hash": "fcbff533b992ea09ee241454162952b2",
+    "path": "config/fancymenu/customization/options_screen_layout.txt"
+  },
+  {
+    "url": "http://157.137.191.121:3000/files/uploads/instances/packages/688d1cc1-5db6-4112-8016-08e6f215fce6_dedshot/config/fancymenu/customization/pack_selection_screen_layout.txt",
+    "size": 7051,
+    "hash": "ffa9dbf8d91cfdb6233baba4d5bf9b73",
+    "path": "config/fancymenu/customization/pack_selection_screen_layout.txt"
+  },
+  {
+    "url": "http://157.137.191.121:3000/files/uploads/instances/packages/688d1cc1-5db6-4112-8016-08e6f215fce6_dedshot/config/fancymenu/customization/progress_screen_layout.txt",
+    "size": 4028,
+    "hash": "cbdb15cc5f6875ae9dca10bb94ac1e7c",
+    "path": "config/fancymenu/customization/progress_screen_layout.txt"
+  },
+  {
+    "url": "http://157.137.191.121:3000/files/uploads/instances/packages/688d1cc1-5db6-4112-8016-08e6f215fce6_dedshot/config/fancymenu/customization/receiving_level_screen_layout.txt",
+    "size": 2549,
+    "hash": "9e93c4ad39371aa137c851860970a0f1",
+    "path": "config/fancymenu/customization/receiving_level_screen_layout.txt"
+  },
+  {
+    "url": "http://157.137.191.121:3000/files/uploads/instances/packages/688d1cc1-5db6-4112-8016-08e6f215fce6_dedshot/config/fancymenu/customization/skin_customization_screen_layout.txt",
+    "size": 4050,
+    "hash": "f5afcc1443c6caf387c33ca3a306d984",
+    "path": "config/fancymenu/customization/skin_customization_screen_layout.txt"
+  },
+  {
+    "url": "http://157.137.191.121:3000/files/uploads/instances/packages/688d1cc1-5db6-4112-8016-08e6f215fce6_dedshot/config/fancymenu/customization/sound_options_screen_layout.txt",
+    "size": 4045,
+    "hash": "332f92ea9dc50003feb81919348b1a89",
+    "path": "config/fancymenu/customization/sound_options_screen_layout.txt"
+  },
+  {
+    "url": "http://157.137.191.121:3000/files/uploads/instances/packages/688d1cc1-5db6-4112-8016-08e6f215fce6_dedshot/config/fancymenu/customization/telemetry_info_screen_layout.txt",
+    "size": 13065,
+    "hash": "8e190f037a8a1213d19a46767413cadc",
+    "path": "config/fancymenu/customization/telemetry_info_screen_layout.txt"
+  },
+  {
+    "url": "http://157.137.191.121:3000/files/uploads/instances/packages/688d1cc1-5db6-4112-8016-08e6f215fce6_dedshot/config/fancymenu/customization/title_screen_layout.txt",
+    "size": 23728,
+    "hash": "7550650df092cd1d892f8ec5d5372be7",
+    "path": "config/fancymenu/customization/title_screen_layout.txt"
+  },
+  {
+    "url": "http://157.137.191.121:3000/files/uploads/instances/packages/688d1cc1-5db6-4112-8016-08e6f215fce6_dedshot/config/fancymenu/customization/video_settings_screen_layout.txt",
+    "size": 4050,
+    "hash": "0474402c164d885a023e6efa0c80113d",
+    "path": "config/fancymenu/customization/video_settings_screen_layout.txt"
+  },
+  {
+    "url": "http://157.137.191.121:3000/files/uploads/instances/packages/688d1cc1-5db6-4112-8016-08e6f215fce6_dedshot/config/fancymenu/customization/win_screen_layout.txt",
+    "size": 1028,
+    "hash": "62d13c01e471e1b421a47f7dd3c8c641",
+    "path": "config/fancymenu/customization/win_screen_layout.txt"
+  },
+  {
+    "url": "http://157.137.191.121:3000/files/uploads/instances/packages/688d1cc1-5db6-4112-8016-08e6f215fce6_dedshot/config/fancymenu/custom_gui_screens.txt",
+    "size": 51,
+    "hash": "0817a4de1c0775ee9ecd292e47b35e32",
+    "path": "config/fancymenu/custom_gui_screens.txt"
+  },
+  {
+    "url": "http://157.137.191.121:3000/files/uploads/instances/packages/688d1cc1-5db6-4112-8016-08e6f215fce6_dedshot/config/fancymenu/layout_editor/widgets/element_layer_control.lewidget",
+    "size": 198,
+    "hash": "8eeaa8f0f2cf387408be43ced9e25e88",
+    "path": "config/fancymenu/layout_editor/widgets/element_layer_control.lewidget"
+  },
+  {
+    "url": "http://157.137.191.121:3000/files/uploads/instances/packages/688d1cc1-5db6-4112-8016-08e6f215fce6_dedshot/config/fancymenu/legacy_checklist.txt",
+    "size": 42,
+    "hash": "18e47d3a23d060bb7e58dafd0bf47393",
+    "path": "config/fancymenu/legacy_checklist.txt"
+  },
+  {
+    "url": "http://157.137.191.121:3000/files/uploads/instances/packages/688d1cc1-5db6-4112-8016-08e6f215fce6_dedshot/config/fancymenu/options.txt",
+    "size": 1857,
+    "hash": "dec7fe4a3db94175d05984459a81bca4",
+    "path": "config/fancymenu/options.txt"
+  },
+  {
+    "url": "http://157.137.191.121:3000/files/uploads/instances/packages/688d1cc1-5db6-4112-8016-08e6f215fce6_dedshot/config/fancymenu/ui_themes/dark.json",
+    "size": 4133,
+    "hash": "3d143e3f062b1d8c395830500794a2dd",
+    "path": "config/fancymenu/ui_themes/dark.json"
+  },
+  {
+    "url": "http://157.137.191.121:3000/files/uploads/instances/packages/688d1cc1-5db6-4112-8016-08e6f215fce6_dedshot/config/fancymenu/ui_themes/light.json",
+    "size": 4135,
+    "hash": "defa69e21f500933ae22a672acfa1dfe",
+    "path": "config/fancymenu/ui_themes/light.json"
+  },
+  {
+    "url": "http://157.137.191.121:3000/files/uploads/instances/packages/688d1cc1-5db6-4112-8016-08e6f215fce6_dedshot/config/fancymenu/user_variables.db",
+    "size": 23,
+    "hash": "5ea49412b0895bf657296e5d49f6db55",
+    "path": "config/fancymenu/user_variables.db"
+  },
+  {
+    "url": "http://157.137.191.121:3000/files/uploads/instances/packages/688d1cc1-5db6-4112-8016-08e6f215fce6_dedshot/config/iris-excluded.json",
+    "size": 31,
+    "hash": "7a77293cff6e2cf6d743c3e2ac7cd118",
+    "path": "config/iris-excluded.json"
+  },
+  {
+    "url": "http://157.137.191.121:3000/files/uploads/instances/packages/688d1cc1-5db6-4112-8016-08e6f215fce6_dedshot/config/iris.properties",
+    "size": 301,
+    "hash": "dd784019334b538d333daed8b8bb9b58",
+    "path": "config/iris.properties"
+  },
+  {
+    "url": "http://157.137.191.121:3000/files/uploads/instances/packages/688d1cc1-5db6-4112-8016-08e6f215fce6_dedshot/config/konkrete/locals/de_de.local",
+    "size": 369,
+    "hash": "6ce9e53a599eaf00837d27a42d06cbb9",
+    "path": "config/konkrete/locals/de_de.local"
+  },
+  {
+    "url": "http://157.137.191.121:3000/files/uploads/instances/packages/688d1cc1-5db6-4112-8016-08e6f215fce6_dedshot/config/konkrete/locals/en_us.local",
+    "size": 426,
+    "hash": "9909d96f9d8bc06f21b7097ffed5dc4f",
+    "path": "config/konkrete/locals/en_us.local"
+  },
+  {
+    "url": "http://157.137.191.121:3000/files/uploads/instances/packages/688d1cc1-5db6-4112-8016-08e6f215fce6_dedshot/config/konkrete/locals/pl_pl.local",
+    "size": 313,
+    "hash": "0ef387d8618709d9b66c7757de880128",
+    "path": "config/konkrete/locals/pl_pl.local"
+  },
+  {
+    "url": "http://157.137.191.121:3000/files/uploads/instances/packages/688d1cc1-5db6-4112-8016-08e6f215fce6_dedshot/config/konkrete/locals/pt_br.local",
+    "size": 322,
+    "hash": "e612e7c9f2d1c8d3ecb9c940f0f80dee",
+    "path": "config/konkrete/locals/pt_br.local"
+  },
+  {
+    "url": "http://157.137.191.121:3000/files/uploads/instances/packages/688d1cc1-5db6-4112-8016-08e6f215fce6_dedshot/config/mcemote.json",
+    "size": 28,
+    "hash": "29268eec03cb557f8863ed5ce21bd316",
+    "path": "config/mcemote.json"
+  },
+  {
+    "url": "http://157.137.191.121:3000/files/uploads/instances/packages/688d1cc1-5db6-4112-8016-08e6f215fce6_dedshot/config/sodium-fingerprint.json",
+    "size": 427,
+    "hash": "6e3cee6eab4b1e0986cff8423e83a1e7",
+    "path": "config/sodium-fingerprint.json"
+  },
+  {
+    "url": "http://157.137.191.121:3000/files/uploads/instances/packages/688d1cc1-5db6-4112-8016-08e6f215fce6_dedshot/config/sodium-mixins.properties",
+    "size": 258,
+    "hash": "9189c99a02765a66d4b8fee8eb60326b",
+    "path": "config/sodium-mixins.properties"
+  },
+  {
+    "url": "http://157.137.191.121:3000/files/uploads/instances/packages/688d1cc1-5db6-4112-8016-08e6f215fce6_dedshot/config/sodium-options.json",
+    "size": 664,
+    "hash": "3c2b7c927aa139fef69d7cdd4de1284a",
+    "path": "config/sodium-options.json"
+  },
+  {
+    "url": "http://157.137.191.121:3000/files/uploads/instances/packages/688d1cc1-5db6-4112-8016-08e6f215fce6_dedshot/config/voicechat/translations.properties",
+    "size": 1182,
+    "hash": "2d22f1161612a7659782cff8c4dbb32b",
+    "path": "config/voicechat/translations.properties"
+  },
+  {
+    "url": "http://157.137.191.121:3000/files/uploads/instances/packages/688d1cc1-5db6-4112-8016-08e6f215fce6_dedshot/config/voicechat/voicechat-client.properties",
+    "size": 4293,
+    "hash": "3fd8922a94354331c79eb78ef7397a96",
+    "path": "config/voicechat/voicechat-client.properties"
+  },
+  {
+    "url": "http://157.137.191.121:3000/files/uploads/instances/packages/688d1cc1-5db6-4112-8016-08e6f215fce6_dedshot/config/voicechat/voicechat-server.properties",
+    "size": 2502,
+    "hash": "debf21f393186bc86ad962e37794e72c",
+    "path": "config/voicechat/voicechat-server.properties"
+  },
+  {
+    "url": "http://157.137.191.121:3000/files/uploads/instances/packages/688d1cc1-5db6-4112-8016-08e6f215fce6_dedshot/config/voicechat/voicechat-volumes.properties",
+    "size": 37,
+    "hash": "849edfae4b41337ff0f98a4abfba76f3",
+    "path": "config/voicechat/voicechat-volumes.properties"
+  },
+  {
+    "url": "http://157.137.191.121:3000/files/uploads/instances/packages/688d1cc1-5db6-4112-8016-08e6f215fce6_dedshot/config/watermedia/custom_vlc_path.txt",
+    "size": 0,
+    "hash": "292d9fc8a1a4ac3d69dc6f61a428fcb7",
+    "path": "config/watermedia/custom_vlc_path.txt"
+  },
+  {
+    "url": "http://157.137.191.121:3000/files/uploads/instances/packages/688d1cc1-5db6-4112-8016-08e6f215fce6_dedshot/data/fabricDefaultResourcePacks.dat",
+    "size": 641,
+    "hash": "8df202d9b4b0b172709b73e346dff687",
+    "path": "data/fabricDefaultResourcePacks.dat"
+  },
+  {
+    "url": "http://157.137.191.121:3000/files/uploads/instances/packages/688d1cc1-5db6-4112-8016-08e6f215fce6_dedshot/downloads/log.json",
+    "size": 0,
+    "hash": "9bd566bfd51d556cc1584ca48b54597c",
+    "path": "downloads/log.json"
+  },
+  {
+    "url": "http://157.137.191.121:3000/files/uploads/instances/packages/688d1cc1-5db6-4112-8016-08e6f215fce6_dedshot/fancymenu_data/last_world.fmdata",
+    "size": 66,
+    "hash": "02853b2c4fb256615e027165340128c5",
+    "path": "fancymenu_data/last_world.fmdata"
+  },
+  {
+    "url": "http://157.137.191.121:3000/files/uploads/instances/packages/688d1cc1-5db6-4112-8016-08e6f215fce6_dedshot/logs/2025-04-09-1.log.gz",
+    "size": 5892,
+    "hash": "e7e54554b0905867bd38607357aa45c5",
+    "path": "logs/2025-04-09-1.log.gz"
+  },
+  {
+    "url": "http://157.137.191.121:3000/files/uploads/instances/packages/688d1cc1-5db6-4112-8016-08e6f215fce6_dedshot/logs/latest.log",
+    "size": 20749,
+    "hash": "3a07f98517dc0774282132d8be44ff55",
+    "path": "logs/latest.log"
+  },
+  {
+    "url": "http://157.137.191.121:3000/files/uploads/instances/packages/688d1cc1-5db6-4112-8016-08e6f215fce6_dedshot/mods/chat_heads-0.12.13-fabric-1.21.jar",
+    "size": 63519,
+    "hash": "85b3f8f2770531075950ec91a9e2d7d4",
+    "path": "mods/chat_heads-0.12.13-fabric-1.21.jar"
+  },
+  {
+    "url": "http://157.137.191.121:3000/files/uploads/instances/packages/688d1cc1-5db6-4112-8016-08e6f215fce6_dedshot/mods/cloth-config-15.0.140-fabric.jar",
+    "size": 1157166,
+    "hash": "0298426bbae8b0bc95778d3e2c9336ea",
+    "path": "mods/cloth-config-15.0.140-fabric.jar"
+  },
+  {
+    "url": "http://157.137.191.121:3000/files/uploads/instances/packages/688d1cc1-5db6-4112-8016-08e6f215fce6_dedshot/mods/custom_player_animations-2.1.0-1.21.1.jar",
+    "size": 604159,
+    "hash": "06fb957bb554eaed61a4231d271bb9b5",
+    "path": "mods/custom_player_animations-2.1.0-1.21.1.jar"
+  },
+  {
+    "url": "http://157.137.191.121:3000/files/uploads/instances/packages/688d1cc1-5db6-4112-8016-08e6f215fce6_dedshot/mods/fabric-api-0.114.0+1.21.1.jar",
+    "size": 2385062,
+    "hash": "961bb92e62d966b69f3dcb1c6099a6f8",
+    "path": "mods/fabric-api-0.114.0+1.21.1.jar"
+  },
+  {
+    "url": "http://157.137.191.121:3000/files/uploads/instances/packages/688d1cc1-5db6-4112-8016-08e6f215fce6_dedshot/mods/fancymenu_fabric_3.4.6_MC_1.21.1.jar",
+    "size": 3220667,
+    "hash": "8f66090c55bead9dab4d4fa0cde56091",
+    "path": "mods/fancymenu_fabric_3.4.6_MC_1.21.1.jar"
+  },
+  {
+    "url": "http://157.137.191.121:3000/files/uploads/instances/packages/688d1cc1-5db6-4112-8016-08e6f215fce6_dedshot/mods/iris-fabric-1.8.8+mc1.21.1.jar",
+    "size": 2690177,
+    "hash": "c6056798d6f76d91001aacdebe6ca54c",
+    "path": "mods/iris-fabric-1.8.8+mc1.21.1.jar"
+  },
+  {
+    "url": "http://157.137.191.121:3000/files/uploads/instances/packages/688d1cc1-5db6-4112-8016-08e6f215fce6_dedshot/mods/konkrete_fabric_1.9.9_MC_1.21.jar",
+    "size": 786695,
+    "hash": "897707ffa8b758fce5fe190db95f8762",
+    "path": "mods/konkrete_fabric_1.9.9_MC_1.21.jar"
+  },
+  {
+    "url": "http://157.137.191.121:3000/files/uploads/instances/packages/688d1cc1-5db6-4112-8016-08e6f215fce6_dedshot/mods/mcemote-1.1.1.jar",
+    "size": 952874,
+    "hash": "b7f8ad71210f5bb698755a7422687931",
+    "path": "mods/mcemote-1.1.1.jar"
+  },
+  {
+    "url": "http://157.137.191.121:3000/files/uploads/instances/packages/688d1cc1-5db6-4112-8016-08e6f215fce6_dedshot/mods/mediaplayer-fabric-1.21.1-3.2.0.jar",
+    "size": 1213946,
+    "hash": "40da3420ec44ae3ca18b628770434f17",
+    "path": "mods/mediaplayer-fabric-1.21.1-3.2.0.jar"
+  },
+  {
+    "url": "http://157.137.191.121:3000/files/uploads/instances/packages/688d1cc1-5db6-4112-8016-08e6f215fce6_dedshot/mods/melody_fabric_1.0.10_MC_1.21.jar",
+    "size": 188035,
+    "hash": "700643acb16f8e20270ada80a8dddcda",
+    "path": "mods/melody_fabric_1.0.10_MC_1.21.jar"
+  },
+  {
+    "url": "http://157.137.191.121:3000/files/uploads/instances/packages/688d1cc1-5db6-4112-8016-08e6f215fce6_dedshot/mods/MinecraftEventsUtilesMod-1.13.jar",
+    "size": 4592508,
+    "hash": "4a96647c83feec2a70120bd99dfac08c",
+    "path": "mods/MinecraftEventsUtilesMod-1.13.jar"
+  },
+  {
+    "url": "http://157.137.191.121:3000/files/uploads/instances/packages/688d1cc1-5db6-4112-8016-08e6f215fce6_dedshot/mods/player-animation-lib-fabric-2.0.1+1.21.1.jar",
+    "size": 204558,
+    "hash": "93b5c912d7ae152179128371b2eb6be3",
+    "path": "mods/player-animation-lib-fabric-2.0.1+1.21.1.jar"
+  },
+  {
+    "url": "http://157.137.191.121:3000/files/uploads/instances/packages/688d1cc1-5db6-4112-8016-08e6f215fce6_dedshot/mods/serverhider-1.0.5-mc1.21.1.jar",
+    "size": 34137,
+    "hash": "a8a7d3e9726145a2edc684c288a023b8",
+    "path": "mods/serverhider-1.0.5-mc1.21.1.jar"
+  },
+  {
+    "url": "http://157.137.191.121:3000/files/uploads/instances/packages/688d1cc1-5db6-4112-8016-08e6f215fce6_dedshot/mods/sodium-fabric-0.6.9+mc1.21.1.jar",
+    "size": 1297415,
+    "hash": "0f3a06195ef7878cd61db3f5e25197ef",
+    "path": "mods/sodium-fabric-0.6.9+mc1.21.1.jar"
+  },
+  {
+    "url": "http://157.137.191.121:3000/files/uploads/instances/packages/688d1cc1-5db6-4112-8016-08e6f215fce6_dedshot/mods/voicechat-fabric-1.21.1-2.5.28.jar",
+    "size": 6602997,
+    "hash": "f7ec00b91c9713d1c0b4203a334ad33c",
+    "path": "mods/voicechat-fabric-1.21.1-2.5.28.jar"
+  },
+  {
+    "url": "http://157.137.191.121:3000/files/uploads/instances/packages/688d1cc1-5db6-4112-8016-08e6f215fce6_dedshot/mods/watermedia-2.1.19.jar",
+    "size": 37845302,
+    "hash": "a2c41bf81a90c11b49aad1b54e42fcfb",
+    "path": "mods/watermedia-2.1.19.jar"
+  },
+  {
+    "url": "http://157.137.191.121:3000/files/uploads/instances/packages/688d1cc1-5db6-4112-8016-08e6f215fce6_dedshot/options.txt",
+    "size": 4569,
+    "hash": "f43af4abf0d8ab6df7c284f95bd9a5eb",
+    "path": "options.txt"
+  },
+  {
+    "url": "http://157.137.191.121:3000/files/uploads/instances/packages/688d1cc1-5db6-4112-8016-08e6f215fce6_dedshot/shaderpacks/buckshot_roulette.zip",
+    "size": 4214,
+    "hash": "f80cfa38c2d185a1af43360fdc9b4313",
+    "path": "shaderpacks/buckshot_roulette.zip"
+  }
+]

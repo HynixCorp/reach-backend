@@ -1,0 +1,40 @@
+{
+  "name": "reach-server-hexa",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "description": "",
+  "dependencies": {
+    "body-parser": "^2.2.0",
+    "colorts": "^0.1.63",
+    "cors": "^2.8.5",
+    "cross-fetch": "^4.1.0",
+    "dotenv": "^16.5.0",
+    "express": "^5.1.0",
+    "extract-zip": "^2.0.1",
+    "file-type": "^16.5.4",
+    "fs-extra": "^11.3.0",
+    "luxon": "^3.6.1",
+    "mongodb": "^6.17.0",
+    "multer": "^2.0.1",
+    "node-cron": "^4.2.0",
+    "socket.io": "^4.8.1",
+    "stable-hash": "^0.0.6",
+    "uuid": "^11.1.0"
+  },
+  "devDependencies": {
+    "@types/body-parser": "^1.19.6",
+    "@types/cors": "^2.8.19",
+    "@types/dotenv": "^6.1.1",
+    "@types/express": "^5.0.3",
+    "@types/luxon": "^3.6.2",
+    "@types/multer": "^1.4.13",
+    "typescript": "^5.8.3"
+  }
+}
