@@ -28,3 +28,4 @@ docker run -p 3000:3000 \
 1. Make sure the files/uploads directory has the correct permissions.
 2. Run `mkdir -p ./uploads/temp && chmod -R 755 ./uploads` to make sure the container has permissions to use the files.
 3. If you want to add more assets like files to the folder `files/uploads/resources`, shut down the container, upload your files, run `chmod -R 755 ./uploads`, then restart your container.
+4. If this doesn't work, try 

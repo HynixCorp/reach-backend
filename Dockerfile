@@ -26,7 +26,7 @@ RUN addgroup -g 1001 -S nodejs && \
     adduser -S nodejs -u 1001
 
 # Create the files/uploads directory structure including subdirectories
-RUN mkdir -p files/uploads/temp files/uploads/instances files/uploads/instances/assets files/uploads/instances/packages files/uploads/resources && \
+RUN mkdir -p files/uploads/{temp,resources} files/uploads/instances/{assets,packages} && \
     chown -R nodejs:nodejs /app && \
     chmod -R u+rwx /app/files/uploads
 

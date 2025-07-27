@@ -42,7 +42,7 @@ function ManifestMaker(targetDir: string): Promise<string> {
 
     return new Promise(async (resolve, reject) => {
         try {
-            const baseUrl = 'http://api.reachsdk.online/files/uploads/instances/packages';
+            const baseUrl =  process.env.BASE_URL || 'http://localost:3000/files/uploads/instances/packages';
             // El nombre de la instancia es el último segmento de targetDir
             const instanceName = path.basename(targetDir);
             const allFiles = walkDir(targetDir);

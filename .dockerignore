@@ -17,8 +17,13 @@ README.md
 .env.test.local
 .env.production.local
 
-# Files directory (uploads, etc.)
-files/
+# Exclude everything in files except uploads
+files/*
+!files/uploads/
+
+# Then exclude everything in uploads except resources
+files/uploads/*
+!files/uploads/resources/
 
 # Logs
 *.log
