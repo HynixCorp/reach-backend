@@ -1,0 +1,31 @@
+services:
+  reach-backend:
+    image: ocir.mx-monterrey-1.oci.oraclecloud.com/axzmqxvekkqk/reach-backend:latest
+    container_name: reach-backend
+    networks:
+      - frontend
+    ports:
+      - "3000:3000"
+    environment:
+      - PORT=3000
+      - DB_URI=mongodb://admin:password@ip:27017/
+      - MULTER_DIR=./files/uploads
+      - NODE_ENV=production
+    labels:
+      # Makes it so the traefik reverse proxy will route traffic to this container
+      - traefik.enable=true
+      - traefik.http.routers.nginx-http.rule=Host(`devs.reachsdk.online`)
+      - traefik.http.routers.nginx-http.entrypoints=web
+      - traefik.http.routers.nginx-https.tls=true
+      - traefik.http.routers.nginx-https.tls.certresolver=cloudflare
+      - traefik.http.routers.nginx-https.entrypoints=websecure
+      - traefik.http.routers.nginx-https.rule=Host(`devs.reachsdk.online`)
+      - traefik.http.services.your-app.loadbalancer.server.port=3000
+    volumes:
+      - ./uploads:/app/files/uploads
+    restart: unless-stopped
+    pull_policy: always
+
+networks:
+  frontend:
+    external: true
