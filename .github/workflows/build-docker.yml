@@ -72,23 +72,23 @@ jobs:
           username: ${{ secrets.OCI_SSH_USER }}
           key: ${{ secrets.OCI_SSH_KEY }}
           script: |
-            cd /home/ubuntu/reach-backend
-            
+            cd /home/opc/apps/reach-backend
+
             echo "🔑 Logging in to Oracle Container Registry..."
             echo "${{ secrets.OCI_AUTH_TOKEN }}" | docker login ${{ env.OCI_REGISTRY }} \
               --username="${{ env.OCI_NAMESPACE }}/${{ secrets.OCI_USERNAME }}" --password-stdin
-            
+
             echo "⬇️  Stopping current containers..."
             docker compose down
-            
+
             echo "📦 Pulling latest image..."
             docker compose pull
-            
+
             echo "🚀 Starting with new image..."
             docker compose up -d
-            
+
             echo "🧹 Cleaning up old images..."
             docker image prune -f
-            
+
             echo "✅ Deployment complete! Container status:"
             docker compose ps
