@@ -116,7 +116,7 @@ function reachSDKHexaLauncherUserAgent(
       .status(400)
       .json(
         createErrorResponse(
-          "[REACH-SDK - HexaLauncher]: Unsupported User-Agent."
+          "[REACH-SDK - HexaLauncher]: MEOW! Unsupported User-Agent."
         )
       );
   }
