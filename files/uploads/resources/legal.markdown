@@ -1,6 +1,6 @@
 # TÉRMINOS DE USO DEL SERVICIO DE HEXA LAUNCHER
 
-meow meow meow meow
+meow meow
 
 ## 1. Aceptación de los Términos
 Al descargar, instalar o utilizar Hexa Launcher, usted acepta estos Términos de Uso del Servicio en su totalidad. Hexa Launcher, desarrollado por **Hexa Creators** con sede en **Santander, Colombia**, y potenciado por la tecnología **Reach SDK**, es un launcher diseñado para distribuir instancias de Minecraft y organizar eventos relacionados.  
