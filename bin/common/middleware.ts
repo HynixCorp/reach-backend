@@ -63,7 +63,7 @@ function reachEmptyBodyHandler(
   if (req.method === "POST") {
     const contentType = req.headers["content-type"];
 
-    if (contentType && contentType.includes("multipart/form-data")) {
+    if (contentType?.includes("multipart/form-data")) {
       // Multer manejará esto, no lo revisamos aquí
       return next();
     }
@@ -109,7 +109,7 @@ function reachSDKHexaLauncherUserAgent(
   }
 
   const userAgent = req.headers["user-agent"];
-  if (userAgent && userAgent.includes("HexaLauncher/1.0")) {
+  if (userAgent?.includes("HexaLauncher/1.0")) {
     next();
   } else {
     res
