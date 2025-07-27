@@ -19,16 +19,18 @@ COPY . .
 # Set default environment variables (can be overridden at runtime)
 ENV PORT=3000
 ENV MULTER_DIR=./files/uploads
-
-# Create the files/uploads directory structure including temp
-RUN mkdir -p files/uploads/temp
+ENV NODE_ENV=production
 
 # Create non-root user for security
 RUN addgroup -g 1001 -S nodejs && \
     adduser -S nodejs -u 1001
 
-# Change ownership of the app directory AFTER creating directories
-RUN chown -R nodejs:nodejs /app
+# Create the files/uploads directory structure including subdirectories
+RUN mkdir -p files/uploads/temp files/uploads/instances files/uploads/instances/assets files/uploads/instances/packages files/uploads/resources && \
+    chown -R nodejs:nodejs /app && \
+    chmod -R u+rwx /app/files/uploads
+
+# Switch to non-root user
 USER nodejs
 
 # Expose the port
