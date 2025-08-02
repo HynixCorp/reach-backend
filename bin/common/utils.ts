@@ -102,8 +102,26 @@ export function getTimeWithTimezone(): Promise<{ time: string, timezone: string 
             });
         }
         catch (error) {
-            console.error("[REACH-SDK - Utils]: Error fetching time with timezone:", error);
+            console.error("[REACH - Utils]: Error fetching time with timezone:", error);
             reject(new Error("Failed to fetch time with timezone."));
         }
     })  
+}
+
+export function getAllFilesFromPath(dirPath: string): string[] {
+    if (!fs.existsSync(dirPath)) {
+        throw new Error(`Directory does not exist: ${dirPath}`);
+    }
+
+    const allFiles: string[] = [];
+    const files = fs.readdirSync(dirPath);
+    files.forEach(file => {
+        const filePath = path.join(dirPath, file);
+        if (fs.statSync(filePath).isDirectory()) {
+            allFiles.push(...getAllFilesFromPath(filePath));
+        } else {
+            allFiles.push(filePath);
+        }
+    });
+    return allFiles;
 }

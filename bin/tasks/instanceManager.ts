@@ -8,17 +8,17 @@ import { MongoDB } from "../common/mongodb/mondodb";
 config();
 
 const DB = new MongoDB(process.env.DB_URI as string, "reach");
-const MAX_AGE_MS = 1000 * 60 * 60 * 48; // 48 horas
+const MAX_AGE_MS = 1000 * 60 * 60 * 48;
 
 (async () => {
     await DB.connect();
 })();
 
-const ASSETS_DIR = path.join(__dirname, "..", "..", "files", "uploads", "instances", "assets");
+// const ASSETS_DIR = path.join(__dirname, "..", "..", "files", "uploads", "instances", "assets");
 const TEMP_DIR = path.join(__dirname, "..", "..", "files", "uploads", "temp");
 
 export function startInstanceManager() {
-    console.log("[REACH-SDK - InstanceManager] Tareas programadas activadas cada minuto.".cyan);
+    console.log("[REACH - InstanceManager] Cleaning tasks every minute.".cyan);
 
     cron.schedule("* * * * *", async () => {
         try {
@@ -26,7 +26,7 @@ export function startInstanceManager() {
             // await cleanUnusedAssets();
             await cleanOldTempFiles();
         } catch (err) {
-            console.error("[REACH-SDK - InstanceManager] Error general:".red, err);
+            console.error("[REACH - InstanceManager] Error in the automatic task schedule:".red, err);
         }
     });
 }
@@ -50,7 +50,7 @@ async function checkWaitingInstances() {
             { $unset: { waitingUntil: "" } }
         );
 
-        console.log(`[REACH-SDK - InstanceManager] Activada: ${instance.name} (${instance.id})`.green);
+        console.log(`[REACH - InstanceManager] Updated pending instance: ${instance.name} (${instance.id})`.green);
     }
 }
 
@@ -78,12 +78,10 @@ async function checkWaitingInstances() {
 
 //             if (age > MAX_AGE_MS) {
 //                 await fs.unlink(filePath);
-//                 console.log(`[REACH-SDK - InstanceManager] Eliminado asset no usado (antiguo): ${file}`.yellow);
-//             } else {
-//                 console.log(`[REACH-SDK - InstanceManager] Archivo ${file} es demasiado reciente, no se elimina`.blue);
+//                 console.log(`[REACH - InstanceManager] Unused asset deleted (old): ${file}`.yellow);
 //             }
 //         } catch (err) {
-//             console.warn(`[REACH-SDK - InstanceManager] No se pudo eliminar ${file}:`.red, err);
+//             console.warn(`[REACH - InstanceManager] Could not be deleted ${file}:`.red, err);
 //         }
 //     }
 // }
@@ -101,12 +99,10 @@ async function cleanOldTempFiles() {
 
             if (age > MAX_AGE_MS) {
                 await fs.unlink(filePath);
-                console.log(`[REACH-SDK - InstanceManager] .zip antiguo eliminado: ${file}`.magenta);
-            } else {
-                console.log(`[REACH-SDK - InstanceManager] Archivo .zip ${file} es demasiado reciente, no se elimina`.blue);
+                console.log(`[REACH - InstanceManager] Old .zip deleted: ${file}`.magenta);
             }
         } catch (err) {
-            console.warn(`[REACH-SDK - InstanceManager] No se pudo revisar/borrar ${file}:`.red, err);
+            console.warn(`[REACH - InstanceManager] Cannot review/delete ${file}:`.red, err);
         }
     }
 }

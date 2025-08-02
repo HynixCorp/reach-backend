@@ -18,7 +18,7 @@ async function createNewUserData(req: Request, res: Response): Promise<Response<
     if (!username || headerDeviceId === undefined || headerMachineId === undefined) {
         return res.status(400).json(
             createErrorResponse(
-                "[REACH-SDK - Auth]: Username, machine ID, or device ID is missing in the request body or headers.",
+                "[REACH - Auth]: Username, machine ID, or device ID is missing in the request body or headers.",
                 400
             )
         );
@@ -30,7 +30,7 @@ async function createNewUserData(req: Request, res: Response): Promise<Response<
     if (existingUser.length > 0) {
         return res.status(409).json(
             createErrorResponse(
-                `[REACH-SDK - Auth]: User with username ${username} already exists.`,
+                `[REACH - Auth]: User with username ${username} already exists.`,
                 409
             )
         );
@@ -39,7 +39,7 @@ async function createNewUserData(req: Request, res: Response): Promise<Response<
     if (!uuidAPI) {
         return res.status(404).json(
             createErrorResponse(
-                `[REACH-SDK - Auth]: User with username ${username} not found.`,
+                `[REACH - Auth]: User with username ${username} not found.`,
                 404
             )
         );
@@ -60,7 +60,7 @@ async function createNewUserData(req: Request, res: Response): Promise<Response<
     } catch (error) {
         return res.status(500).json(
             createErrorResponse(
-                `[REACH-SDK - Auth]: Failed to create user: ${error}`,
+                `[REACH - Auth]: Failed to create user: ${error}`,
                 500
             )
         );
@@ -70,7 +70,7 @@ async function createNewUserData(req: Request, res: Response): Promise<Response<
         createSuccessResponse(
             createPacket,
             
-            "[REACH-SDK - Auth]: User created successfully."
+            "[REACH - Auth]: User created successfully."
         )
     );
 }
@@ -79,7 +79,7 @@ async function getUserData(req: Request, res: Response): Promise<Response<any, R
     const { uuid } = req.query;
     if (!uuid) {
         return res.status(400).json(
-            createErrorResponse("[REACH-SDK - Auth]: UUID is required.", 400)
+            createErrorResponse("[REACH - Auth]: UUID is required.", 400)
         );
     }
 
@@ -88,7 +88,7 @@ async function getUserData(req: Request, res: Response): Promise<Response<any, R
         
         if (user.length === 0) {
             return res.status(404).json(
-                createErrorResponse("[REACH-SDK - Auth]: User not found.", 404)
+                createErrorResponse("[REACH - Auth]: User not found.", 404)
             );
         }
         
@@ -97,14 +97,14 @@ async function getUserData(req: Request, res: Response): Promise<Response<any, R
         return res.status(200).json(
             createSuccessResponse(
                 userData,
-                "[REACH-SDK - Auth]: User data retrieved successfully."
+                "[REACH - Auth]: User data retrieved successfully."
             )
         );
     }
     catch (error) {
-        console.error("[REACH-SDK - Auth]: Error fetching user data:", error);
+        console.error("[REACH - Auth]: Error fetching user data:", error);
         return res.status(500).json(
-            createErrorResponse("[REACH-SDK - Auth]: Failed to fetch user data.", 500)
+            createErrorResponse("[REACH - Auth]: Failed to fetch user data.", 500)
         );
     }
 }   
