@@ -10,74 +10,51 @@ import {
     createErrorResponse,
     createGenericResponse,
     createSuccessResponse,
+    getAllFilesFromPath,
     multerDirSafe,
     verifyPackageExists
 } from "../../common/utils";
 import { reach_packageDecompile } from "../../common/resourcesMe/packageDecompile";
+import { ReachC } from "../../common/cryptography/reachCrypto";
 
 config();
 
 const REACH_SDK_DB = new MongoDB(process.env.DB_URI as string, "reach");
+const crypto = new ReachC(process.env.CRYPTO_SECRET!);
 
 async function createNewInstance(req: Request, res: Response) {
     try {
         const {
             name,
             status,
-            minClientVersion,
             thumbnailURI,
             logoURI,
-            videos,
             isReachEnabled,
             isTestingEnabled,
             allowedUsersIDs,
             gameVersion,
-            waitingUntil
+            waitingUntil,
+            provider,
+            modsURLs,
         } = req.body;
 
-        const uploadedFile = req.file;
-        if (!uploadedFile) {
+        if (!provider || !["reach", "curseforge", "modrinth"].includes(provider)) {
             return res.status(400).json(createErrorResponse(
-                "[REACH-SDK - AInstances]: No instance package file was uploaded.",
+                "[REACH - AInstances]: Invalid or missing provider field.",
                 400
             ));
         }
 
-        const fileType = await fromFile(uploadedFile.path);
-        if (!fileType || fileType.ext !== 'zip' || fileType.mime !== 'application/zip') {
-            await fs.promises.unlink(uploadedFile.path);
-            return res.status(400).json(createErrorResponse(
-                "[REACH-SDK - AInstances]: Uploaded file is not a valid ZIP archive.",
-                400
-            ));
-        }
-
-        const stats = await fs.promises.stat(uploadedFile.path);
-        if (stats.size < 100) {
-            await fs.promises.unlink(uploadedFile.path);
-            return res.status(400).json(createErrorResponse(
-                "[REACH-SDK - AInstances]: Uploaded ZIP file is too small or empty.",
-                400
-            ));
-        }
-
-        const size = uploadedFile.size.toString();
-
-        // Validar campos obligatorios
-        const requiredFields = [name, status, minClientVersion, thumbnailURI, logoURI, gameVersion];
+        const requiredFields = [name, status, thumbnailURI, logoURI, gameVersion];
         const hasAllFields = requiredFields.every(field => field !== undefined && field !== null);
         if (!hasAllFields) {
             return res.status(400).json(createErrorResponse(
-                "[REACH-SDK - AInstances]: Missing required fields in the request body. Please ensure all required fields are provided.",
+                "[REACH - AInstances]: Missing required fields in the request body.",
                 400
             ));
         }
 
-        const REACH_UUID = uuidv4();
         const NAME_PARSED = name.replace(/[^a-zA-Z0-9_]/g, "_").toLowerCase();
-        const MULTER_DIR = multerDirSafe();
-
-        // Verificar existencia previa
         const existingInstance = await REACH_SDK_DB.findDocuments("instances", { name });
         if (existingInstance.length > 0) {
             return res.status(409).json(createGenericResponse(
@@ -88,106 +65,177 @@ async function createNewInstance(req: Request, res: Response) {
             ));
         }
 
-        if (verifyPackageExists(NAME_PARSED)) {
-            return res.status(409).json(createGenericResponse(
-                false,
-                null,
-                `Instance package with name ${NAME_PARSED} already exists. Resend the request for create new Reach SDK UUID.`,
-                409
-            ));
-        }
-
-        // Guardar paquete zip
-        const PACKAGE_DIR = path.join(MULTER_DIR, "instances", "packages");
-        await fs.promises.mkdir(PACKAGE_DIR, { recursive: true });
-        const finalPackagePath = path.join(PACKAGE_DIR, `${REACH_UUID}_${NAME_PARSED}.zip`);
-        await fs.promises.rename(uploadedFile.path, finalPackagePath);
-
-        // Decompile the package
-        const decompileResult = await reach_packageDecompile(`${REACH_UUID}_${NAME_PARSED}.zip`);
-        if (!decompileResult || !decompileResult.manifestPath) {
-            return res.status(500).json(createErrorResponse(
-                "[REACH-SDK - AInstances]: Failed to decompile the instance package.",
-                500
-            ));
-        }
-
-        //Delete the original zip file after decompilation
-        await fs.promises.unlink(finalPackagePath);
-
+        const REACH_UUID = uuidv4();
         let UInstanceNew: InstanceInformation;
 
-        if (status === "waiting") {
-            if (!waitingUntil) {
+        // --- Reach-specific logic ---
+        if (provider === "reach") {
+            const uploadedFile = req.file;
+            if (!uploadedFile) {
                 return res.status(400).json(createErrorResponse(
-                    "[REACH-SDK - AInstances]: 'waitingUntil' field is required when status is 'waiting'.",
+                    "[REACH - AInstances]: No instance package file was uploaded.",
                     400
                 ));
             }
 
-            UInstanceNew = {
+            const fileType = await fromFile(uploadedFile.path);
+            if (!fileType || fileType.ext !== "zip") {
+                await fs.promises.unlink(uploadedFile.path);
+                return res.status(400).json(createErrorResponse(
+                    "[REACH - AInstances]: Uploaded file is not a valid ZIP archive.",
+                    400
+                ));
+            }
+
+            const stats = await fs.promises.stat(uploadedFile.path);
+            if (stats.size < 100) {
+                await fs.promises.unlink(uploadedFile.path);
+                return res.status(400).json(createErrorResponse(
+                    "[REACH - AInstances]: ZIP file is too small or empty.",
+                    400
+                ));
+            }
+
+            const exists = await verifyPackageExists(uploadedFile.path);
+            if (exists) {
+                await fs.promises.unlink(uploadedFile.path);
+                return res.status(400).json(createErrorResponse(
+                    "[REACH - AInstances]: Instance package folder already exists.",
+                    400
+                ))
+            }
+
+            const MULTER_DIR = multerDirSafe();
+            const PACKAGE_DIR = path.join(MULTER_DIR, "instances", "packages");
+            await fs.promises.mkdir(PACKAGE_DIR, { recursive: true });
+            const finalPackagePath = path.join(PACKAGE_DIR, `${REACH_UUID}_${NAME_PARSED}.zip`);
+            await fs.promises.rename(uploadedFile.path, finalPackagePath);
+
+            const decompileResult = await reach_packageDecompile(`${REACH_UUID}_${NAME_PARSED}.zip`);
+            if (!decompileResult || !decompileResult.manifestPath) {
+                return res.status(500).json(createErrorResponse(
+                    "[REACH - AInstances]: Failed to decompile the instance package.",
+                    500
+                ));
+            }
+
+            await fs.promises.unlink(finalPackagePath);
+
+            const extractedPath = finalPackagePath.replace('.zip', '');
+            const allfilesArray = getAllFilesFromPath(extractedPath);
+            const filesArray = allfilesArray.filter(file => !file.endsWith("manifest.json"));
+
+            for (const filePath of filesArray) {
+                const fileData = await fs.promises.readFile(filePath);
+                const encryptedData = crypto.encryptRaw(fileData);
+                await fs.promises.writeFile(filePath, encryptedData);
+            }
+
+            const commonFields = {
                 id: REACH_UUID,
                 name: NAME_PARSED,
                 createdAt: new Date(),
                 updatedAt: new Date(),
                 currentVersion: "1.0.0",
-                status: "waiting",
-                size: parseInt(size, 10),
-                packageManifest: decompileResult.manifestPath,
+                provider: "reach" as const,
                 application: {
-                    minClientVersionRequired: minClientVersion || "latest",
                     thumbnail: thumbnailURI,
                     logo: logoURI,
-                    videos,
-                    gameVersion: gameVersion
+                    gameVersion
                 },
                 options: {
                     isReachEnabled: isReachEnabled === "true",
                     isTestingEnabled: isTestingEnabled === "true"
                 },
                 allowedUsersIDs: allowedUsersIDs || [],
-                waitingUntil: new Date(waitingUntil)
+                size: stats.size,
+                packageManifest: decompileResult.manifestPath
             };
-        } else {
-            UInstanceNew = {
+
+            if (status === "waiting") {
+                if (!waitingUntil) {
+                    return res.status(400).json(createErrorResponse(
+                        "[REACH - AInstances]: 'waitingUntil' is required when status is 'waiting'.",
+                        400
+                    ));
+                }
+                UInstanceNew = {
+                    ...commonFields,
+                    status: "waiting",
+                    waitingUntil: new Date(waitingUntil)
+                };
+            } else {
+                UInstanceNew = {
+                    ...commonFields,
+                    status: status as Exclude<InstanceInformation["status"], "waiting">
+                };
+            }
+        }
+
+        // --- Curseforge / Modrinth logic ---
+        else {
+            if (!Array.isArray(modsURLs) || modsURLs.length === 0) {
+                return res.status(400).json(createErrorResponse(
+                    `[REACH - AInstances]: 'modsURLs' is required for provider ${provider}.`,
+                    400
+                ));
+            }
+
+            const commonFields = {
                 id: REACH_UUID,
                 name: NAME_PARSED,
                 createdAt: new Date(),
                 updatedAt: new Date(),
                 currentVersion: "1.0.0",
-                status: status as Exclude<InstanceInformation["status"], "waiting">,
-                size: parseInt(size, 10),
-                packageManifest: decompileResult.manifestPath,
+                provider: provider as "curseforge" | "modrinth",
                 application: {
-                    minClientVersionRequired: minClientVersion || "latest",
                     thumbnail: thumbnailURI,
                     logo: logoURI,
-                    videos,
-                    gameVersion: gameVersion
+                    gameVersion
                 },
                 options: {
                     isReachEnabled: isReachEnabled === "true",
                     isTestingEnabled: isTestingEnabled === "true"
                 },
-                allowedUsersIDs: allowedUsersIDs || []
+                allowedUsersIDs: allowedUsersIDs || [],
+                modsURLs
             };
+
+            if (status === "waiting") {
+                if (!waitingUntil) {
+                    return res.status(400).json(createErrorResponse(
+                        "[REACH - AInstances]: 'waitingUntil' is required when status is 'waiting'.",
+                        400
+                    ));
+                }
+                UInstanceNew = {
+                    ...commonFields,
+                    status: "waiting",
+                    waitingUntil: new Date(waitingUntil)
+                };
+            } else {
+                UInstanceNew = {
+                    ...commonFields,
+                    status: status as Exclude<InstanceInformation["status"], "waiting">
+                };
+            }
         }
 
         await REACH_SDK_DB.insertDocument("instances", UInstanceNew);
 
         return res.status(201).json(createSuccessResponse(
             UInstanceNew,
-            "[REACH-SDK - AInstances]: New instance created successfully."
+            "[REACH - AInstances]: New instance created successfully."
         ));
     } catch (error) {
-        console.error("[REACH-SDK - AInstances]: Error creating new instance:", error);
+        console.error("[REACH - AInstances]: Error creating new instance:", error);
         return res.status(500).json(createErrorResponse(
-            "[REACH-SDK - AInstances]: An error occurred while creating a new instance.",
+            "[REACH - AInstances]: An error occurred while creating a new instance.",
             500
         ));
     }
 }
-
+  
 async function createInstanceAssets(req: Request, res: Response) {
     try {
         const { name } = req.body;
@@ -197,7 +245,7 @@ async function createInstanceAssets(req: Request, res: Response) {
 
         if (!FILES_UPLOADED || FILES_UPLOADED.length === 0) {
             return res.status(400).json(createErrorResponse(
-                "[REACH-SDK - AInstances]: No asset files were uploaded.",
+                "[REACH - AInstances]: No asset files were uploaded.",
                 400
             ));
         }
@@ -224,13 +272,13 @@ async function createInstanceAssets(req: Request, res: Response) {
 
         return res.status(200).json(createSuccessResponse(
             datapackResult,
-            `[REACH-SDK - AInstances]: Instance assets created successfully for ${name}.`
+            `[REACH - AInstances]: Instance assets created successfully for ${name}.`
         ));
 
     } catch (error) {
-        console.error("[REACH-SDK - AInstances]: Error creating instance assets:", error);
+        console.error("[REACH - AInstances]: Error creating instance assets:", error);
         return res.status(500).json(createErrorResponse(
-            "[REACH-SDK - AInstances]: An error occurred while creating instance assets.",
+            "[REACH - AInstances]: An error occurred while creating instance assets.",
             500
         ));
     }
