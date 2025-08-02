@@ -20,7 +20,7 @@ async function getInstancesManifest(req: Request, res: Response){
         if (!instances || instances.length === 0) {
             return res.status(200).json(
                 createGenericResponse(
-                    false,
+                    true,
                     { instances: [] },
                     "[REACH - Instances]: No instances found in the database.",
                     200
