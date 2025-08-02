@@ -25,7 +25,6 @@ function calculateFileHash(filePath: string): Promise<string> {
 }
 
 function ManifestMaker(targetDir: string): Promise<string> {
-    // Helper to recursively walk directory
     function walkDir(dir: string, fileList: string[] = []): string[] {
         const files = fs.readdirSync(dir);
         files.forEach((file) => {
@@ -42,14 +41,12 @@ function ManifestMaker(targetDir: string): Promise<string> {
 
     return new Promise(async (resolve, reject) => {
         try {
-            const baseUrl =  process.env.BASE_URL || 'http://localost:3000/files/uploads/instances/packages';
-            // El nombre de la instancia es el último segmento de targetDir
+            const baseUrl = `${process.env.BASE_URL}/files/uploads/instances/packages` || 'http://localhost:3000/files/uploads/instances/packages';
             const instanceName = path.basename(targetDir);
             const allFiles = walkDir(targetDir);
             const files: FileManifest[] = [];
             for (const filePath of allFiles) {
                 const stats = fs.statSync(filePath);
-                // Relative path for URL y para path
                 const relPath = path.relative(targetDir, filePath).replace(/\\/g, "/");
                 const url = `${baseUrl}/${instanceName}/${relPath}`;
                 files.push({
@@ -85,9 +82,7 @@ export function reach_packageDecompile(fileName: string): Promise<any> {
     return new Promise(async (resolve, reject) => {
         try {
             await extract(packetPath, { dir: target })
-            const manifestPath = await ManifestMaker(target);
-            // Construir la ruta pública para manifestPath
-            // Ejemplo: /files/uploads/instances/packages/[nombre]/manifest.json
+            await ManifestMaker(target);
             const publicManifestPath = `/files/uploads/instances/packages/${folderName}/manifest.json`;
             resolve({
                 message: `Package ${fileName} decompiled successfully.`,

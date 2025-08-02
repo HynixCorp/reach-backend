@@ -5,7 +5,7 @@ import dotenv from "dotenv";
 import cors from 'cors';
 import bodyparser from 'body-parser';
 import { Server } from "socket.io";
-import { reachCondor, reachCondorErrorHandler, reachEmptyBodyHandler, reachSDKHexaLauncherUserAgent } from "./bin/common/middleware";
+import { reachCondor, reachCondorErrorHandler, reachEmptyBodyHandler, reachUserAgentMiddleware } from "./bin/common/middleware";
 import { API_ROUTER } from './bin/models/router';
 import { multerDirSafe } from './bin/common/utils';
 import { startInstanceManager } from './bin/tasks/instanceManager';
@@ -32,14 +32,14 @@ app.use(express.urlencoded({ limit: '1gb', extended: true }));
 app.use(reachCondor);
 app.use(reachCondorErrorHandler);
 app.use(reachEmptyBodyHandler);
-app.use(reachSDKHexaLauncherUserAgent);
+app.use(reachUserAgentMiddleware);
 app.use(API_ROUTER);
 
 const server = createServer(app);
 const io = new Server(server);
 
 server.listen(PORT, () => {
-    console.log(`[REACH-SDK - Express] Server is running on port ${PORT}`.green);
+    console.log(`[REACH - Express] Server is running on port ${PORT}`.green);
 }).on("error", (error) => {
     throw new Error(error.message);
 });

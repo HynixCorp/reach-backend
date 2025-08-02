@@ -29,7 +29,7 @@ function reachCondor(req: Request, res: Response, next: NextFunction): void {
         .status(400)
         .json(
           createErrorResponse(
-            "[REACH-SDK - Condor]: Suspicious content detected in request body."
+            "[REACH - Condor]: Suspicious content detected in request body."
           )
         );
       return;
@@ -45,12 +45,12 @@ function reachCondorErrorHandler(
   res: Response,
   next: NextFunction
 ): void {
-  console.error(`[REACH-SDK - Condor]: An error occurred - ${err.message}`.red);
+  console.error(`[REACH - Condor]: An error occurred - ${err.message}`.red);
   res
     .status(500)
     .json(
       createErrorResponse(
-        "[REACH-SDK - Condor]: An internal server error occurred."
+        "[REACH - Condor]: An internal server error occurred."
       )
     );
 }
@@ -64,7 +64,6 @@ function reachEmptyBodyHandler(
     const contentType = req.headers["content-type"];
 
     if (contentType?.includes("multipart/form-data")) {
-      // Multer manejará esto, no lo revisamos aquí
       return next();
     }
 
@@ -73,7 +72,7 @@ function reachEmptyBodyHandler(
         .status(400)
         .json(
           createErrorResponse(
-            "[REACH-SDK - Condor]: Request body cannot be empty."
+            "[REACH - Condor]: Request body cannot be empty."
           )
         );
       return;
@@ -81,14 +80,14 @@ function reachEmptyBodyHandler(
 
     if (Object.keys(req.body).length === 0) {
       console.warn(
-        `[REACH-SDK - Condor]: Empty request body detected at ${new Date().toLocaleString()}`
+        `[REACH - Condor]: Empty request body detected at ${new Date().toLocaleString()}`
           .yellow
       );
       res
         .status(400)
         .json(
           createErrorResponse(
-            "[REACH-SDK - Condor]: Request body cannot be empty."
+            "[REACH - Condor]: Request body cannot be empty."
           )
         );
     } else {
@@ -99,7 +98,7 @@ function reachEmptyBodyHandler(
   }
 }
 
-function reachSDKHexaLauncherUserAgent(
+function reachUserAgentMiddleware(
   req: Request,
   res: Response,
   next: NextFunction
@@ -109,14 +108,14 @@ function reachSDKHexaLauncherUserAgent(
   }
 
   const userAgent = req.headers["user-agent"];
-  if (userAgent?.includes("HexaLauncher/1.0")) {
+  if (userAgent?.includes("ReachXClient/1.0")) {
     next();
   } else {
     res
       .status(400)
       .json(
         createErrorResponse(
-          "[REACH-SDK - HexaLauncher]: Unsupported User-Agent."
+          "[REACH - UserAgent]: Unsupported User-Agent. Please use the correct."
         )
       );
   }
@@ -126,5 +125,5 @@ export {
   reachCondor,
   reachCondorErrorHandler,
   reachEmptyBodyHandler,
-  reachSDKHexaLauncherUserAgent,
+  reachUserAgentMiddleware,
 };

@@ -12,7 +12,7 @@ async function getInstancesManifest(req: Request, res: Response){
         const { id } = req.query;
 
         if(!id) {
-            return res.status(400).json(createErrorResponse("[REACH-SDK - Instances]: User ID is required.", 400));
+            return res.status(400).json(createErrorResponse("[REACH - Instances]: User ID is required.", 400));
         }
 
         const instances = await REACH_SDK_DB.findDocuments("instances");
@@ -22,7 +22,7 @@ async function getInstancesManifest(req: Request, res: Response){
                 createGenericResponse(
                     false,
                     { instances: [] },
-                    "[REACH-SDK - Instances]: No instances found in the database.",
+                    "[REACH - Instances]: No instances found in the database.",
                     200
                 )
             );
@@ -54,7 +54,7 @@ async function getInstancesManifest(req: Request, res: Response){
                     }
                     
                 } catch (error) {
-                    console.error("[REACH-SDK - Instances]: Error fetching current time with timezone:", error);
+                    console.error("[REACH - Instances]: Error fetching current time with timezone:", error);
                     return null;
                 }
                 return {
@@ -92,9 +92,9 @@ async function getInstancesManifest(req: Request, res: Response){
         );
         
     } catch (error) {
-        console.error("[REACH-SDK - Instances]: Error fetching instances manifest:", error);
+        console.error("[REACH - Instances]: Error fetching instances manifest:", error);
         return res.status(500).json({
-            error: "[REACH-SDK - Instances]: Failed to fetch instances manifest."
+            error: "[REACH - Instances]: Failed to fetch instances manifest."
         });
     }
 }
@@ -104,13 +104,13 @@ async function getInstanceInformation(req: Request, res: Response) {
         const { id } = req.query;
 
         if (!id) {
-            return res.status(400).json(createErrorResponse("[REACH-SDK - Instances]: Instance ID is required.", 400));
+            return res.status(400).json(createErrorResponse("[REACH - Instances]: Instance ID is required.", 400));
         }
 
         const instance = await REACH_SDK_DB.findDocuments("instances", { id });
 
         if (!instance) {
-            return res.status(404).json(createErrorResponse("[REACH-SDK - Instances]: Instance not found.", 404));
+            return res.status(404).json(createErrorResponse("[REACH - Instances]: Instance not found.", 404));
         }
 
         return res.status(200).json(
@@ -120,9 +120,9 @@ async function getInstanceInformation(req: Request, res: Response) {
             )
         );
     } catch (error) {
-        console.error("[REACH-SDK - Instances]: Error fetching instance information:", error);
+        console.error("[REACH - Instances]: Error fetching instance information:", error);
         return res.status(500).json({
-            error: "[REACH-SDK - Instances]: Failed to fetch instance information."
+            error: "[REACH - Instances]: Failed to fetch instance information."
         });
     }
 }
@@ -136,7 +136,7 @@ async function getAllInstances(req: Request, res: Response) {
                 createGenericResponse(
                     false,
                     { instances: [] },
-                    "[REACH-SDK - Instances]: No instances found in the database.",
+                    "[REACH - Instances]: No instances found in the database.",
                     200
                 )
             );
@@ -149,9 +149,9 @@ async function getAllInstances(req: Request, res: Response) {
             )
         );
     } catch (error) {
-        console.error("[REACH-SDK - Instances]: Error fetching all instances:", error);
+        console.error("[REACH - Instances]: Error fetching all instances:", error);
         return res.status(500).json({
-            error: "[REACH-SDK - Instances]: Failed to fetch all instances."
+            error: "[REACH - Instances]: Failed to fetch all instances."
         });
     }
 }
