@@ -134,7 +134,7 @@ async function getAllInstances(req: Request, res: Response) {
         if (!instances || instances.length === 0) {
             return res.status(200).json(
                 createGenericResponse(
-                    false,
+                    true,
                     { instances: [] },
                     "[REACH-SDK - Instances]: No instances found in the database.",
                     200
