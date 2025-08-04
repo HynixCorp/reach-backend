@@ -1,8 +1,6 @@
 import { createCipheriv, createDecipheriv } from "crypto";
 import {
     sha256,
-    bufferToBase64,
-    base64ToBuffer
 } from "./helpers";
 
 export class ReachC {
@@ -13,10 +11,9 @@ export class ReachC {
     constructor(password: string) {
         this.password = password;
 
-        // Derivamos salt e IV fijos desde el password
         const baseHash = sha256(password);
-        this.salt = baseHash.subarray(0, 16); // 128 bits
-        this.iv = baseHash.subarray(16, 32);  // otros 128 bits
+        this.salt = baseHash.subarray(0, 16);
+        this.iv = baseHash.subarray(16, 32);
     }
 
     encryptRaw(data: Buffer | string): Buffer {
@@ -61,6 +58,6 @@ export class ReachC {
     }
 
     private _mathModelDecrypt(buffer: Buffer): Buffer {
-        return this._mathModelEncrypt(buffer); // reversible
+        return this._mathModelEncrypt(buffer);
     }
 }

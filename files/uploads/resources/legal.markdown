@@ -1,87 +1,68 @@
-# TÉRMINOS DE USO DEL SERVICIO DE HEXA LAUNCHER
+# Términos de Uso del Servicio
 
-meow
+Bienvenido a **Reach**, un servicio de infraestructura potenciado por la tecnología **ReachX**, operado por **Reach Team** con sede en México. Estos Términos de Uso del Servicio regulan el acceso y uso de los servicios de Reach, incluyendo **ReachZ Athenas** (servicio en la nube), **ReachS3** (almacenamiento en la nube) y **Reach Client** (descarga de instancias para Minecraft). Al utilizar nuestros servicios, usted acepta cumplir con estos términos. Si no está de acuerdo, por favor absténgase de usarlos.
 
-## 1. Aceptación de los Términos
-Al descargar, instalar o utilizar Hexa Launcher, usted acepta estos Términos de Uso del Servicio en su totalidad. Hexa Launcher, desarrollado por **Hexa Creators** con sede en **Santander, Colombia**, y potenciado por la tecnología **Reach SDK**, es un launcher diseñado para distribuir instancias de Minecraft y organizar eventos relacionados.  
-Si no está de acuerdo con estos términos, no utilice el servicio.
+## 1. Descripción del Servicio
+**Reach** es una plataforma que permite a los líderes de organizaciones de eventos en Minecraft adquirir suscripciones mensuales para crear y gestionar hasta 5 organizaciones, según el nivel de suscripción. Los líderes pueden invitar administradores para gestionar instancias de Minecraft, quienes a su vez pueden invitar usuarios o distribuir códigos de canje (redeem codes) para acceder a dichas instancias. El servicio opera de manera similar a plataformas como Epic Games o Steam, facilitando la distribución de contenido desarrollado por estudios externos.
 
-## 2. Obligaciones del Usuario
-Como usuario de Hexa Launcher, usted se compromete a:
+## 2. Elegibilidad
+Para usar los servicios de **Reach**, usted debe:
+- Ser mayor de 18 años o contar con el consentimiento de un tutor legal.
+- Proporcionar información veraz y completa durante el registro.
+- Contar con una cuenta de Microsoft válida para acceder a Minecraft.
+- Aceptar los presentes Términos de Uso y el Aviso de Privacidad.
 
-- Utilizar el launcher exclusivamente para fines legales y en cumplimiento con estos términos.
-- No emplear trampas, hacks, modificaciones no autorizadas o cualquier software que interfiera con el juego limpio o la integridad de las instancias.
-- No divulgar información confidencial sobre instancias beta o de prueba sin el consentimiento previo por escrito de Hexa Creators.
-- Proporcionar información precisa y actualizada al registrar su cuenta (correo electrónico, nombre de usuario, etc.).
-- Mantener la confidencialidad de sus credenciales de cuenta y notificar inmediatamente cualquier uso no autorizado.
+## 3. Suscripciones y Pagos
+- **Reach** ofrece planes de suscripción mensual que permiten la creación de 1 a 5 organizaciones, según el nivel seleccionado.
+- Los pagos se procesan a través de proveedores de servicios de pago externos, quienes cumplen con estándares de seguridad.
+- Las suscripciones se renuevan automáticamente a menos que sean canceladas antes del próximo ciclo de facturación.
+- No se ofrecen reembolsos por cancelaciones parciales o por falta de uso del servicio.
 
-## 3. Sanciones por Violaciones
-Hexa Creators se reserva el derecho de imponer sanciones si usted incumple estos términos. Las sanciones pueden incluir:
+## 4. Uso Aceptable
+Al utilizar **Reach**, usted se compromete a:
+- No realizar actividades que comprometan la seguridad o integridad del servicio, como hacking, uso de trampas (cheats) o distribución no autorizada de instancias.
+- No divulgar información confidencial de instancias beta o testing, lo que puede resultar en la exclusión permanente de eventos similares o acciones legales por parte del estudio desarrollador correspondiente.
+- Respetar las políticas de los estudios desarrolladores que publican las instancias.
 
-- **Advertencia:** Notificación formal de la infracción.  
-- **Suspensión temporal:** Restricción de acceso al launcher o eventos por un período determinado.  
-- **Baneo permanente:** Prohibición total de uso del launcher y participación en eventos.  
-- **Acciones legales:** En casos graves, como violaciones de propiedad intelectual o daños intencionales, podemos iniciar procedimientos legales.
+## 5. Sistema ReachX Anticheat
+El sistema **ReachX Anticheat** monitorea el comportamiento de los usuarios para prevenir fraudes o trampas. Para ello, recopila datos técnicos como:
+- Número de serie de la placa base.
+- Identificador único del dispositivo (Device ID).
+- Dirección IP.
+- Lista de aplicaciones abiertas.
 
-En casos de infracciones agravadas (por ejemplo, uso de trampas detectado por Reach Anticheat), registraremos datos del dispositivo (como el número de serie de la placa madre) para invalidar el uso de cuentas adicionales en el mismo ordenador.
-
-## 4. Participación en Instancias Beta o de Prueba
-La participación en instancias beta o de prueba es un privilegio exclusivo por invitación. Usted acepta:
-
-- No divulgar ningún contenido, información o materiales relacionados con estas instancias sin autorización explícita de Hexa Creators.
-- Cumplir con todas las reglas específicas comunicadas para dichas instancias.
-
-Las violaciones a estas condiciones, como la divulgación no autorizada antes del lanzamiento oficial, pueden resultar en:
-
-- Exclusión permanente de futuros eventos beta o de prueba.
-- Acciones legales por incumplimiento de confidencialidad, según lo determine Hexa Creators u organizaciones asociadas.
-
-## 5. Control Manual por Administradores
-Los administradores de Hexa Creators pueden supervisar y controlar manualmente las acciones dentro de Hexa Launcher y las instancias de juego en las siguientes circunstancias:
-
-- Resolución de problemas técnicos reportados por los usuarios.
-- Investigación de sospechas de trampas o violaciones de los términos.
-- Activación de protocolos antitrampas cuando sea necesario.
-
-Este control se realiza únicamente para garantizar la calidad del servicio y la equidad en los eventos.
+En caso de infracciones:
+- La cuenta infractora puede ser suspendida por el estudio desarrollador correspondiente.
+- En casos de sanciones agravadas, se registra el dispositivo para prevenir el uso de cuentas adicionales en el mismo equipo.
+- **Reach Team** no aplica sanciones globales ni gestiona las políticas de los estudios desarrolladores.
 
 ## 6. Propiedad Intelectual
-Todo el contenido, software y servicios proporcionados a través de Hexa Launcher (incluyendo código, diseños, instancias y eventos) son propiedad exclusiva de Hexa Creators o sus licenciantes.
-Se le otorga una licencia limitada, no exclusiva, no transferible y revocable para usar el launcher únicamente para fines personales y no comerciales, siempre que cumpla con estos términos.
+- Las instancias de Minecraft distribuidas a través de **Reach Client** son propiedad de los estudios desarrolladores correspondientes. **Reach Team** actúa únicamente como plataforma de distribución.
+- Todo el contenido de la plataforma **Reach**, incluyendo el software, la interfaz y la tecnología **ReachX**, es propiedad de **Reach Team** o sus licenciantes.
+- No está permitido copiar, modificar, distribuir o realizar ingeniería inversa del software o servicios de **Reach**.
 
-## 7. Limitación de Responsabilidad
-En la máxima medida permitida por la ley, Hexa Creators no será responsable de daños indirectos, incidentales, especiales, consecuentes o punitivos derivados del uso de Hexa Launcher, incluyendo pero no limitado a pérdida de datos, interrupciones del servicio o daños a su dispositivo.
+## 7. Responsabilidad de los Estudios Desarrolladores
+- Los estudios desarrolladores son responsables de la gestión de sus instancias, incluyendo la aplicación de sanciones por infracciones o la divulgación no autorizada de contenido beta o testing.
+- **Reach Team** no se hace responsable por las acciones, decisiones o políticas de los estudios desarrolladores.
 
 ## 8. Terminación del Servicio
-Nos reservamos el derecho de suspender o terminar su acceso a Hexa Launcher en cualquier momento, con o sin previo aviso, por cualquier motivo, incluyendo violaciones de estos términos o a nuestra sola discreción.  
-Tras la terminación, su licencia para usar el launcher cesará inmediatamente, y usted deberá desinstalar el software.
+**Reach Team** se reserva el derecho de suspender o cancelar el acceso a los servicios en caso de:
+- Incumplimiento de estos Términos de Uso.
+- Uso fraudulento o no autorizado del servicio.
+- Solicitud de una autoridad competente.
 
-## 9. Ley Aplicable
-Estos términos se rigen por las leyes de Colombia.
-Cualquier disputa relacionada con estos términos o el uso de Hexa Launcher será resuelta exclusivamente en los tribunales de Santander, Colombia.
+En caso de terminación, no se otorgarán reembolsos por el período no utilizado de la suscripción.
+
+## 9. Limitación de Responsabilidad
+**Reach Team** no será responsable por daños indirectos, incidentales o consecuentes derivados del uso del servicio, incluyendo la pérdida de datos, interrupciones del servicio o sanciones impuestas por estudios desarrolladores. El servicio se proporciona “tal cual”, sin garantías de ningún tipo.
 
 ## 10. Modificaciones a los Términos
-Podemos actualizar estos términos en cualquier momento para reflejar cambios en nuestros servicios, requisitos legales o políticas internas.  
-Le notificaremos sobre cambios significativos a través del launcher o por correo electrónico. Su uso continuado del servicio tras dichas modificaciones constituye su aceptación de los nuevos términos.
+**Reach Team** podrá modificar estos Términos de Uso en cualquier momento. Los cambios serán notificados a través del sitio web **www.reachsdk.online** o por correo electrónico, con al menos 30 días de aviso previo a su entrada en vigor. El uso continuado del servicio implica la aceptación de los nuevos términos.
 
-## 11. Requisitos de Cuenta de Minecraft
-Para utilizar Hexa Launcher, debe poseer una cuenta válida de Minecraft y cumplir con los términos de servicio de Minecraft establecidos por Microsoft.
-Hexa Creators no es responsable de las acciones tomadas por Microsoft respecto a su cuenta.
+## 11. Ley Aplicable y Jurisdicción
+Estos Términos de Uso se rigen por las leyes de México. Cualquier disputa será sometida a los tribunales competentes en la Ciudad de México, renunciando a cualquier otra jurisdicción.
 
-## 12. Conducta en Eventos
-Al participar en eventos organizados por Hexa Creators, usted acepta:
+## 12. Contacto
+Para cualquier duda o aclaración, contáctenos en **soporte@reachsdk.online**.
 
-- Seguir las reglas específicas de cada evento, las cuales serán comunicadas con antelación.
-- Respetar a otros participantes y abstenerse de comportamientos disruptivos (como griefing o acoso).
-- No utilizar el launcher o las instancias para fines distintos a los establecidos por el evento.
-
-## 13. Resolución de Disputas
-Cualquier conflicto derivado de estos términos será sometido a arbitraje vinculante en Santander, Colombia, conforme a las normas de una institución de arbitraje reconocida, salvo que la ley exija lo contrario.
-
-## 14. Contacto
-Para preguntas, reportes de problemas o aclaraciones sobre estos términos, contáctenos en **contacto@hexacreators.net**.  
-Nos esforzamos por responder a todas las consultas de manera oportuna.
-
----
-
-**Fecha de Vigencia:** Estos Términos de Uso del Servicio entran en vigencia el **28 de junio del 2025** y pueden ser actualizados periódicamente. Las actualizaciones serán notificadas conforme a lo establecido en la sección de modificaciones.
+Última actualización: 3 de agosto de 2025.
