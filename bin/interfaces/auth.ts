@@ -10,5 +10,4 @@ interface BaseUserPacket {
   createdAt: Date;
   machineId: string;
   deviceId: string;
-  rol: "user" | "developer" | "collaborator" | "betatester";
 }

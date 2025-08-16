@@ -11,14 +11,24 @@ config();
 const REACH_SDK_DB = new MongoDB(process.env.DB_URI as string, "reach");
 
 async function createNewUserData(req: Request, res: Response): Promise<Response<any, Record<string, any>>> {
-    const { username } = req.body;
+
+    const isBodyValid = req.body === undefined || req.body === null || req.body === "";
+    if (isBodyValid) {
+        return res.status(400).json(
+            createErrorResponse(
+                "[REACH - Auth]: Body is empty.",
+                400
+            )
+        );
+    }
+    const { username, uuid } = req.body;
     const headerMachineId = req.headers['machine-id'] as string;
     const headerDeviceId = req.headers['device-id'] as string;
     
-    if (!username || headerDeviceId === undefined || headerMachineId === undefined) {
+    if (!username || headerDeviceId === undefined || headerMachineId === undefined || !uuid) {
         return res.status(400).json(
             createErrorResponse(
-                "[REACH - Auth]: Username, machine ID, or device ID is missing in the request body or headers.",
+                "[REACH - Auth]: Username, machine ID, device ID or UUID is missing in the request body or headers.",
                 400
             )
         );
@@ -27,11 +37,20 @@ async function createNewUserData(req: Request, res: Response): Promise<Response<
     const uuidAPI = await getMinecraftUUID(username);
     const existingUser = await REACH_SDK_DB.findDocuments("users", { uuid: uuidAPI });
     
-    if (existingUser.length > 0) {
-        return res.status(409).json(
+    if (uuid !== uuidAPI) {
+        return res.status(400).json(
             createErrorResponse(
-                `[REACH - Auth]: User with username ${username} already exists.`,
-                409
+                "[REACH - Auth]: UUID is invalid or not found.",
+                400
+            )
+        );
+    }
+
+    if (existingUser.length > 0) {
+        return res.status(200).json(
+            createSuccessResponse(
+                null,
+                "[REACH - Auth]: User already exists."
             )
         );
     }
@@ -52,7 +71,6 @@ async function createNewUserData(req: Request, res: Response): Promise<Response<
         createdAt: new Date(),
         machineId: headerMachineId,
         deviceId: headerDeviceId, 
-        rol: "user",
     }
 
     try {
@@ -69,7 +87,6 @@ async function createNewUserData(req: Request, res: Response): Promise<Response<
     return res.status(201).json(
         createSuccessResponse(
             createPacket,
-            
             "[REACH - Auth]: User created successfully."
         )
     );

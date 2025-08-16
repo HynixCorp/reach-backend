@@ -1,6 +1,6 @@
 import fs from "fs";
 import path from "path";
-import { fromFile } from 'file-type';
+import { fileTypeFromFile } from 'file-type';
 import { config } from "dotenv";
 import { v4 as uuidv4 } from "uuid";
 import { Request, Response } from "express";
@@ -78,7 +78,7 @@ async function createNewInstance(req: Request, res: Response) {
                 ));
             }
 
-            const fileType = await fromFile(uploadedFile.path);
+            const fileType = await fileTypeFromFile(uploadedFile.path);
             if (!fileType || fileType.ext !== "zip") {
                 await fs.promises.unlink(uploadedFile.path);
                 return res.status(400).json(createErrorResponse(
@@ -282,6 +282,10 @@ async function createInstanceAssets(req: Request, res: Response) {
             500
         ));
     }
+}
+
+async function configCloudSave(req: Request, res: Response) {
+    
 }
 
 export { createNewInstance, createInstanceAssets };

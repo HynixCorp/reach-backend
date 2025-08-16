@@ -60,12 +60,17 @@ function reachEmptyBodyHandler(
   res: Response,
   next: NextFunction
 ): void {
+  if(req.path.startsWith("/api/payments/v0")) {
+    return next();
+  }
+
   if (req.method === "POST") {
     const contentType = req.headers["content-type"];
 
     if (contentType?.includes("multipart/form-data")) {
       return next();
     }
+    
 
     if (req.body === undefined || req.body === null) {
       res
@@ -104,6 +109,10 @@ function reachUserAgentMiddleware(
   next: NextFunction
 ): void {
   if (req.path.startsWith("/files/uploads")) {
+    return next();
+  }
+
+  if(req.path.startsWith("/api/payments/v0")) {
     return next();
   }
 
