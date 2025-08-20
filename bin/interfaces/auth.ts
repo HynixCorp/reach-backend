@@ -1,6 +1,6 @@
 export type UserPacket =
-  | ({ banned: "temporal"; bannedUntil: Date } & BaseUserPacket)
-  | ({ banned: "permanent" } & BaseUserPacket)
+  | ({ banned: "temporal"; bannedUntil: Date, bannedGroups: string[], bannedGlobal: boolean } & BaseUserPacket)
+  | ({ banned: "permanent"; bannedGroups: string[], bannedGlobal: boolean } & BaseUserPacket)
   | ({ banned: "none" } & BaseUserPacket);
 
 interface BaseUserPacket {

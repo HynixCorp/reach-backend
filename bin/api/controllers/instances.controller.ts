@@ -28,9 +28,9 @@ async function getInstancesManifest(req: Request, res: Response){
             );
         }
 
-        //Find instances allowed for the user ID in allowedUsersIDs array for each instance
+        //Find instances allowed for the user ID in allowedUsersIDs array for each instance or if in the allowedUsersIDs array is set to "public"
         const userInstances = instances.filter(instance => 
-            instance.allowedUsersIDs && instance.allowedUsersIDs.includes(id as string)
+            instance.allowedUsersIDs && (instance.allowedUsersIDs.includes(id as string) || instance.allowedUsersIDs.includes("public"))
         );
         if (userInstances.length === 0) {
             return res.status(200).json(

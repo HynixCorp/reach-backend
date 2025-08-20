@@ -1,68 +1,68 @@
-# Términos de Uso del Servicio
+# Terms of Service
 
-Bienvenido a **Reach**, un servicio de infraestructura potenciado por la tecnología **ReachX**, operado por **Reach Team** con sede en México. Estos Términos de Uso del Servicio regulan el acceso y uso de los servicios de Reach, incluyendo **ReachZ Athenas** (servicio en la nube), **ReachS3** (almacenamiento en la nube) y **Reach Client** (descarga de instancias para Minecraft). Al utilizar nuestros servicios, usted acepta cumplir con estos términos. Si no está de acuerdo, por favor absténgase de usarlos.
+Welcome to **Reach**, an infrastructure service powered by **ReachX** technology, operated by **Reach Team**, based in Mexico. These Terms of Service govern the access and use of Reach services, including **ReachZ Athenas** (cloud service), **ReachS3** (cloud storage), and **Reach Client** (downloading instances for Minecraft). By using our services, you agree to comply with these terms. If you do not agree, please refrain from using them.
 
-## 1. Descripción del Servicio
-**Reach** es una plataforma que permite a los líderes de organizaciones de eventos en Minecraft adquirir suscripciones mensuales para crear y gestionar hasta 5 organizaciones, según el nivel de suscripción. Los líderes pueden invitar administradores para gestionar instancias de Minecraft, quienes a su vez pueden invitar usuarios o distribuir códigos de canje (redeem codes) para acceder a dichas instancias. El servicio opera de manera similar a plataformas como Epic Games o Steam, facilitando la distribución de contenido desarrollado por estudios externos.
+## 1. Description of the Service
+**Reach** is a platform that allows leaders of Minecraft event organizations to purchase monthly subscriptions to create and manage up to 5 organizations, depending on the subscription level. Leaders can invite administrators to manage Minecraft instances, who in turn can invite users or distribute redeem codes to access those instances. The service operates similarly to platforms like Epic Games or Steam, facilitating the distribution of content developed by third-party studios.
 
-## 2. Elegibilidad
-Para usar los servicios de **Reach**, usted debe:
-- Ser mayor de 18 años o contar con el consentimiento de un tutor legal.
-- Proporcionar información veraz y completa durante el registro.
-- Contar con una cuenta de Microsoft válida para acceder a Minecraft.
-- Aceptar los presentes Términos de Uso y el Aviso de Privacidad.
+## 2. Eligibility
+To use **Reach** services, you must:
+- Be at least 18 years old or have the consent of a legal guardian.
+- Provide truthful and complete information during registration.
+- Have a valid Microsoft account to access Minecraft.
+- Accept these Terms of Service and the Privacy Notice.
 
-## 3. Suscripciones y Pagos
-- **Reach** ofrece planes de suscripción mensual que permiten la creación de 1 a 5 organizaciones, según el nivel seleccionado.
-- Los pagos se procesan a través de proveedores de servicios de pago externos, quienes cumplen con estándares de seguridad.
-- Las suscripciones se renuevan automáticamente a menos que sean canceladas antes del próximo ciclo de facturación.
-- No se ofrecen reembolsos por cancelaciones parciales o por falta de uso del servicio.
+## 3. Subscriptions and Payments
+- **Reach** offers monthly subscription plans that allow the creation of 1 to 5 organizations, depending on the selected level.
+- Payments are processed through third-party payment service providers that comply with security standards.
+- Subscriptions renew automatically unless canceled before the next billing cycle.
+- No refunds are offered for partial cancellations or non-use of the service.
 
-## 4. Uso Aceptable
-Al utilizar **Reach**, usted se compromete a:
-- No realizar actividades que comprometan la seguridad o integridad del servicio, como hacking, uso de trampas (cheats) o distribución no autorizada de instancias.
-- No divulgar información confidencial de instancias beta o testing, lo que puede resultar en la exclusión permanente de eventos similares o acciones legales por parte del estudio desarrollador correspondiente.
-- Respetar las políticas de los estudios desarrolladores que publican las instancias.
+## 4. Acceptable Use
+By using **Reach**, you agree to:
+- Not engage in activities that compromise the security or integrity of the service, such as hacking, using cheats, or unauthorized distribution of instances.
+- Not disclose confidential information about beta or testing instances, which may result in permanent exclusion from similar events or legal action by the respective game studio.
+- Respect the policies of the studios that publish the instances.
 
-## 5. Sistema ReachX Anticheat
-El sistema **ReachX Anticheat** monitorea el comportamiento de los usuarios para prevenir fraudes o trampas. Para ello, recopila datos técnicos como:
-- Número de serie de la placa base.
-- Identificador único del dispositivo (Device ID).
-- Dirección IP.
-- Lista de aplicaciones abiertas.
+## 5. ReachX Anticheat System
+The **ReachX Anticheat** system monitors user behavior to prevent fraud or cheating. It collects technical data such as:
+- Motherboard serial number.
+- Unique device identifier (Device ID).
+- IP address.
+- List of open applications.
 
-En caso de infracciones:
-- La cuenta infractora puede ser suspendida por el estudio desarrollador correspondiente.
-- En casos de sanciones agravadas, se registra el dispositivo para prevenir el uso de cuentas adicionales en el mismo equipo.
-- **Reach Team** no aplica sanciones globales ni gestiona las políticas de los estudios desarrolladores.
+In case of violations:
+- The offending account may be suspended by the relevant game studio.
+- In cases of severe violations, the device may be registered to prevent the use of additional accounts on the same device.
+- **Reach Team** does not apply global sanctions or manage the policies of game studios.
 
-## 6. Propiedad Intelectual
-- Las instancias de Minecraft distribuidas a través de **Reach Client** son propiedad de los estudios desarrolladores correspondientes. **Reach Team** actúa únicamente como plataforma de distribución.
-- Todo el contenido de la plataforma **Reach**, incluyendo el software, la interfaz y la tecnología **ReachX**, es propiedad de **Reach Team** o sus licenciantes.
-- No está permitido copiar, modificar, distribuir o realizar ingeniería inversa del software o servicios de **Reach**.
+## 6. Intellectual Property
+- Minecraft instances distributed through **Reach Client** are owned by the respective game studios. **Reach Team** acts solely as a distribution platform.
+- All content on the **Reach** platform, including software, interface, and **ReachX** technology, is owned by **Reach Team** or its licensors.
+- Copying, modifying, distributing, or reverse-engineering the software or services of **Reach** is prohibited.
 
-## 7. Responsabilidad de los Estudios Desarrolladores
-- Los estudios desarrolladores son responsables de la gestión de sus instancias, incluyendo la aplicación de sanciones por infracciones o la divulgación no autorizada de contenido beta o testing.
-- **Reach Team** no se hace responsable por las acciones, decisiones o políticas de los estudios desarrolladores.
+## 7. Responsibility of Game Studios
+- Game studios are responsible for managing their instances, including applying sanctions for violations or unauthorized disclosure of beta or testing content.
+- **Reach Team** is not responsible for the actions, decisions, or policies of game studios.
 
-## 8. Terminación del Servicio
-**Reach Team** se reserva el derecho de suspender o cancelar el acceso a los servicios en caso de:
-- Incumplimiento de estos Términos de Uso.
-- Uso fraudulento o no autorizado del servicio.
-- Solicitud de una autoridad competente.
+## 8. Termination of Service
+**Reach Team** reserves the right to suspend or terminate access to the services in case of:
+- Breach of these Terms of Service.
+- Fraudulent or unauthorized use of the service.
+- Request by a competent authority.
 
-En caso de terminación, no se otorgarán reembolsos por el período no utilizado de la suscripción.
+In case of termination, no refunds will be provided for the unused subscription period.
 
-## 9. Limitación de Responsabilidad
-**Reach Team** no será responsable por daños indirectos, incidentales o consecuentes derivados del uso del servicio, incluyendo la pérdida de datos, interrupciones del servicio o sanciones impuestas por estudios desarrolladores. El servicio se proporciona “tal cual”, sin garantías de ningún tipo.
+## 9. Limitation of Liability
+**Reach Team** shall not be liable for indirect, incidental, or consequential damages arising from the use of the service, including data loss, service interruptions, or sanctions imposed by game studios. The service is provided "as is," without warranties of any kind.
 
-## 10. Modificaciones a los Términos
-**Reach Team** podrá modificar estos Términos de Uso en cualquier momento. Los cambios serán notificados a través del sitio web **www.reachsdk.online** o por correo electrónico, con al menos 30 días de aviso previo a su entrada en vigor. El uso continuado del servicio implica la aceptación de los nuevos términos.
+## 10. Modifications to the Terms
+**Reach Team** may modify these Terms of Service at any time. Changes will be notified through the website **www.reachsdk.online** or via email, with at least 30 days' notice before they take effect. Continued use of the service implies acceptance of the new terms.
 
-## 11. Ley Aplicable y Jurisdicción
-Estos Términos de Uso se rigen por las leyes de México. Cualquier disputa será sometida a los tribunales competentes en la Ciudad de México, renunciando a cualquier otra jurisdicción.
+## 11. Governing Law and Jurisdiction
+These Terms of Service are governed by the laws of Mexico. Any disputes will be submitted to the competent courts in Mexico City, waiving any other jurisdiction.
 
-## 12. Contacto
-Para cualquier duda o aclaración, contáctenos en **soporte@reachsdk.online**.
+## 12. Contact
+For any questions or clarifications, please contact us at **soporte@reachsdk.online**.
 
-Última actualización: 3 de agosto de 2025.
+Last updated: August 3, 2025.
