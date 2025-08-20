@@ -11,7 +11,7 @@ COPY package*.json ./
 RUN npm ci && npm cache clean --force
 
 # Install ts-node and typescript globally
-RUN npm install -g ts-node typescript
+RUN npm install --legacy-peer-deps -g ts-node typescript
 
 # Copy source code (node_modules and files/ will be excluded via .dockerignore)
 COPY . .
