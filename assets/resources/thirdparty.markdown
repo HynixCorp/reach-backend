@@ -2,6 +2,7 @@
 
 Several free and open source libraries have contributed to the Reach Client's features. Some require us to include their license agreements in our product. These are presented below in recognition of their work. At Reach Team, we appreciate the work these individuals do to support development teams. Thank you.
 
+
 ---
 
 ## Libraries used in the front-end:
