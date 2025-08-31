@@ -7,8 +7,7 @@ on:
     branches: [main, master]
 
 env:
-  OCI_REGISTRY: ocir.mx-monterrey-1.oci.oraclecloud.com
-  OCI_NAMESPACE: axzmqxvekkqk
+  REGISTRY: registry.reachsdk.online
   IMAGE_NAME: reach-backend
 
 jobs:
@@ -26,15 +25,15 @@ jobs:
         if: github.event_name != 'pull_request'
         uses: docker/login-action@v3
         with:
-          registry: ${{ env.OCI_REGISTRY }}
-          username: ${{ env.OCI_NAMESPACE }}/${{ secrets.OCI_USERNAME }}
-          password: ${{ secrets.OCI_AUTH_TOKEN }}
+          registry: ${{ env.REGISTRY }}
+          username: ${{ secrets.REGISTRY_USERNAME }}
+          password: ${{ secrets.REGISTRY_PASSWORD }}
 
       - name: Extract metadata
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ${{ env.OCI_REGISTRY }}/${{ env.OCI_NAMESPACE }}/${{ env.IMAGE_NAME }}
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
           tags: |
             type=ref,event=branch
             type=ref,event=pr
@@ -57,7 +56,7 @@ jobs:
         run: |
           echo "✅ Docker image pushed successfully!"
           echo "🏷️  Tags: ${{ steps.meta.outputs.tags }}"
-          echo "📍 Registry: ${{ env.OCI_REGISTRY }}/${{ env.OCI_NAMESPACE }}/${{ env.IMAGE_NAME }}"
+          echo "📍 Registry: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}"
 
   deploy:
     needs: build-and-push
@@ -75,8 +74,8 @@ jobs:
             cd /home/opc/apps/reach-backend
 
             echo "🔑 Logging in to Oracle Container Registry..."
-            echo "${{ secrets.OCI_AUTH_TOKEN }}" | docker login ${{ env.OCI_REGISTRY }} \
-              --username="${{ env.OCI_NAMESPACE }}/${{ secrets.OCI_USERNAME }}" --password-stdin
+            echo "${{ secrets.REGISTRY_PASSWORD }}" | docker login ${{ env.REGISTRY }} \
+              --username="${{ secrets.REGISTRY_USERNAME }}" --password-stdin
 
             echo "⬇️  Stopping current containers..."
             docker compose down
