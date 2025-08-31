@@ -2,10 +2,13 @@ import { config } from "dotenv";
 import { Request, Response } from "express";
 import { MongoDB } from "../../common/mongodb/mondodb";
 import { createErrorResponse, createGenericResponse, createSuccessResponse, getTimeWithTimezone } from "../../common/utils";
+import { nanoid } from "nanoid";
+import { InstanceCode } from "../../interfaces/instances";
 
 config();
 
 const REACH_SDK_DB = new MongoDB(process.env.DB_URI as string, "reach");
+const REACH_SDK_USERS_DB = new MongoDB(process.env.DB_URI as string, "reachauth");
 
 async function getInstancesManifest(req: Request, res: Response){
     try {
@@ -156,4 +159,137 @@ async function getAllInstances(req: Request, res: Response) {
     }
 }
 
-export { getInstancesManifest, getInstanceInformation, getAllInstances };
+async function createInstanceCode(req: Request, res: Response) {
+    try {
+        const { id, ownerID, limitedUsages } = req.body;
+
+        if (!id || !ownerID ) {
+            return res.status(400).json(createErrorResponse("[REACH - Instances]: 'id' and 'ownerID' are required.", 400));
+        }
+
+        const instance = await REACH_SDK_DB.findDocuments("instances", { id: id });
+
+        if (instance.length === 0) {
+            return res.status(404).json(createErrorResponse("[REACH - Instances]: Instance not found.", 404));
+        }
+
+        const ownerExists = await REACH_SDK_USERS_DB.findDocuments("account", { accountId: ownerID });
+
+        if (ownerExists.length === 0) {
+            return res.status(404).json(createErrorResponse("[REACH - Instances]: Owner not found.", 404));
+        }
+
+        const codeGenerated = nanoid(10);
+
+        const codeWithoutDashes = codeGenerated.replace(/-/g, "Q");
+
+        const codeParsedFirstPart = codeWithoutDashes.slice(0, 5);
+        const codeParsedSecondPart = codeWithoutDashes.slice(5);
+
+        const code = `${codeParsedFirstPart}-${codeParsedSecondPart}`;
+
+        let instanceCode: InstanceCode;
+
+        if(limitedUsages) {
+            instanceCode = {
+                id: instance[0].id,
+                code: codeWithoutDashes,
+                ownerID,
+                createdAt: new Date(),
+                updatedAt: new Date(),
+                limitedUsages: true,
+                limitedUsagesValue: limitedUsages,
+            };
+        } else {
+            instanceCode = {
+                id: instance[0].id,
+                code: codeWithoutDashes,
+                ownerID,
+                createdAt: new Date(),
+                updatedAt: new Date(),
+                limitedUsages: false,
+            };
+        }
+
+        await REACH_SDK_DB.insertDocument("instanceCodes", instanceCode);
+
+        return res.status(200).json(createSuccessResponse(
+            {
+                code,
+            },
+            "Instance code created successfully.",
+        ));
+    }
+    catch (error) {
+        console.error("[REACH - Instances]: Error creating instance code:", error);
+        return res.status(500).json({
+            error: "[REACH - Instances]: Failed to create instance code."
+        });
+    }
+}
+
+async function requestPermissionInstance(req: Request, res: Response) {
+    try {
+        const { id, permissionToken } = req.body;
+
+        if (!id || !permissionToken) {
+            return res.status(400).json(createErrorResponse("[REACH - Instances]: 'id' and 'permissionToken' are required.", 400));
+        }
+
+        const instanceCode = await REACH_SDK_DB.findDocuments("instanceCodes", { code: permissionToken });
+
+        if (instanceCode.length === 0) {
+            return res.status(404).json(createErrorResponse("[REACH - Instances]: Instance code not found.", 404));
+        }
+
+        const userExists = await REACH_SDK_DB.findDocuments("users", { uuid: id });
+
+        if (userExists.length === 0) {
+            return res.status(404).json(createErrorResponse("[REACH - Instances]: User not found to add to the instance allowed users.", 404));
+        }
+
+        if(instanceCode[0].limitedUsages) {
+            if(instanceCode[0].limitedUsagesValue <= 0) {
+                return res.status(423).json(createErrorResponse("[REACH - Instances]: Instance code has no more usages. Please generate a new one or contact the administrator.", 400));
+            }
+        }
+    
+        const instance = await REACH_SDK_DB.findDocuments("instances", { id: instanceCode[0].id });
+
+        if (instance.length === 0) {
+            return res.status(404).json(createErrorResponse("[REACH - Instances]: Instance not found.", 404));
+        }
+
+        if (instance[0].allowedUsersIDs.includes(id)) {
+            return res.status(200).json(createSuccessResponse(
+                {
+                    allowed: true,
+                },
+                "Instance permission granted previously.",
+            ));
+        }
+
+        await REACH_SDK_DB.updateDocument("instances", { id: instanceCode[0].id }, { $push: { allowedUsersIDs: id } });
+
+        if(instanceCode[0].limitedUsages) {
+            const instanceCodeUpdated = await REACH_SDK_DB.findDocuments("instanceCodes", { id: instanceCode[0].id });
+            instanceCodeUpdated[0].limitedUsagesValue--;
+            await REACH_SDK_DB.updateDocument("instanceCodes", { id: instanceCode[0].id }, { $set: { limitedUsagesValue: instanceCodeUpdated[0].limitedUsagesValue } });
+        }
+
+        return res.status(200).json(createSuccessResponse(
+            {
+                allowed: true,
+            },
+            "Instance permission granted successfully.",
+        ));
+    }
+    catch (error) {
+        console.error("[REACH - Instances]: Error requesting permission for instance:", error);
+        return res.status(500).json({
+            error: "[REACH - Instances]: Failed to request permission for instance."
+        });
+    }
+}
+
+export { getInstancesManifest, getInstanceInformation, getAllInstances, requestPermissionInstance, createInstanceCode };

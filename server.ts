@@ -7,7 +7,7 @@ import bodyparser from 'body-parser';
 import { Server } from "socket.io";
 import { reachCondor, reachCondorErrorHandler, reachEmptyBodyHandler, reachUserAgentMiddleware } from "./bin/common/middleware";
 import { API_ROUTER } from './bin/models/router';
-import { multerDirSafe } from './bin/common/utils';
+import { multerDirSafe, assetsDirSafe } from './bin/common/utils';
 import { startInstanceManager } from './bin/tasks/instanceManager';
 
 dotenv.config();
@@ -22,7 +22,8 @@ app.use(bodyparser.json());
 app.use(bodyparser.urlencoded({ extended: true }));
 
 // Serve static files from the 'public' directory
-app.use('/files/uploads', express.static(multerDirSafe()));
+app.use('/cdn', express.static(multerDirSafe()));
+app.use('/assets', express.static(assetsDirSafe()));
 
 // Limit the size of incoming requests to 1gb
 app.use(express.json({ limit: '1gb' }));

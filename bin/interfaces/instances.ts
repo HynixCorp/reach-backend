@@ -15,6 +15,7 @@ interface ReachInstanceInformation {
   createdAt: Date;
   updatedAt: Date;
   currentVersion: string;
+  ownerID: string;
   status: "active" | "inactive" | "maintenance" | "testing" | "waiting";
   provider: "reach";
   size: number;
@@ -25,10 +26,9 @@ interface ReachInstanceInformation {
     gameVersion: string;
   };
   options: {
-    isReachEnabled: boolean;
-    isTestingEnabled: boolean;
+    discordCustom: boolean;
   };
-  allowedUsersIDs: string[] | "all";
+  allowedUsersIDs: string[] | "public";
 }
 
 interface CurseforgeOrModrinthInstanceInformation {
@@ -37,6 +37,7 @@ interface CurseforgeOrModrinthInstanceInformation {
   createdAt: Date;
   updatedAt: Date;
   currentVersion: string;
+  ownerID: string;
   status: "active" | "inactive" | "maintenance" | "testing" | "waiting";
   provider: "curseforge" | "modrinth";
   modsURLs: string[];
@@ -46,8 +47,23 @@ interface CurseforgeOrModrinthInstanceInformation {
     gameVersion: string;
   };
   options: {
-    isReachEnabled: boolean;
-    isTestingEnabled: boolean;
+    discordCustom: boolean;
   };
-  allowedUsersIDs: string[] | "all";
+  allowedUsersIDs: string[] | "public";
+}
+
+export type InstanceCode = ({
+  limitedUsages: true;
+  limitedUsagesValue: number;
+} & InstanceCodeBase) | ({
+  limitedUsages: false;
+} & InstanceCodeBase);
+
+interface InstanceCodeBase {
+  id: string;
+  code: string;
+  ownerID: string;
+  createdAt: Date;
+  updatedAt: Date;
+  limitedUsages: boolean;
 }

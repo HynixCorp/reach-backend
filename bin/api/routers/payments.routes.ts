@@ -24,6 +24,8 @@ ROUTER.get("/cancel", CONTROLLER.cancel_payment);
 
 ROUTER.get("/create/portal", CONTROLLER.create_portal);
 
+ROUTER.get("/info", CONTROLLER.get_payment_info);
+
 // ROUTER.get("/portal", CustomerPortal({
 //     accessToken: POLAR_TOKEN,
 //     getCustomerId: async (req) => {

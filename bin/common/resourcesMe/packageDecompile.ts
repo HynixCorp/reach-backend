@@ -41,7 +41,7 @@ function ManifestMaker(targetDir: string): Promise<string> {
 
     return new Promise(async (resolve, reject) => {
         try {
-            const baseUrl = `${process.env.BASE_URL}/files/uploads/instances/packages` || 'http://localhost:3000/files/uploads/instances/packages';
+            const baseUrl = `${process.env.BASE_URL}/cdn/instances/packages` || 'http://localhost:3000/cdn/instances/packages';
             const instanceName = path.basename(targetDir);
             const allFiles = walkDir(targetDir);
             const files: FileManifest[] = [];
@@ -70,7 +70,7 @@ function ManifestMaker(targetDir: string): Promise<string> {
 }
 
 export function reach_packageDecompile(fileName: string): Promise<any> {
-    const MULTER_DIR = process.env.MULTER_DIR || './files/uploads';
+    const MULTER_DIR = process.env.MULTER_DIR || './cdn';
     const packetPath = `${MULTER_DIR}/instances/packages/${fileName}`;
     const folderName = fileName.replace('.zip', '');
     const target = path.resolve(`${MULTER_DIR}/instances/packages/${folderName}`);
@@ -83,7 +83,7 @@ export function reach_packageDecompile(fileName: string): Promise<any> {
         try {
             await extract(packetPath, { dir: target })
             await ManifestMaker(target);
-            const publicManifestPath = `/files/uploads/instances/packages/${folderName}/manifest.json`;
+            const publicManifestPath = `/cdn/instances/packages/${folderName}/manifest.json`;
             resolve({
                 message: `Package ${fileName} decompiled successfully.`,
                 manifestPath: publicManifestPath,

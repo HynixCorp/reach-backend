@@ -13,22 +13,22 @@ RUN npm ci --legacy-peer-deps && npm cache clean --force
 # Install ts-node and typescript globally
 RUN npm install --legacy-peer-deps -g ts-node typescript
 
-# Copy source code (node_modules and files/ will be excluded via .dockerignore)
+# Copy source code (node_modules and cdn/ will be excluded via .dockerignore)
 COPY . .
 
 # Set default environment variables (can be overridden at runtime)
 ENV PORT=3000
-ENV MULTER_DIR=./files/uploads
+ENV MULTER_DIR=./cdn
 ENV NODE_ENV=production
 
 # Create non-root user for security
 RUN addgroup -g 1001 -S nodejs && \
     adduser -S nodejs -u 1001
 
-# Create the files/uploads directory structure including subdirectories
-RUN mkdir -p files/uploads/temp files/uploads/instances files/uploads/instances/assets files/uploads/instances/packages files/uploads/resources && \
+# Create the cdn directory structure including subdirectories
+RUN mkdir -p cdn/temp cdn/instances cdn/instances/assets cdn/instances/packages assets/resources && \
     chown -R nodejs:nodejs /app && \
-    chmod -R u+rwx /app/files/uploads
+    chmod -R u+rwx /app/cdn
 
 # Switch to non-root user
 USER nodejs

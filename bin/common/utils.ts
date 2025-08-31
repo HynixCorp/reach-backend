@@ -42,7 +42,18 @@ export function createGenericResponse(
 }
 
 export function multerDirSafe(){
-    const relativePath = process.env.MULTER_DIR || './files/uploads';
+    const relativePath = process.env.MULTER_DIR || './cdn';
+    const absolutePath = path.resolve(__dirname, '..', '..', relativePath);
+    
+    if (!fs.existsSync(absolutePath)){
+        fs.mkdirSync(absolutePath, { recursive: true });
+    }
+
+    return absolutePath;
+}
+
+export function assetsDirSafe(){
+    const relativePath = process.env.ASSETS_DIR || './assets';
     const absolutePath = path.resolve(__dirname, '..', '..', relativePath);
     
     if (!fs.existsSync(absolutePath)){

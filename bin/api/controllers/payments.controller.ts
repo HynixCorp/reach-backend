@@ -55,6 +55,11 @@ export async function success_payment(req: Request, res: Response) {
     endDate: new Date(new Date().getTime() + 30 * 24 * 60 * 60 * 1000), // 30 days
     betterAuthId: checkoutInfo.customer_external_id as string,
     status: "active",
+    plan: checkoutInfo.products[0].name.toLowerCase() as
+      | "hobby"
+      | "standard"
+      | "pro"
+      | "enterprise",
   };
 
   const result = await REACH_DB.insertDocument("payments", order);
@@ -123,7 +128,38 @@ export async function create_portal(req: Request, res: Response) {
     REACH_KEYWORD as string
   );
   const customerID = await getCustomerID(customerSessionToken);
+  if (customerID === null) {
+    return res
+      .status(400)
+      .json(createErrorResponse("[REACH - Payments]: Failed to get customer ID. Please contact support.", 400));
+  }
   const customerPortalURL = await getCustomerPortalURL(customerID.id);
 
   res.redirect(customerPortalURL.customer_portal_url);
+}
+
+export async function get_payment_info(req: Request, res: Response) {
+  const { baId } = req.query;
+
+  if (!baId) {
+    return res
+      .status(400)
+      .json(createErrorResponse("[REACH - Payments]: BA-ID is missing. Please contact support.", 400));
+  }
+
+  const order: PolarOrderDB[] = await REACH_DB.findDocuments("payments", {
+    betterAuthId: baId as string,
+  });
+
+  if (order.length === 0) {
+    return res
+      .status(400)
+      .json(createErrorResponse("[REACH - Payments]: No active subscription found for this user. Please contact support.", 400));
+  }
+
+  const paymentInfo = order[0];
+
+  paymentInfo.customerSessionToken = null as unknown as string;
+
+  return res.status(200).json(createSuccessResponse(paymentInfo, "Payment info fetched successfully."));
 }

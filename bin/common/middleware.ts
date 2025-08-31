@@ -108,7 +108,11 @@ function reachUserAgentMiddleware(
   res: Response,
   next: NextFunction
 ): void {
-  if (req.path.startsWith("/files/uploads")) {
+  if (req.path.startsWith("/cdn")) {
+    return next();
+  }
+
+  if(req.path.startsWith("/assets")) {
     return next();
   }
 

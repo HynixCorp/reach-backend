@@ -27,7 +27,7 @@ export async function getCheckoutInfo(checkoutId: string): Promise<PolarCheckout
     return data;
 }
 
-export async function getCustomerID(customerSessionToken: string): Promise<PolarCustomerMeResponse> {
+export async function getCustomerID(customerSessionToken: string): Promise<PolarCustomerMeResponse | null> {
 
     const response = await fetch(`${POLAR_URI}/customer-portal/customers/me`, {
         headers: {
@@ -35,9 +35,10 @@ export async function getCustomerID(customerSessionToken: string): Promise<Polar
         },
         method: "GET"
     });
+    console.log(response);
 
     if(!response.ok) {
-        throw new Error("Failed to get customer ID");
+        return null;
     }
 
     const data: PolarCustomerMeResponse = await response.json() as PolarCustomerMeResponse;

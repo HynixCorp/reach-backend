@@ -51,6 +51,5 @@ Thumbs.db
 *.seed
 *.pid.lock
 
-# Exclude the entire files/uploads/instances directory
-files/uploads/instances
-files/uploads/instances/**
+# Exclude the entire cdn directory
+cdn/**

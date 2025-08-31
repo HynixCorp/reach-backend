@@ -20,6 +20,7 @@ import { ReachC } from "../../common/cryptography/reachCrypto";
 config();
 
 const REACH_SDK_DB = new MongoDB(process.env.DB_URI as string, "reach");
+const REACH_USERS_DB = new MongoDB(process.env.DB_URI as string, "reachauth");
 const crypto = new ReachC(process.env.CRYPTO_SECRET!);
 
 async function createNewInstance(req: Request, res: Response) {
@@ -29,13 +30,13 @@ async function createNewInstance(req: Request, res: Response) {
             status,
             thumbnailURI,
             logoURI,
-            isReachEnabled,
-            isTestingEnabled,
+            discordCustom,
             allowedUsersIDs,
             gameVersion,
             waitingUntil,
             provider,
             modsURLs,
+            ownerID
         } = req.body;
 
         if (!provider || !["reach", "curseforge", "modrinth"].includes(provider)) {
@@ -45,7 +46,7 @@ async function createNewInstance(req: Request, res: Response) {
             ));
         }
 
-        const requiredFields = [name, status, thumbnailURI, logoURI, gameVersion];
+        const requiredFields = [name, status, thumbnailURI, logoURI, gameVersion, ownerID, discordCustom];
         const hasAllFields = requiredFields.every(field => field !== undefined && field !== null);
         if (!hasAllFields) {
             return res.status(400).json(createErrorResponse(
@@ -60,8 +61,17 @@ async function createNewInstance(req: Request, res: Response) {
             return res.status(409).json(createGenericResponse(
                 false,
                 null,
-                `Instance with name ${name} already exists.`,
+                `[REACH - AInstances]: Instance with name ${name} already exists.`,
                 409
+            ));
+        }
+
+        const ownerExists = await REACH_USERS_DB.findDocuments("account", { accountId: ownerID });
+        
+        if (ownerExists.length === 0) {
+            return res.status(400).json(createErrorResponse(
+                "[REACH - AInstances]: Owner account does not exist or is not valid.",
+                400
             ));
         }
 
@@ -138,14 +148,14 @@ async function createNewInstance(req: Request, res: Response) {
                 updatedAt: new Date(),
                 currentVersion: "1.0.0",
                 provider: "reach" as const,
+                ownerID,
                 application: {
                     thumbnail: thumbnailURI,
                     logo: logoURI,
                     gameVersion
                 },
                 options: {
-                    isReachEnabled: isReachEnabled === "true",
-                    isTestingEnabled: isTestingEnabled === "true"
+                    discordCustom: discordCustom === "true"
                 },
                 allowedUsersIDs: allowedUsersIDs || [],
                 size: stats.size,
@@ -188,14 +198,14 @@ async function createNewInstance(req: Request, res: Response) {
                 updatedAt: new Date(),
                 currentVersion: "1.0.0",
                 provider: provider as "curseforge" | "modrinth",
+                ownerID,
                 application: {
                     thumbnail: thumbnailURI,
                     logo: logoURI,
                     gameVersion
                 },
                 options: {
-                    isReachEnabled: isReachEnabled === "true",
-                    isTestingEnabled: isTestingEnabled === "true"
+                    discordCustom: discordCustom === "true"
                 },
                 allowedUsersIDs: allowedUsersIDs || [],
                 modsURLs
@@ -208,7 +218,7 @@ async function createNewInstance(req: Request, res: Response) {
                         400
                     ));
                 }
-                UInstanceNew = {
+                UInstanceNew = {    
                     ...commonFields,
                     status: "waiting",
                     waitingUntil: new Date(waitingUntil)

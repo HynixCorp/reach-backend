@@ -46,7 +46,13 @@ export class MongoDB {
         const db = this.getDb();
         const collection = db.collection(collectionName);
         try {
-            await collection.updateOne(filter, { $set: update });
+            // Si el update ya contiene operadores de MongoDB ($push, $set, $unset, etc.), usarlo directamente
+            // Si no, envolverlo en $set para mantener compatibilidad hacia atrás
+            const updateOperation = Object.keys(update).some(key => key.startsWith('$')) 
+                ? update 
+                : { $set: update };
+            
+            await collection.updateOne(filter, updateOperation);
         } catch (error) {
             throw error;
         }

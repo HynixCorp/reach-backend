@@ -7,6 +7,7 @@ export interface PolarOrderDB {
   endDate: Date;
   betterAuthId: string;
   status: "active" | "expired";
+  plan: "hobby" | "standard" | "pro" | "enterprise";
 }
 
 export interface PolarCheckoutResponse {
