@@ -20,17 +20,6 @@ jobs:
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
-      - name: Debug secret lengths
-        run: |
-          echo "Username length: $(echo -n '${{ secrets.REGISTRY_USERNAME }}' | wc -c)"
-          echo "Password length: $(echo -n '${{ secrets.REGISTRY_PASSWORD }}' | wc -c)"
-      - name: Raw docker login to registry
-        if: github.event_name != 'pull_request'
-        run: |
-          echo "${{ secrets.REGISTRY_PASSWORD }}" | \
-            docker login ${{ env.REGISTRY }} \
-              -u "${{ secrets.REGISTRY_USERNAME }}" \
-              --password-stdin
 
       - name: Extract metadata
         id: meta
