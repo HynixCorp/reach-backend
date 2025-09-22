@@ -45,7 +45,9 @@ function reachCondorErrorHandler(
   res: Response,
   next: NextFunction
 ): void {
-  console.error(`[REACH - Condor]: An error occurred - ${err.message}`.red);
+  console.error(
+    `[REACH - Condor]: An error occurred - ${err.message.toUpperCase()}`.red
+  );
   res
     .status(500)
     .json(
@@ -60,7 +62,7 @@ function reachEmptyBodyHandler(
   res: Response,
   next: NextFunction
 ): void {
-  if(req.path.startsWith("/api/payments/v0")) {
+  if (req.path.startsWith("/api/payments/v0")) {
     return next();
   }
 
@@ -70,15 +72,12 @@ function reachEmptyBodyHandler(
     if (contentType?.includes("multipart/form-data")) {
       return next();
     }
-    
 
     if (req.body === undefined || req.body === null) {
       res
         .status(400)
         .json(
-          createErrorResponse(
-            "[REACH - Condor]: Request body cannot be empty."
-          )
+          createErrorResponse("[REACH - Condor]: Request body cannot be empty.")
         );
       return;
     }
@@ -91,9 +90,7 @@ function reachEmptyBodyHandler(
       res
         .status(400)
         .json(
-          createErrorResponse(
-            "[REACH - Condor]: Request body cannot be empty."
-          )
+          createErrorResponse("[REACH - Condor]: Request body cannot be empty.")
         );
     } else {
       next();
@@ -112,11 +109,11 @@ function reachUserAgentMiddleware(
     return next();
   }
 
-  if(req.path.startsWith("/assets")) {
+  if (req.path.startsWith("/assets")) {
     return next();
   }
 
-  if(req.path.startsWith("/api/payments/v0")) {
+  if (req.path.startsWith("/api/payments/v0")) {
     return next();
   }
 

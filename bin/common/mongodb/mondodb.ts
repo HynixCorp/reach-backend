@@ -1,4 +1,4 @@
-import { MongoClient } from 'mongodb';
+import { Collection, MongoClient, ObjectId } from 'mongodb';
 
 export class MongoDB {
     private client: MongoClient;
@@ -56,6 +56,25 @@ export class MongoDB {
         } catch (error) {
             throw error;
         }
+    }
+
+    createObjectId(id?: string | ObjectId): ObjectId {
+        if (!id) {
+            return new ObjectId();
+        }
+
+        if (id instanceof ObjectId) {
+            return id;
+        }
+
+        if (typeof id === 'string') {
+            const hex24 = /^[0-9a-fA-F]{24}$/;
+            if (hex24.test(id)) {
+                return new ObjectId(id);
+            }
+        }
+
+        return new ObjectId();
     }
 
     async deleteDocument(collectionName: string, filter: object): Promise<void> {

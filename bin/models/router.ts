@@ -6,6 +6,7 @@ import { STORAGE_ROUTER } from "../api/routers/storage.routes";
 import { INSTANCES_ROUTER } from "../api/routers/instances.routes";
 import { PAYMENTS_ROUTER } from "../api/routers/payments.routes";
 import { ORGANIZATIONS_ROUTER } from "../api/routers/organizations.routes";
+// import { LAUNCHER_ROUTER } from "../api/routers/launcher.routes";
 
 const ROUTER = express.Router();
 
@@ -20,5 +21,7 @@ ROUTER.use("/api/instances/v0", INSTANCES_ROUTER);
 ROUTER.use("/api/payments/v0", PAYMENTS_ROUTER);
 // Registering the organizations routes
 ROUTER.use("/api/organizations/v0", ORGANIZATIONS_ROUTER);
+// Registering the launcher routes
+// ROUTER.use("/api/launcher/v0", LAUNCHER_ROUTER);
 
 export { ROUTER as API_ROUTER };

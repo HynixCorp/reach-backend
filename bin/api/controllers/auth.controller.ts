@@ -8,6 +8,7 @@ import getMinecraftUUID from "../../common/mcResources/uuid";
 
 config();
 
+
 const REACH_SDK_DB = new MongoDB(process.env.DB_URI as string, "reach");
 
 async function createNewUserData(req: Request, res: Response): Promise<Response<any, Record<string, any>>> {
