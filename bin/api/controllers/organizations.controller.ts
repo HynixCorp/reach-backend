@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { MongoDB } from "../../common/mongodb/mondodb";
+import { MongoDB } from "../../common/mongodb/mongodb";
 import {
   createErrorResponse,
   createGenericResponse,

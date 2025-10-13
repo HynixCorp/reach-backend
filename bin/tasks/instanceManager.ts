@@ -3,7 +3,7 @@ import cron from "node-cron";
 import fs from "fs/promises";
 import path from "path";
 import { config } from "dotenv";
-import { MongoDB } from "../common/mongodb/mondodb";
+import { MongoDB } from "../common/mongodb/mongodb";
 
 config();
 

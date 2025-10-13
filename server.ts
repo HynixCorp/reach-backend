@@ -57,8 +57,6 @@ app.use(reachEmptyBodyHandler);
 app.use(reachUserAgentMiddleware);
 app.use(API_ROUTER);
 
-
-
 // Limit the size of incoming requests to 1gb
 app.use(express.json({ limit: "1gb" }));
 app.use(express.urlencoded({ limit: "1gb", extended: true }));

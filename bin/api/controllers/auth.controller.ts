@@ -3,7 +3,7 @@ import { v4 as uuidv4 } from "uuid";
 import { config } from "dotenv";
 import { createErrorResponse, createSuccessResponse } from "../../common/utils";
 import { UserPacket } from "../../types/auth";
-import { MongoDB } from "../../common/mongodb/mondodb";
+import { MongoDB } from "../../common/mongodb/mongodb";
 import getMinecraftUUID from "../../common/mcResources/uuid";
 
 config();

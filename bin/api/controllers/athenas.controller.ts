@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { config } from "dotenv";
-import { MongoDB } from "../../common/mongodb/mondodb";
+import { MongoDB } from "../../common/mongodb/mongodb";
 import { createErrorResponse, createGenericResponse, createSuccessResponse } from "../../common/utils";
 
 config();

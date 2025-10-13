@@ -4,7 +4,7 @@ import { fileTypeFromFile } from 'file-type';
 import { config } from "dotenv";
 import { v4 as uuidv4 } from "uuid";
 import { Request, Response } from "express";
-import { MongoDB } from "../../common/mongodb/mondodb";
+import { MongoDB } from "../../common/mongodb/mongodb";
 import { InstanceInformation } from "../../types/instances";
 import {
     createErrorResponse,

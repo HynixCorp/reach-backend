@@ -1,6 +1,6 @@
 import { config } from "dotenv";
 import { Request, Response } from "express";
-import { MongoDB } from "../../common/mongodb/mondodb";
+import { MongoDB } from "../../common/mongodb/mongodb";
 import { createErrorResponse, createGenericResponse, createSuccessResponse, getTimeWithTimezone } from "../../common/utils";
 import { nanoid } from "nanoid";
 import { InstanceCode } from "../../types/instances";
