@@ -5,7 +5,7 @@ import { config } from "dotenv";
 import { v4 as uuidv4 } from "uuid";
 import { Request, Response } from "express";
 import { MongoDB } from "../../common/mongodb/mondodb";
-import { InstanceInformation } from "../../interfaces/instances";
+import { InstanceInformation } from "../../types/instances";
 import {
     createErrorResponse,
     createGenericResponse,

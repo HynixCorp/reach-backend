@@ -1,8 +1,8 @@
 import { Request, Response } from "express";
 import { config } from "dotenv";
 import { MongoDB } from "../../common/mongodb/mondodb";
-import { createErrorResponse, createSuccessResponse } from "../../common/utils";
-import { PolarOrderDB } from "../../interfaces/polar";
+import { createErrorResponse, createGenericResponse, createSuccessResponse } from "../../common/utils";
+import { PolarOrderDB } from "../../types/polar";
 import {
   getCheckoutInfo,
   getCustomerID,
@@ -141,6 +141,8 @@ export async function create_portal(req: Request, res: Response) {
 export async function get_payment_info(req: Request, res: Response) {
   const { baId } = req.query;
 
+  const productIds: string[] = ["c0598bff-8486-4888-bfba-c038ab207031", "fb97ea5c-b2ae-422d-b217-c57d752911fa", "2fbe7c28-8535-413d-8242-fb896ef4aa87"]
+
   if (!baId) {
     return res
       .status(400)
@@ -153,13 +155,28 @@ export async function get_payment_info(req: Request, res: Response) {
 
   if (order.length === 0) {
     return res
-      .status(400)
-      .json(createErrorResponse("[REACH - Payments]: No active subscription found for this user. Please contact support.", 400));
+      .status(200)
+      .json(createGenericResponse(false, [], "[REACH - Payments]: No active subscription found for this user. Purchase a new subscription to continue.", 200));
   }
 
   const paymentInfo = order[0];
 
   paymentInfo.customerSessionToken = null as unknown as string;
+  
+  switch(paymentInfo.products[0]){
+    case productIds[0]:
+      paymentInfo.plan = "hobby";
+      break;
+    case productIds[1]: 
+      paymentInfo.plan = "standard";
+      break;
+    case productIds[2]:
+      paymentInfo.plan = "pro";
+      break;
+    default: 
+      paymentInfo.plan = "enterprise";
+      break;
+  }
 
   return res.status(200).json(createSuccessResponse(paymentInfo, "Payment info fetched successfully."));
 }

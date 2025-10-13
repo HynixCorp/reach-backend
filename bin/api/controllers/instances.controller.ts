@@ -3,7 +3,7 @@ import { Request, Response } from "express";
 import { MongoDB } from "../../common/mongodb/mondodb";
 import { createErrorResponse, createGenericResponse, createSuccessResponse, getTimeWithTimezone } from "../../common/utils";
 import { nanoid } from "nanoid";
-import { InstanceCode } from "../../interfaces/instances";
+import { InstanceCode } from "../../types/instances";
 
 config();
 

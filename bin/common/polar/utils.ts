@@ -1,5 +1,5 @@
 import { config } from "dotenv";
-import { PolarCheckoutResponse, PolarCustomerMeResponse, PolarCustomerSessionResponse } from "../../interfaces/polar";
+import { PolarCheckoutResponse, PolarCustomerMeResponse, PolarCustomerSessionResponse } from "../../types/polar";
 
 config();
 

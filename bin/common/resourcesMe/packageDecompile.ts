@@ -4,7 +4,7 @@ import extract from 'extract-zip';
 import fs from 'fs';
 import path from 'path';
 import { config } from 'dotenv';
-import { FileManifest } from '../../interfaces/manifest';
+import { FileManifest } from '../../types/manifest';
 
 config();
 
