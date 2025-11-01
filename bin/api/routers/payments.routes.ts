@@ -16,7 +16,7 @@ ROUTER.get("/create", Checkout({
     includeCheckoutId: true,
     server: "sandbox",
     theme: "dark"
-}));
+})); 
 
 ROUTER.get("/success", CONTROLLER.success_payment);
 
@@ -25,6 +25,8 @@ ROUTER.get("/cancel", CONTROLLER.cancel_payment);
 ROUTER.get("/create/portal", CONTROLLER.create_portal);
 
 ROUTER.get("/info", CONTROLLER.get_payment_info);
+
+ROUTER.get("/usage/info", CONTROLLER.get_usage);
 
 // ROUTER.get("/portal", CustomerPortal({
 //     accessToken: POLAR_TOKEN,

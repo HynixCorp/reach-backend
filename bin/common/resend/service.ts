@@ -47,7 +47,7 @@ export class ResendService {
 
     try {
       await this.resendClient.emails.send({
-        from: "Reach Team <agent@reachsdk.online>",
+        from: "ReachX <payments@service.reachx.dev>",
         to,
         subject,
         html: body,

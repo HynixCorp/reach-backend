@@ -1,0 +1,37 @@
+import { config } from "dotenv";
+import { DateTime } from "luxon";
+import { getReachAuthDB } from "../services/database.service";
+
+config();
+
+const REACH_SDK_DB = getReachAuthDB();
+
+
+export async function getOrganizationIdFromBID(betterID: string): Promise<string>{
+    try{
+        const documentOrg = await REACH_SDK_DB.findDocuments("organizations", {
+            members: betterID
+        })
+
+        if(documentOrg.length === 0){
+            throw new Error("There are no members within this organization.")
+        }
+
+        const id = documentOrg[0]._id.toString();
+        return id;
+    }
+    catch (error) {
+        throw error;
+    }
+}
+
+export async function verifyTokenDate(tokenDate: DateTime) {
+    const now = DateTime.now();
+    const diff = now.diff(tokenDate, "minutes");
+
+    if (diff.minutes > 60) {
+        return false;
+    }
+    
+    return true;
+}

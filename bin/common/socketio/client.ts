@@ -11,7 +11,18 @@ export class Client {
   }
 
   public setup() {
-    this.io = new Server(this.server);
+    // Configurar Socket.IO con CORS
+    this.io = new Server(this.server, {
+      cors: {
+        origin: [
+          "http://dashboard.reachsdk.local:3001",
+          "http://localhost:3001",
+          "http://localhost:3000"
+        ],
+        methods: ["GET", "POST"],
+        credentials: true
+      }
+    });
 
     // Solo una vez
     this.io.on("connection", (socket: any) => {

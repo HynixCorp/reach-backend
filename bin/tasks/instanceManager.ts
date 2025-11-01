@@ -18,8 +18,6 @@ const MAX_AGE_MS = 1000 * 60 * 60 * 48;
 const TEMP_DIR = path.join(__dirname, "..", "..", "cdn", "temp");
 
 export function startInstanceManager() {
-    console.log("[REACH - InstanceManager] Cleaning tasks every minute.".cyan);
-
     cron.schedule("* * * * *", async () => {
         try {
             await checkWaitingInstances();

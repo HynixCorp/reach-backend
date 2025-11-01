@@ -1,11 +1,11 @@
 // storage.routes.ts
 import express from "express";
-import { tempUpload } from "../../common/multer/multer.temp";
-const CONTROLLER = require("../controllers/storage.controller");
+import { createInstanceHandler, createManifestSignature } from "../controllers/storage.controller";
+import { instanceUploadFields } from "../../common/multer/multer.instances";
 
-const ROUTER = express.Router();
+const router = express.Router();
 
-ROUTER.post("/instance/new", tempUpload.single("package"), CONTROLLER.createNewInstance);
-ROUTER.post("/instance/assets/new", tempUpload.array("assets", 2), CONTROLLER.createInstanceAssets);
+router.post("/instances", instanceUploadFields, createInstanceHandler);
+router.get("/:instanceId/manifest", createManifestSignature)
 
-export { ROUTER as STORAGE_ROUTER };
+export default router;

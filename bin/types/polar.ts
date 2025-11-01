@@ -7,8 +7,10 @@ export interface PolarOrderDB {
   endDate: Date;
   betterAuthId: string;
   status: "active" | "expired";
-  plan: "hobby" | "standard" | "pro" | "enterprise";
+  plan: "hobby" | "standard" | "pro" | null;
 }
+
+
 
 export interface PolarCheckoutResponse {
   created_at: string;
