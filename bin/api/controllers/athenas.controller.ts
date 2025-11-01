@@ -1,17 +1,18 @@
 import { Request, Response } from "express";
 import { config } from "dotenv";
-import { MongoDB } from "../../common/mongodb/mongodb";
-import { createErrorResponse, createGenericResponse, createSuccessResponse } from "../../common/utils";
+import { createGenericResponse } from "../../common/utils";
+import { getReachDB } from "../../common/services/database.service";
+import { ResponseHandler } from "../../common/services/response.service";
 
 config();
 
-const REACH_SDK_DB = new MongoDB(process.env.DB_URI as string, "reach");
+const REACH_SDK_DB = getReachDB();
 
 async function get_status(req: Request, res: Response): Promise<Response> {
     try {
         const athenasStatus = await REACH_SDK_DB.findDocuments("status", {});
         if (athenasStatus.length === 0) {
-            return res.status(404).json(createErrorResponse("[REACH - Athenas]: No Athenas status found.", 404));
+            return ResponseHandler.notFound(res, "Athenas status");
         }
         
         if(athenasStatus[0].maintenance){
@@ -21,7 +22,7 @@ async function get_status(req: Request, res: Response): Promise<Response> {
         return res.status(200).json(createGenericResponse(true, athenasStatus[0], "ok"));
     } catch (error) {
         console.error("[REACH - Athena]: Error retrieving Athena status:", error);
-        return res.status(500).json(createErrorResponse("[REACH - Athenas]: An error occurred while retrieving Athena status.", 500));
+        return ResponseHandler.serverError(res, error as Error);
     }
 }
 

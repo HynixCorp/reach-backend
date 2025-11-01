@@ -1,22 +1,26 @@
 import { config } from "dotenv";
 import { Request, Response } from "express";
-import { MongoDB } from "../../common/mongodb/mongodb";
 import { createErrorResponse, createGenericResponse, createSuccessResponse, getTimeWithTimezone } from "../../common/utils";
 import { nanoid } from "nanoid";
 import { InstanceCode } from "../../types/instances";
+import { getReachDB, getReachAuthDB } from "../../common/services/database.service";
+import { validateRequest, isValidObjectId } from "../../common/services/validation.service";
+import { ResponseHandler, asyncHandler } from "../../common/services/response.service";
 
 config();
 
-const REACH_SDK_DB = new MongoDB(process.env.DB_URI as string, "reach");
-const REACH_SDK_USERS_DB = new MongoDB(process.env.DB_URI as string, "reachauth");
+const REACH_SDK_DB = getReachDB();
+const REACH_SDK_USERS_DB = getReachAuthDB();
 
 async function getInstancesManifest(req: Request, res: Response){
     try {
-        const { id } = req.query;
-
-        if(!id) {
-            return res.status(400).json(createErrorResponse("[REACH - Instances]: User ID is required.", 400));
+        const validation = validateRequest(req, { requiredQuery: ["id"] });
+        
+        if (!validation.isValid) {
+            return ResponseHandler.validationError(res, validation.errors);
         }
+
+        const { id } = req.query;
 
         const instances = await REACH_SDK_DB.findDocuments("instances");
         
@@ -96,24 +100,24 @@ async function getInstancesManifest(req: Request, res: Response){
         
     } catch (error) {
         console.error("[REACH - Instances]: Error fetching instances manifest:", error);
-        return res.status(500).json({
-            error: "[REACH - Instances]: Failed to fetch instances manifest."
-        });
+        return ResponseHandler.serverError(res, error as Error);
     }
 }
 
 async function getInstanceInformation(req: Request, res: Response) {
     try {
-        const { id } = req.query;
-
-        if (!id) {
-            return res.status(400).json(createErrorResponse("[REACH - Instances]: Instance ID is required.", 400));
+        const validation = validateRequest(req, { requiredQuery: ["id"] });
+        
+        if (!validation.isValid) {
+            return ResponseHandler.validationError(res, validation.errors);
         }
+
+        const { id } = req.query;
 
         const instance = await REACH_SDK_DB.findDocuments("instances", { id });
 
-        if (!instance) {
-            return res.status(404).json(createErrorResponse("[REACH - Instances]: Instance not found.", 404));
+        if (!instance || instance.length === 0) {
+            return ResponseHandler.notFound(res, "Instance");
         }
 
         return res.status(200).json(
@@ -124,9 +128,7 @@ async function getInstanceInformation(req: Request, res: Response) {
         );
     } catch (error) {
         console.error("[REACH - Instances]: Error fetching instance information:", error);
-        return res.status(500).json({
-            error: "[REACH - Instances]: Failed to fetch instance information."
-        });
+        return ResponseHandler.serverError(res, error as Error);
     }
 }
 
@@ -161,22 +163,26 @@ async function getAllInstances(req: Request, res: Response) {
 
 async function createInstanceCode(req: Request, res: Response) {
     try {
-        const { id, ownerID, limitedUsages } = req.body;
-
-        if (!id || !ownerID ) {
-            return res.status(400).json(createErrorResponse("[REACH - Instances]: 'id' and 'ownerID' are required.", 400));
+        const validation = validateRequest(req, {
+            requiredBody: ["id", "ownerID"]
+        });
+        
+        if (!validation.isValid) {
+            return ResponseHandler.validationError(res, validation.errors);
         }
+
+        const { id, ownerID, limitedUsages } = req.body;
 
         const instance = await REACH_SDK_DB.findDocuments("instances", { id: id });
 
         if (instance.length === 0) {
-            return res.status(404).json(createErrorResponse("[REACH - Instances]: Instance not found.", 404));
+            return ResponseHandler.notFound(res, "Instance");
         }
 
         const ownerExists = await REACH_SDK_USERS_DB.findDocuments("account", { accountId: ownerID });
 
         if (ownerExists.length === 0) {
-            return res.status(404).json(createErrorResponse("[REACH - Instances]: Owner not found.", 404));
+            return ResponseHandler.notFound(res, "Owner");
         }
 
         const codeGenerated = nanoid(10);
@@ -222,9 +228,7 @@ async function createInstanceCode(req: Request, res: Response) {
     }
     catch (error) {
         console.error("[REACH - Instances]: Error creating instance code:", error);
-        return res.status(500).json({
-            error: "[REACH - Instances]: Failed to create instance code."
-        });
+        return ResponseHandler.serverError(res, error as Error);
     }
 }
 
@@ -290,6 +294,10 @@ async function requestPermissionInstance(req: Request, res: Response) {
             error: "[REACH - Instances]: Failed to request permission for instance."
         });
     }
+}
+
+async function getOrganizationInstances(req:Request, res: Response) {
+    
 }
 
 export { getInstancesManifest, getInstanceInformation, getAllInstances, requestPermissionInstance, createInstanceCode };

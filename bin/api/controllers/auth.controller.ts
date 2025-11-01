@@ -3,44 +3,32 @@ import { v4 as uuidv4 } from "uuid";
 import { config } from "dotenv";
 import { createErrorResponse, createSuccessResponse } from "../../common/utils";
 import { UserPacket } from "../../types/auth";
-import { MongoDB } from "../../common/mongodb/mongodb";
 import getMinecraftUUID from "../../common/mcResources/uuid";
+import { getReachDB, getReachAuthDB } from "../../common/services/database.service";
+import { validateRequest } from "../../common/services/validation.service";
+import { ResponseHandler, asyncHandler } from "../../common/services/response.service";
 
 config();
 
-const REACH_SDK_DB = new MongoDB(process.env.DB_URI as string, "reach");
-const REACH_AUTH_DB = new MongoDB(process.env.DB_URI as string, "reachauth");
+const REACH_SDK_DB = getReachDB();
+const REACH_AUTH_DB = getReachAuthDB();
 
 async function createNewUserData(
   req: Request,
   res: Response
 ): Promise<Response<any, Record<string, any>>> {
-  const isBodyValid =
-    req.body === undefined || req.body === null || req.body === "";
-  if (isBodyValid) {
-    return res
-      .status(400)
-      .json(createErrorResponse("[REACH - Auth]: Body is empty.", 400));
+  const validation = validateRequest(req, {
+    requiredBody: ["username", "uuid"],
+    requiredHeaders: ["machine-id", "device-id"]
+  });
+  
+  if (!validation.isValid) {
+    return ResponseHandler.validationError(res, validation.errors);
   }
+
   const { username, uuid } = req.body;
   const headerMachineId = req.headers["machine-id"] as string;
   const headerDeviceId = req.headers["device-id"] as string;
-
-  if (
-    !username ||
-    headerDeviceId === undefined ||
-    headerMachineId === undefined ||
-    !uuid
-  ) {
-    return res
-      .status(400)
-      .json(
-        createErrorResponse(
-          "[REACH - Auth]: Username, machine ID, device ID or UUID is missing in the request body or headers.",
-          400
-        )
-      );
-  }
 
   const uuidAPI = await getMinecraftUUID(username);
   const existingUser = await REACH_SDK_DB.findDocuments("users", {
@@ -48,14 +36,7 @@ async function createNewUserData(
   });
 
   if (uuid !== uuidAPI) {
-    return res
-      .status(400)
-      .json(
-        createErrorResponse(
-          "[REACH - Auth]: UUID is invalid or not found.",
-          400
-        )
-      );
+    return ResponseHandler.badRequest(res, "UUID is invalid or not found.");
   }
 
   if (existingUser.length > 0) {
@@ -67,15 +48,9 @@ async function createNewUserData(
   }
 
   if (!uuidAPI) {
-    return res
-      .status(404)
-      .json(
-        createErrorResponse(
-          `[REACH - Auth]: User with username ${username} not found.`,
-          404
-        )
-      );
+    return ResponseHandler.notFound(res, `User with username ${username}`);
   }
+  
   const createPacket: UserPacket = {
     id: uuidv4(),
     username: username,
@@ -89,14 +64,7 @@ async function createNewUserData(
   try {
     await REACH_SDK_DB.insertDocument("users", createPacket);
   } catch (error) {
-    return res
-      .status(500)
-      .json(
-        createErrorResponse(
-          `[REACH - Auth]: Failed to create user: ${error}`,
-          500
-        )
-      );
+    return ResponseHandler.serverError(res, error as Error);
   }
 
   return res

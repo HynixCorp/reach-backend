@@ -41,6 +41,12 @@ export function createGenericResponse(
     };
 }
 
+/*
+ * Get the safe multer directory path
+ * If the directory does not exist, create it
+ * Return the absolute path
+ * @returns {string} - The absolute path to the multer directory
+ */
 export function multerDirSafe(){
     const relativePath = process.env.MULTER_DIR || './cdn';
     const absolutePath = path.resolve(__dirname, '..', '..', relativePath);
