@@ -5,7 +5,7 @@ const CONTROLLER = require("../controllers/instances.controller");
 
 ROUTER.get("/manifest/get", CONTROLLER.getInstancesManifest);
 ROUTER.get("/information/get", CONTROLLER.getInstanceInformation);
-ROUTER.get("/all/get", CONTROLLER.getAllInstances);
+ROUTER.get("/:orgId/all/get", CONTROLLER.getAllInstances);
 ROUTER.post("/permission/request", CONTROLLER.requestPermissionInstance);
 ROUTER.post("/code/create", CONTROLLER.createInstanceCode);
 

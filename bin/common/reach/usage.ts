@@ -63,52 +63,47 @@ export async function usageToken(
 ): Promise<boolean> {
   // Validación de parámetros de entrada
   if (!authID || typeof authID !== "string" || authID.trim().length === 0) {
-    throw new Error("authID debe ser una cadena no vacía");
+    throw new Error("authID is required and must be a non-empty string");
   }
 
   if (!type || !["private", "public", "testing"].includes(type)) {
-    throw new Error("type debe ser 'private', 'public' o 'testing'");
+    throw new Error("type must be 'private', 'public' or 'testing'");
   }
 
   try {
     // Obtener el documento de uso
     const usageDocument = await getUsageDocument(authID.trim());
     if (!usageDocument) {
-      console.warn(`[Usage] No se encontró documento de uso para: ${authID}`);
+      console.warn(`[Usage] No usage document found for: ${authID}`);
       return false;
     }
 
     const { _udoc: document } = usageDocument;
     
-    // Validar que el documento tenga la estructura correcta
     if (!document || !document.instances) {
-      console.warn(`[Usage] Documento corrupto o sin instancias para: ${authID}`);
+      console.warn(`[Usage] Corrupted document or no instances for: ${authID}`);
       return false;
     }
 
-    // Verificar y consumir el token según el tipo
     const wasConsumed = consumeInstanceToken(document.instances, type, authID);
     
     if (!wasConsumed) {
       return false;
     }
 
-    // Actualizar el documento en la base de datos
     await REACH_SDK_DB.updateDocument("usage", {
       auth: authID.trim()
     }, usageDocument);
 
-    console.log(`[Usage] Token ${type} consumido exitosamente para: ${authID}`);
     return true;
 
   } catch (error) {
-    console.error(`[Usage] Error al consumir token ${type} para ${authID}:`, error);
+    console.error(`[Usage] Error consuming ${type} token for ${authID}:`, error);
 
-    // Re-lanzar con información más específica
     if (error instanceof Error) {
-      throw new Error(`Error al consumir token de uso: ${error.message}`);
+      throw new Error(`Error consuming usage token: ${error.message}`);
     } else {
-      throw new Error("Error desconocido al consumir token de uso");
+      throw new Error("Unknown error while consuming usage token");
     }
   }
 }
@@ -127,22 +122,17 @@ function consumeInstanceToken(
 ): boolean {
   const currentCount = instances[type];
   
-  // Verificar que el contador existe y es válido
   if (currentCount === undefined || currentCount === null || typeof currentCount !== "number") {
-    console.warn(`[Usage] Contador de instancia '${type}' no disponible o inválido para: ${authID}`);
+    console.warn(`[Usage] Instance counter '${type}' not available or invalid for: ${authID}`);
     return false;
   }
 
-  // Verificar que hay tokens disponibles
   if (currentCount <= 0) {
-    console.warn(`[Usage] No hay tokens disponibles para instancia '${type}' para: ${authID} (disponibles: ${currentCount})`);
+    console.warn(`[Usage] No tokens available for instance '${type}' for: ${authID} (available: ${currentCount})`);
     return false;
   }
 
-  // Consumir el token
   instances[type] = currentCount - 1;
-  console.log(`[Usage] Token ${type} consumido. Restantes: ${instances[type]} para: ${authID}`);
-  
   return true;
 }
 

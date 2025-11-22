@@ -10,8 +10,12 @@ const REACH_SDK_DB = getReachAuthDB();
 export async function getOrganizationIdFromBID(betterID: string): Promise<string>{
     try{
         const documentOrg = await REACH_SDK_DB.findDocuments("organizations", {
-            members: betterID
-        })
+            $or: [
+                { members: betterID },
+                { members: { $elemMatch: { userId: betterID } } },
+                { ownerId: betterID }
+            ]
+        });
 
         if(documentOrg.length === 0){
             throw new Error("There are no members within this organization.")

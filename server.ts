@@ -22,6 +22,7 @@ import { setupListeners } from "./bin/common/socketio/handleListeners";
 import { registerSocketClient } from "./bin/common/socketio/bridge";
 
 import { startInstanceManager } from "./bin/tasks/instanceManager";
+import { startTempCleaner } from "./bin/tasks/tempCleaner";
 
 import { getDatabaseService } from "./bin/common/services/database.service";
 import path from "node:path";
@@ -40,6 +41,7 @@ const app = express();
   app.locals.dbService = dbService;
 
   startInstanceManager();
+  startTempCleaner();
 })();
 
 
@@ -61,6 +63,11 @@ app.use(
 app.use(bodyparser.json());
 app.use(bodyparser.urlencoded({ extended: true }));
 
+app.use(
+  "/assets/resources",
+  express.static(path.join(__dirname, "assets", "resources"))
+)
+
 // Serve static files from the 'cdn/instances/assets' directory
 app.use(
   "/cdn/instances/assets",
@@ -72,6 +79,18 @@ app.use(
   "/cdn/instances/packages",
   reachCDNProtection,
   express.static(path.join(multerDirSafe(), "/instances/packages"))
+);
+
+app.use(
+  "/cdn/instances/experience-archives",
+  reachCDNProtection,
+  express.static(path.join(multerDirSafe(), "/instances/experience-archives"))
+);
+
+app.use(
+  "/cdn/instances/experience-folders",
+  reachCDNProtection,
+  express.static(path.join(multerDirSafe(), "/instances/experience-folders"))
 );
 
 // Middleware to handle specific request patterns and errors

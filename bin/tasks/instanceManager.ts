@@ -4,6 +4,7 @@ import fs from "fs/promises";
 import path from "path";
 import { config } from "dotenv";
 import { MongoDB } from "../common/mongodb/mongodb";
+import { cleanOldVersionsGlobal } from "../api/controllers/storage.controller";
 
 config();
 
@@ -25,6 +26,16 @@ export function startInstanceManager() {
             await cleanOldTempFiles();
         } catch (err) {
             console.error("[REACH - InstanceManager] Error in the automatic task schedule:".red, err);
+        }
+    });
+    
+    // Run version cleanup every 6 hours
+    cron.schedule("0 */6 * * *", async () => {
+        try {
+            console.log("[REACH - InstanceManager] Starting global version cleanup...".cyan);
+            await cleanInstanceVersionsGlobal();
+        } catch (err) {
+            console.error("[REACH - InstanceManager] Error in version cleanup task:".red, err);
         }
     });
 }
@@ -86,21 +97,50 @@ async function checkWaitingInstances() {
 
 async function cleanOldTempFiles() {
     const now = Date.now();
-
-    const files = await fs.readdir(TEMP_DIR);
+    let files: string[] = [];
+    try {
+        files = await fs.readdir(TEMP_DIR);
+    } catch (err: any) {
+        console.warn(`[REACH - InstanceManager] Could not read temp dir ${TEMP_DIR}:`.red, err);
+        return;
+    }
 
     for (const file of files) {
         const filePath = path.join(TEMP_DIR, file);
         try {
-            const stats = await fs.stat(filePath);
+            let stats;
+            try {
+                stats = await fs.stat(filePath);
+            } catch (statErr: any) {
+                // File might have been removed by another process (TempCleaner). Ignore ENOENT.
+                if (statErr && statErr.code === "ENOENT") continue;
+                console.warn(`[REACH - InstanceManager] Could not stat ${file}:`.red, statErr);
+                continue;
+            }
+
             const age = now - stats.birthtimeMs;
 
             if (age > MAX_AGE_MS) {
-                await fs.unlink(filePath);
-                console.log(`[REACH - InstanceManager] Old .zip deleted: ${file}`.magenta);
+                try {
+                    await fs.unlink(filePath);
+                    console.log(`[REACH - InstanceManager] Old .zip deleted: ${file}`.magenta);
+                } catch (unlinkErr: any) {
+                    // If the file was removed between stat and unlink, ignore it.
+                    if (unlinkErr && unlinkErr.code === 'ENOENT') continue;
+                    console.warn(`[REACH - InstanceManager] Failed to delete ${file}:`.red, unlinkErr);
+                }
             }
         } catch (err) {
             console.warn(`[REACH - InstanceManager] Cannot review/delete ${file}:`.red, err);
         }
+    }
+}
+
+async function cleanInstanceVersionsGlobal() {
+    try {
+        await cleanOldVersionsGlobal();
+        console.log("[REACH - InstanceManager] Version cleanup completed successfully".green);
+    } catch (err) {
+        console.error("[REACH - InstanceManager] Error in cleanInstanceVersionsGlobal:".red, err);
     }
 }

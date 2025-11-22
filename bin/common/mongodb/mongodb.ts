@@ -58,6 +58,20 @@ export class MongoDB {
         }
     }
 
+    async updateDocuments(collectionName: string, filter: object, update: object): Promise<void> {
+        const db = this.getDb();
+        const collection = db.collection(collectionName);
+        try {
+            const updateOperation = Object.keys(update).some(key => key.startsWith('$')) 
+                ? update 
+                : { $set: update };
+            
+            await collection.updateMany(filter, updateOperation);
+        } catch (error) {
+            throw error;
+        }
+    }
+
     createObjectId(id?: string | ObjectId): ObjectId {
         if (!id) {
             return new ObjectId();
@@ -82,6 +96,16 @@ export class MongoDB {
         const collection = db.collection(collectionName);
         try {
             await collection.deleteOne(filter);
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    async deleteDocuments(collectionName: string, filter: object): Promise<void> {
+        const db = this.getDb();
+        const collection = db.collection(collectionName);
+        try {
+            await collection.deleteMany(filter);
         } catch (error) {
             throw error;
         }
