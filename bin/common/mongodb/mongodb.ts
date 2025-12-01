@@ -21,11 +21,11 @@ export class MongoDB {
         return this.client.db(this.dbName);
     }
 
-    async insertDocument(collectionName: string, document: object): Promise<void> {
+    async insertDocument(collectionName: string, document: object): Promise<any> {
         const db = this.getDb();
         const collection = db.collection(collectionName);
         try {
-            await collection.insertOne(document);
+            return await collection.insertOne(document);
         } catch (error) {
             throw error;
         }

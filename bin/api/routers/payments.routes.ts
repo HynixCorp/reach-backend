@@ -9,6 +9,7 @@ const POLAR_WEBHOOK_SECRET = process.env.POLAR_WEBHOOK_SECRET;
 
 const ROUTER = express.Router();
 const CONTROLLER = require("../controllers/payments.controller");
+const WEBHOOKS_CONTROLLER = require("../controllers/webhooks.controller");
 
 ROUTER.get("/create", Checkout({
     accessToken: POLAR_TOKEN,
@@ -36,14 +37,9 @@ ROUTER.get("/usage/info", CONTROLLER.get_usage);
 //     server: "sandbox"
 // }));
 
-ROUTER.get("/webhook", Webhooks({
+ROUTER.post("/webhook", Webhooks({
     webhookSecret: POLAR_WEBHOOK_SECRET || "",
-    onPayload: async (payload) => {
-        console.log(payload);
-    },
-    onOrderPaid: async (order) => {
-        console.log(order);
-    }
+    onPayload: WEBHOOKS_CONTROLLER.handlePolarPayload,
 }));
 
 export { ROUTER as PAYMENTS_ROUTER };

@@ -131,11 +131,25 @@ export async function success_payment(req: Request, res: Response) {
     betterAuthId: checkoutInfo.customer_external_id as string,
     status: "active",
     plan: parsePlan(productID),
+    subscriptionId: checkoutInfo.subscription_id,
   };
 
-  const result = await REACH_DB.insertDocument("payments", order);
+  let result;
+  try {
+    result = await REACH_DB.insertDocument("payments", order);
+  } catch (error) {
+    console.error("[REACH - Payments]: Error inserting order:", error);
+    return res
+      .status(500)
+      .json(
+        createErrorResponse(
+          "[REACH - Payments]: Failed to insert order into database. Please contact support.",
+          500
+        )
+      );
+  }
 
-  if (result === null) {
+  if (!result || !result.acknowledged) {
     return res
       .status(500)
       .json(
@@ -148,13 +162,22 @@ export async function success_payment(req: Request, res: Response) {
 
   const _udoc = createNewUsageDocument(order);
 
-  if (_udoc) {
-    const result_usage = await REACH_AUTH_DB.insertDocument("usage", {
-      auth: checkoutInfo.customer_external_id as string,
-      _udoc,
-    });
+  if (!_udoc) {
+    console.warn(
+      `[REACH - Payments]: Failed to create usage document. Invalid plan for product ID: ${productID}`
+    );
+  } else {
+    try {
+      const result_usage = await REACH_AUTH_DB.insertDocument("usage", {
+        auth: checkoutInfo.customer_external_id as string,
+        _udoc,
+      });
 
-    if (result_usage === null) {
+      if (!result_usage || !result_usage.acknowledged) {
+        throw new Error("Failed to acknowledge usage insertion.");
+      }
+    } catch (error) {
+      console.error("[REACH - Payments]: Error inserting usage document:", error);
       return res
         .status(500)
         .json(

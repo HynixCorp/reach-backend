@@ -8,6 +8,7 @@ export interface PolarOrderDB {
   betterAuthId: string;
   status: "active" | "expired";
   plan: "hobby" | "standard" | "pro" | null;
+  subscriptionId: string | null;
 }
 
 
