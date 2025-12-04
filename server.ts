@@ -6,7 +6,6 @@ import cors from "cors";
 import bodyparser from "body-parser";
 
 import {
-  reachCondor,
   reachCondorErrorHandler,
   reachEmptyBodyHandler,
   reachUserAgentMiddleware,
@@ -68,6 +67,12 @@ app.use(
   express.static(path.join(__dirname, "assets", "resources"))
 )
 
+// Serve static update files from the 'cdn/updates' directory
+app.use(
+  "/cdn/updates",
+  express.static(path.join(multerDirSafe(), "updates"))
+);
+
 // Serve static files from the 'cdn/instances/assets' directory
 app.use(
   "/cdn/instances/assets",
@@ -95,7 +100,6 @@ app.use(
 
 // Middleware to handle specific request patterns and errors
 app.use(reachLogger);
-app.use(reachCondor);
 app.use(reachCondorErrorHandler);
 app.use(reachEmptyBodyHandler);
 app.use(reachUserAgentMiddleware);

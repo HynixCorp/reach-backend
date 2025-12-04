@@ -3,45 +3,6 @@ import { NextFunction, Request, Response } from "express";
 import { createErrorResponse } from "./utils";
 
 /* =========================
-   🪶 REACH CONDOR CORE
-========================= */
-function reachCondor(req: Request, res: Response, next: NextFunction): void {
-  const METHOD_REQ = req.method;
-  const DATE_REQ = new Date().toLocaleString();
-  const BODY_REQ = JSON.stringify(req.body);
-
-  const patternsSuspicions = [
-    /select\s+\*/i,
-    /union\s+select/i,
-    /insert\s+into/i,
-    /delete\s+from/i,
-    /drop\s+table/i,
-    /update\s+.+\s+set/i,
-    /exec\s*\(/i,
-    /execute\s*\(/i,
-  ];
-
-  for (const pattern of patternsSuspicions) {
-    if (pattern.test(BODY_REQ)) {
-      console.log(
-        `%s`,
-        `[${DATE_REQ}] - ${METHOD_REQ} request with suspicious content detected: ${BODY_REQ}`.red
-      );
-      res
-        .status(400)
-        .json(
-          createErrorResponse(
-            "[REACH - Condor]: Suspicious content detected in request body."
-          )
-        );
-      return;
-    }
-  }
-
-  next();
-}
-
-/* =========================
    🧩 LOGGING MONITOR
 ========================= */
 function reachLogger(req: Request, res: Response, next: NextFunction): void {
@@ -70,14 +31,22 @@ function reachLogger(req: Request, res: Response, next: NextFunction): void {
         ? res.statusCode.toString().yellow
         : res.statusCode.toString().green;
 
-    const resultPreview =
-      typeof body === "string"
-        ? body.slice(0, 20)
-        : JSON.stringify(body).slice(0, 20);
+    // Para la vista tomar la respuesta del body, intentar parsearla si es JSON y tomar la clave status o message
+    let resultPreview = "";
+    try {
+      const parsedBody = JSON.parse(body);
+      resultPreview = parsedBody.status
+        ? parsedBody.status.toString()
+        : parsedBody.message
+        ? parsedBody.message.toString()
+        : body.toString();
+    } catch {
+      resultPreview = body.toString();
+    }
 
     // Mostrar línea formateada
     console.log(
-      `[${timestamp.gray}] ${statusColor} | ${responseTime.blue} | ${methodColor} | ${req.originalUrl.white} | ${resultPreview.dim}`
+      `[${timestamp.gray}] ${statusColor} | ${responseTime.blue} | ${methodColor} | ${req.originalUrl.white} | Response Code: ${resultPreview.dim}`
     );
 
     return originalSend.call(this, body);
@@ -152,6 +121,8 @@ function reachUserAgentMiddleware(
   next: NextFunction
 ): void {
   if (
+    req.path.startsWith("/api/athenas/v0") ||
+    req.path.startsWith("/api/updates/v0") ||
     req.path.startsWith("/cdn") ||
     req.path.startsWith("/assets") ||
     req.path.startsWith("/api/payments/v0") ||
@@ -166,7 +137,7 @@ function reachUserAgentMiddleware(
       .status(400)
       .json(
         createErrorResponse(
-          "[REACH - UserAgent]: Unsupported User-Agent. Please use the correct."
+          "[REACH - UserAgent]: Unsupported User-Agent. Please use the correct one."
         )
       );
   }
@@ -176,7 +147,6 @@ function reachUserAgentMiddleware(
    📦 EXPORTS
 ========================= */
 export {
-  reachCondor,
   reachLogger,
   reachCondorErrorHandler,
   reachEmptyBodyHandler,

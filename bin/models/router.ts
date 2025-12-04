@@ -5,6 +5,7 @@ import { ATHENAS_ROUTER } from "../api/routers/athenas.routes";
 import { INSTANCES_ROUTER } from "../api/routers/instances.routes";
 import { PAYMENTS_ROUTER } from "../api/routers/payments.routes";
 import { ORGANIZATIONS_ROUTER } from "../api/routers/organizations.routes";
+import { UPDATES_ROUTER } from "../api/routers/updates.routes";
 import router from "../api/routers/storage.routes";
 // import { LAUNCHER_ROUTER } from "../api/routers/launcher.routes";
 
@@ -23,5 +24,7 @@ ROUTER.use("/api/payments/v0", PAYMENTS_ROUTER);
 ROUTER.use("/api/organizations/v0", ORGANIZATIONS_ROUTER);
 // Registering the launcher routes
 // ROUTER.use("/api/launcher/v0", LAUNCHER_ROUTER);
+// Registering the launcher updates routes
+ROUTER.use("/api/updates/v0", UPDATES_ROUTER)
 
 export { ROUTER as API_ROUTER };
