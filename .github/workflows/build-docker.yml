@@ -1,4 +1,4 @@
-name: Build and Push Docker Image
+name: Build and Deploy Reach Backend
 
 on:
   push:
@@ -21,7 +21,7 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Log in to Oracle Container Registry
+      - name: Log in to Container Registry
         if: github.event_name != 'pull_request'
         uses: docker/login-action@v3
         with:
@@ -64,6 +64,61 @@ jobs:
     if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
 
     steps:
+      - name: Checkout repository (for docker-compose file)
+        uses: actions/checkout@v4
+
+      - name: Setup deployment files
+        run: |
+          # Create the deployment package
+          mkdir -p deploy
+          cp docker-compose-with-traefik.yaml deploy/docker-compose.yml
+          
+          # Create .env file for the server
+          cat > deploy/.env << 'EOF'
+          DB_URI=${{ secrets.DB_URI }}
+          CRYPTO_SECRET=${{ secrets.CRYPTO_SECRET }}
+          CDN_SECRET_KEY=${{ secrets.CDN_SECRET_KEY }}
+          UPDATE_SECRET=${{ secrets.UPDATE_SECRET }}
+          DASHBOARD_URL=${{ secrets.DASHBOARD_URL }}
+          POLAR_API_KEY=${{ secrets.POLAR_API_KEY }}
+          POLAR_WEBHOOK_SECRET=${{ secrets.POLAR_WEBHOOK_SECRET }}
+          POLAR_ENDPOINT_URI=${{ secrets.POLAR_ENDPOINT_URI }}
+          RESEND_API_KEY=${{ secrets.RESEND_API_KEY }}
+          EOF
+          
+          # Create initialization script
+          cat > deploy/init-server.sh << 'SCRIPT'
+          #!/bin/bash
+          set -e
+          
+          echo "🔧 Initializing Reach Backend Server..."
+          
+          # Create required directories
+          APP_DIR="/home/opc/apps/reach-backend"
+          mkdir -p "$APP_DIR"
+          
+          # Create Docker network if not exists
+          docker network inspect frontend >/dev/null 2>&1 || \
+            docker network create frontend
+          
+          # Create named volume for persistent CDN data
+          docker volume inspect reach-cdn-data >/dev/null 2>&1 || \
+            docker volume create reach-cdn-data
+          
+          echo "✅ Server initialization complete!"
+          SCRIPT
+          chmod +x deploy/init-server.sh
+
+      - name: Copy files to server
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.OCI_HOST }}
+          username: ${{ secrets.OCI_SSH_USER }}
+          key: ${{ secrets.OCI_SSH_KEY }}
+          source: "deploy/*"
+          target: "/home/opc/apps/reach-backend"
+          strip_components: 1
+
       - name: Deploy to Oracle Cloud VM
         uses: appleboy/ssh-action@v1.0.3
         with:
@@ -71,23 +126,52 @@ jobs:
           username: ${{ secrets.OCI_SSH_USER }}
           key: ${{ secrets.OCI_SSH_KEY }}
           script: |
+            set -e
             cd /home/opc/apps/reach-backend
-
-            echo "🔑 Logging in to Oracle Container Registry..."
+            
+            echo "🔧 Running initialization script..."
+            chmod +x init-server.sh
+            ./init-server.sh
+            
+            echo "🔑 Logging in to Container Registry..."
             echo "${{ secrets.REGISTRY_PASSWORD }}" | docker login ${{ env.REGISTRY }} \
               --username="${{ secrets.REGISTRY_USERNAME }}" --password-stdin
-
+            
             echo "⬇️  Stopping current containers..."
-            docker compose down
-
+            docker compose down --remove-orphans || true
+            
             echo "📦 Pulling latest image..."
             docker compose pull
-
+            
             echo "🚀 Starting with new image..."
             docker compose up -d
-
+            
+            echo "⏳ Waiting for health check..."
+            sleep 10
+            
+            # Check if container is healthy
+            HEALTH=$(docker inspect --format='{{.State.Health.Status}}' reach-backend 2>/dev/null || echo "unknown")
+            if [ "$HEALTH" = "healthy" ]; then
+              echo "✅ Container is healthy!"
+            elif [ "$HEALTH" = "starting" ]; then
+              echo "⏳ Container is still starting, waiting..."
+              sleep 20
+              HEALTH=$(docker inspect --format='{{.State.Health.Status}}' reach-backend 2>/dev/null || echo "unknown")
+              echo "📊 Health status: $HEALTH"
+            else
+              echo "⚠️  Health status: $HEALTH"
+              echo "📋 Container logs:"
+              docker compose logs --tail=50
+            fi
+            
             echo "🧹 Cleaning up old images..."
             docker image prune -f
-
-            echo "✅ Deployment complete! Container status:"
+            
+            echo ""
+            echo "════════════════════════════════════════"
+            echo "✅ Deployment complete!"
+            echo "════════════════════════════════════════"
             docker compose ps
+            echo ""
+            echo "📁 Volume info:"
+            docker volume inspect reach-cdn-data --format '{{.Mountpoint}}'

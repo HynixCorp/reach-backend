@@ -1,6 +1,6 @@
 services:
   reach-backend:
-    image: ocir.mx-monterrey-1.oci.oraclecloud.com/axzmqxvekkqk/reach-backend:latest
+    image: registry.reachsdk.online/reach-backend:latest
     container_name: reach-backend
     networks:
       - frontend
@@ -8,23 +8,51 @@ services:
       - "3000:3000"
     environment:
       - PORT=3000
-      - DB_URI=mongodb://admin:password@ip:27017/
-      - MULTER_DIR=./files/uploads
+      - DB_URI=${DB_URI}
+      - MULTER_DIR=/app/cdn
       - NODE_ENV=production
+      - CRYPTO_SECRET=${CRYPTO_SECRET}
+      - CDN_SECRET_KEY=${CDN_SECRET_KEY}
+      - UPDATE_SECRET=${UPDATE_SECRET}
+      - DASHBOARD_URL=${DASHBOARD_URL}
+      - POLAR_API_KEY=${POLAR_API_KEY}
+      - POLAR_WEBHOOK_SECRET=${POLAR_WEBHOOK_SECRET}
+      - POLAR_ENDPOINT_URI=${POLAR_ENDPOINT_URI}
+      - RESEND_API_KEY=${RESEND_API_KEY}
     labels:
-      # Makes it so the traefik reverse proxy will route traffic to this container
+      # Traefik reverse proxy configuration
       - traefik.enable=true
-      - traefik.http.routers.nginx-http.rule=Host(`devs.reachsdk.online`)
-      - traefik.http.routers.nginx-http.entrypoints=web
-      - traefik.http.routers.nginx-https.tls=true
-      - traefik.http.routers.nginx-https.tls.certresolver=cloudflare
-      - traefik.http.routers.nginx-https.entrypoints=websecure
-      - traefik.http.routers.nginx-https.rule=Host(`devs.reachsdk.online`)
-      - traefik.http.services.your-app.loadbalancer.server.port=3000
+      # HTTP router (redirect to HTTPS)
+      - traefik.http.routers.reach-http.rule=Host(`devs.reachsdk.online`)
+      - traefik.http.routers.reach-http.entrypoints=web
+      - traefik.http.routers.reach-http.middlewares=redirect-to-https
+      # HTTPS router
+      - traefik.http.routers.reach-https.rule=Host(`devs.reachsdk.online`)
+      - traefik.http.routers.reach-https.entrypoints=websecure
+      - traefik.http.routers.reach-https.tls=true
+      - traefik.http.routers.reach-https.tls.certresolver=cloudflare
+      # Service configuration
+      - traefik.http.services.reach-backend.loadbalancer.server.port=3000
+      # Middleware for HTTPS redirect
+      - traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https
+      - traefik.http.middlewares.redirect-to-https.redirectscheme.permanent=true
     volumes:
-      - ./uploads:/app/files/uploads
+      # Persistent storage for CDN files
+      - reach-cdn-data:/app/cdn
+      # Optional: Mount specific directories if you need host access
+      # - ./data/cdn:/app/cdn
     restart: unless-stopped
     pull_policy: always
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/api/updates/v0/latest"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+volumes:
+  reach-cdn-data:
+    driver: local
 
 networks:
   frontend:

@@ -17,9 +17,9 @@ README.md
 .env.test.local
 .env.production.local
 
-# Exclude everything in files except uploads
+# Exclude CDN data (user uploads should be in volumes)
 cdn/*
-!cdn/
+!cdn/.gitkeep
 
 # Logs
 *.log
@@ -77,3 +77,7 @@ build
 Dockerfile*
 .dockerignore
 docker-compose*.yml
+docker-compose*.yaml
+
+# Scripts (deployment scripts, not needed in container)
+scripts/
