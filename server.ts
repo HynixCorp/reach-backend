@@ -31,6 +31,27 @@ import { asyncHandler } from "./bin/common/services/response.service";
 
 dotenv.config();
 
+// Check for critical environment variables
+const requiredEnvVars = [
+  "DB_URI",
+  "CRYPTO_SECRET",
+  "CDN_SECRET_KEY",
+  "UPDATE_SECRET"
+];
+
+const missingEnvVars = requiredEnvVars.filter((key) => !process.env[key]);
+
+if (missingEnvVars.length > 0) {
+  console.warn(
+    `[REACH - Warning] Missing critical environment variables: ${missingEnvVars.join(
+      ", "
+    )}`.yellow
+  );
+  console.warn(
+    `[REACH - Warning] Some features may not work correctly.`.yellow
+  );
+}
+
 const PORT = process.env.PORT || 3000;
 const app = express();
 
