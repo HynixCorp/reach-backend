@@ -68,22 +68,32 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Setup deployment files
+        env:
+          DB_URI: ${{ secrets.DB_URI }}
+          CRYPTO_SECRET: ${{ secrets.CRYPTO_SECRET }}
+          CDN_SECRET_KEY: ${{ secrets.CDN_SECRET_KEY }}
+          UPDATE_SECRET: ${{ secrets.UPDATE_SECRET }}
+          DASHBOARD_URL: ${{ secrets.DASHBOARD_URL }}
+          POLAR_API_KEY: ${{ secrets.POLAR_API_KEY }}
+          POLAR_WEBHOOK_SECRET: ${{ secrets.POLAR_WEBHOOK_SECRET }}
+          POLAR_ENDPOINT_URI: ${{ secrets.POLAR_ENDPOINT_URI }}
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
         run: |
           # Create the deployment package
           mkdir -p deploy
           cp docker-compose-with-traefik.yaml deploy/docker-compose.yml
           
-          # Create .env file for the server
-          cat > deploy/.env << 'EOF'
-          DB_URI=${{ secrets.DB_URI }}
-          CRYPTO_SECRET=${{ secrets.CRYPTO_SECRET }}
-          CDN_SECRET_KEY=${{ secrets.CDN_SECRET_KEY }}
-          UPDATE_SECRET=${{ secrets.UPDATE_SECRET }}
-          DASHBOARD_URL=${{ secrets.DASHBOARD_URL }}
-          POLAR_API_KEY=${{ secrets.POLAR_API_KEY }}
-          POLAR_WEBHOOK_SECRET=${{ secrets.POLAR_WEBHOOK_SECRET }}
-          POLAR_ENDPOINT_URI=${{ secrets.POLAR_ENDPOINT_URI }}
-          RESEND_API_KEY=${{ secrets.RESEND_API_KEY }}
+          # Create .env file for the server with actual values
+          cat > deploy/.env << EOF
+          DB_URI=${DB_URI}
+          CRYPTO_SECRET=${CRYPTO_SECRET}
+          CDN_SECRET_KEY=${CDN_SECRET_KEY}
+          UPDATE_SECRET=${UPDATE_SECRET}
+          DASHBOARD_URL=${DASHBOARD_URL}
+          POLAR_API_KEY=${POLAR_API_KEY}
+          POLAR_WEBHOOK_SECRET=${POLAR_WEBHOOK_SECRET}
+          POLAR_ENDPOINT_URI=${POLAR_ENDPOINT_URI}
+          RESEND_API_KEY=${RESEND_API_KEY}
           EOF
           
           # Create initialization script
@@ -121,10 +131,15 @@ jobs:
 
       - name: Deploy to Oracle Cloud VM
         uses: appleboy/ssh-action@v1.0.3
+        env:
+          REGISTRY: ${{ env.REGISTRY }}
+          REGISTRY_USERNAME: ${{ secrets.REGISTRY_USERNAME }}
+          REGISTRY_PASSWORD: ${{ secrets.REGISTRY_PASSWORD }}
         with:
           host: ${{ secrets.OCI_HOST }}
           username: ${{ secrets.OCI_SSH_USER }}
           key: ${{ secrets.OCI_SSH_KEY }}
+          envs: REGISTRY,REGISTRY_USERNAME,REGISTRY_PASSWORD
           script: |
             set -e
             cd /home/opc/apps/reach-backend
@@ -134,8 +149,8 @@ jobs:
             ./init-server.sh
             
             echo "🔑 Logging in to Container Registry..."
-            echo "${{ secrets.REGISTRY_PASSWORD }}" | docker login ${{ env.REGISTRY }} \
-              --username="${{ secrets.REGISTRY_USERNAME }}" --password-stdin
+            echo "$REGISTRY_PASSWORD" | docker login $REGISTRY \
+              --username="$REGISTRY_USERNAME" --password-stdin
             
             echo "⬇️  Stopping current containers..."
             docker compose down --remove-orphans || true
@@ -147,7 +162,7 @@ jobs:
             docker compose up -d
             
             echo "⏳ Waiting for health check..."
-            sleep 10
+            sleep 15
             
             # Check if container is healthy
             HEALTH=$(docker inspect --format='{{.State.Health.Status}}' reach-backend 2>/dev/null || echo "unknown")
@@ -155,13 +170,13 @@ jobs:
               echo "✅ Container is healthy!"
             elif [ "$HEALTH" = "starting" ]; then
               echo "⏳ Container is still starting, waiting..."
-              sleep 20
+              sleep 30
               HEALTH=$(docker inspect --format='{{.State.Health.Status}}' reach-backend 2>/dev/null || echo "unknown")
               echo "📊 Health status: $HEALTH"
             else
               echo "⚠️  Health status: $HEALTH"
               echo "📋 Container logs:"
-              docker compose logs --tail=50
+              docker compose logs --tail=100
             fi
             
             echo "🧹 Cleaning up old images..."
