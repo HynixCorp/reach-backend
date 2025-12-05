@@ -26,6 +26,8 @@ import { startTempCleaner } from "./bin/tasks/tempCleaner";
 import { getDatabaseService } from "./bin/common/services/database.service";
 import path from "node:path";
 import { reachCDNProtection } from "./bin/common/cdnMiddleware";
+import { health, rootInfo } from "./bin/api/controllers/athenas.controller";
+import { asyncHandler } from "./bin/common/services/response.service";
 
 dotenv.config();
 
@@ -33,17 +35,8 @@ const PORT = process.env.PORT || 3000;
 const app = express();
 
 // Health check and root endpoint (before any middleware)
-app.get("/", (req, res) => {
-  res.json({ 
-    status: "ok", 
-    service: "reach-backend",
-    timestamp: new Date().toISOString()
-  });
-});
-
-app.get("/health", (req, res) => {
-  res.json({ status: "healthy" });
-});
+app.get("/", asyncHandler(rootInfo));
+app.get("/health", asyncHandler(health));
 
 (async () => {
   const dbService = getDatabaseService();

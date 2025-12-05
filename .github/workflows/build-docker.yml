@@ -128,6 +128,7 @@ jobs:
           source: "deploy/*"
           target: "/home/opc/apps/reach-backend"
           strip_components: 1
+          overwrite: true
 
       - name: Deploy to Oracle Cloud VM
         uses: appleboy/ssh-action@v1.0.3
@@ -147,6 +148,9 @@ jobs:
             echo "🔧 Running initialization script..."
             chmod +x init-server.sh
             ./init-server.sh
+
+            echo "🧹 Removing legacy docker-compose.yaml (warning cleanup)..."
+            rm -f docker-compose.yaml
             
             echo "🔑 Logging in to Container Registry..."
             echo "$REGISTRY_PASSWORD" | docker login $REGISTRY \

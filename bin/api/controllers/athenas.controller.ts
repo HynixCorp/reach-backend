@@ -26,4 +26,16 @@ async function get_status(req: Request, res: Response): Promise<Response> {
     }
 }
 
-export { get_status };
+async function health(req: Request, res: Response): Promise<Response> {
+    return res.status(200).json({ status: "healthy", service: "reach-backend" });
+}
+
+async function rootInfo(req: Request, res: Response): Promise<Response> {
+    return res.status(200).json({
+        status: "ok",
+        service: "reach-backend",
+        timestamp: new Date().toISOString()
+    });
+}
+
+export { get_status, health, rootInfo };
