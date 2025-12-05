@@ -4,12 +4,6 @@ FROM node:22-alpine
 # Set working directory
 WORKDIR /app
 
-# Install required system dependencies
-RUN apk add --no-cache \
-    dumb-init \
-    curl \
-    && rm -rf /var/cache/apk/*
-
 # Copy package files first for better layer caching
 COPY package*.json ./
 
@@ -50,12 +44,9 @@ USER nodejs
 # Expose the port
 EXPOSE 3000
 
-# Health check
-HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-    CMD curl -f http://localhost:3000/api/updates/v0/latest || exit 1
-
-# Use dumb-init as PID 1 for proper signal handling
-ENTRYPOINT ["dumb-init", "--"]
+# Health check using wget (already included in Alpine)
+HEALTHCHECK --interval=30s --timeout=10s --start-period=15s --retries=3 \
+    CMD wget -q --spider http://localhost:3000/api/updates/v0/latest || exit 1
 
 # Start the application
 CMD ["npx", "ts-node", "server.ts"]
