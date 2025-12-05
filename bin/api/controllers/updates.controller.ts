@@ -71,7 +71,9 @@ export async function checkForUpdates(req: Request, res: Response) {
         let downloadUrl = platformData.url;
 
         if (!downloadUrl || !downloadUrl.startsWith("http")) {
-            downloadUrl = `${baseUrl}/cdn/updates/${platformData.filename || platformData.url}`;
+            const filename = platformData.filename || platformData.url;
+            // Encode filename to handle spaces and special characters
+            downloadUrl = `${baseUrl}/cdn/updates/${encodeURIComponent(filename)}`;
         }
 
         // Return Tauri v2 compatible response
@@ -113,7 +115,9 @@ export async function getLatestVersion(req: Request, res: Response) {
             let downloadUrl = data.url;
 
             if (!downloadUrl || !downloadUrl.startsWith("http")) {
-                downloadUrl = `${baseUrl}/cdn/updates/${data.filename || data.url}`;
+                const filename = data.filename || data.url;
+                // Encode filename to handle spaces and special characters
+                downloadUrl = `${baseUrl}/cdn/updates/${encodeURIComponent(filename)}`;
             }
 
             platforms[platform] = {
@@ -234,6 +238,9 @@ export async function uploadUpdateFile(req: Request, res: Response) {
              filename = `${platform}_${filename}`;
         }
 
+        // Sanitize filename: replace spaces with underscores
+        filename = filename.replace(/\s+/g, '_');
+
         const destPath = path.join(CDN_DIR, filename);
         
         await fs.move(file.path, destPath, { overwrite: true });
@@ -271,7 +278,10 @@ export async function uploadUpdateFiles(req: Request, res: Response) {
 
         const uploaded: string[] = [];
         for (const file of files) {
-            const filename = file.originalname;
+            let filename = file.originalname;
+            // Sanitize filename: replace spaces with underscores
+            filename = filename.replace(/\s+/g, '_');
+            
             const destPath = path.join(CDN_DIR, filename);
             await fs.move(file.path, destPath, { overwrite: true });
             uploaded.push(filename);
@@ -363,6 +373,30 @@ function compareVersions(a: string, b: string): number {
     }
     
     return 0;
+}
+
+/**
+ * DELETE /api/updates/v0/purge
+ * Completely erase all update data (files, manifests, history)
+ * Requires x-update-secret header
+ */
+export async function purgeUpdates(req: Request, res: Response) {
+    try {
+        const updateSecret = req.headers["x-update-secret"];
+        if (!updateSecret || updateSecret !== process.env.UPDATE_SECRET) {
+            return res.status(401).json(createErrorResponse("Unauthorized", 401));
+        }
+
+        // Dangerous operation: remove everything in CDN_DIR
+        await fs.emptyDir(CDN_DIR);
+        
+        console.log("[REACH - Updates] PURGED all update data".red.bold);
+
+        return res.json(createSuccessResponse({}, "All update data has been purged"));
+    } catch (error) {
+        console.error("[REACH - Updates] Error purging updates:".red, error);
+        return res.status(500).json(createErrorResponse("Internal server error", 500));
+    }
 }
 
 // Legacy export for backwards compatibility

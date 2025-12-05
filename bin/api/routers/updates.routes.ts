@@ -12,7 +12,8 @@ import {
     uploadUpdateFile,
     uploadUpdateFiles,
     getVersionHistory,
-    deleteVersion
+    deleteVersion,
+    purgeUpdates
 } from "../controllers/updates.controller";
 
 const ROUTER = express.Router();
@@ -71,6 +72,10 @@ ROUTER.post("/upload-batch", updateUpload.array("files", 10), asyncHandler(uploa
 // Delete a version
 // DELETE /api/updates/v0/version/:version
 ROUTER.delete("/version/:version", asyncHandler(deleteVersion));
+
+// Purge all updates
+// DELETE /api/updates/v0/purge
+ROUTER.delete("/purge", asyncHandler(purgeUpdates));
 
 export { ROUTER as UPDATES_ROUTER };
 export default ROUTER;
