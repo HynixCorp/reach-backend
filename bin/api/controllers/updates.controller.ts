@@ -220,7 +220,14 @@ export async function uploadUpdateFile(req: Request, res: Response) {
         }
 
         // Move file from temp to updates directory with proper name
-        const filename = file.originalname;
+        let filename = file.originalname;
+
+        // FIX: Prevent filename collisions for different platforms (e.g. macOS ARM vs Intel)
+        // If the filename doesn't contain the platform or arch, prepend it.
+        if (!filename.includes(platform) && !filename.includes(platform.split('-')[1])) {
+             filename = `${platform}_${filename}`;
+        }
+
         const destPath = path.join(CDN_DIR, filename);
         
         await fs.move(file.path, destPath, { overwrite: true });
