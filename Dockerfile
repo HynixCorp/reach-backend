@@ -46,7 +46,7 @@ EXPOSE 3000
 
 # Health check using wget (already included in Alpine)
 HEALTHCHECK --interval=30s --timeout=10s --start-period=15s --retries=3 \
-    CMD wget -q --spider http://localhost:3000/api/updates/v0/latest || exit 1
+    CMD wget -q --spider http://localhost:3000/health || exit 1
 
 # Start the application
 CMD ["npx", "ts-node", "server.ts"]

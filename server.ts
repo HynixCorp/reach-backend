@@ -29,8 +29,21 @@ import { reachCDNProtection } from "./bin/common/cdnMiddleware";
 
 dotenv.config();
 
-const PORT = process.env.PORT;
+const PORT = process.env.PORT || 3000;
 const app = express();
+
+// Health check and root endpoint (before any middleware)
+app.get("/", (req, res) => {
+  res.json({ 
+    status: "ok", 
+    service: "reach-backend",
+    timestamp: new Date().toISOString()
+  });
+});
+
+app.get("/health", (req, res) => {
+  res.json({ status: "healthy" });
+});
 
 (async () => {
   const dbService = getDatabaseService();
@@ -41,6 +54,8 @@ const app = express();
 
   startInstanceManager();
   startTempCleaner();
+  
+  console.log("[REACH - Server] Database connected and tasks started".green);
 })();
 
 
@@ -117,7 +132,11 @@ socketIOClient.setup();
 registerSocketClient(socketIOClient);
 
 server
-  .listen(PORT)
+  .listen(PORT, () => {
+    console.log(`[REACH - Server] 🚀 Server running on port ${PORT}`.green);
+    console.log(`[REACH - Server] Environment: ${process.env.NODE_ENV || 'development'}`.blue);
+  })
   .on("error", (error) => {
+    console.error(`[REACH - Server] Failed to start: ${error.message}`.red);
     throw new Error(error.message);
   });
