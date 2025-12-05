@@ -16,11 +16,11 @@ services:
       # Traefik reverse proxy configuration
       - traefik.enable=true
       # HTTP router (redirect to HTTPS)
-      - traefik.http.routers.reach-http.rule=Host(`devs.reachsdk.online`)
+      - traefik.http.routers.reach-http.rule=Host(`api.reachx.dev`)
       - traefik.http.routers.reach-http.entrypoints=web
       - traefik.http.routers.reach-http.middlewares=redirect-to-https
       # HTTPS router
-      - traefik.http.routers.reach-https.rule=Host(`devs.reachsdk.online`)
+      - traefik.http.routers.reach-https.rule=Host(`api.reachx.dev`)
       - traefik.http.routers.reach-https.entrypoints=websecure
       - traefik.http.routers.reach-https.tls=true
       - traefik.http.routers.reach-https.tls.certresolver=cloudflare

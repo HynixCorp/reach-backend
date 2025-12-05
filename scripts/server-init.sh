@@ -134,10 +134,10 @@ services:
       - RESEND_API_KEY=${RESEND_API_KEY}
     labels:
       - traefik.enable=true
-      - traefik.http.routers.reach-http.rule=Host(`devs.reachsdk.online`)
+      - traefik.http.routers.reach-http.rule=Host(`api.reachx.dev`)
       - traefik.http.routers.reach-http.entrypoints=web
       - traefik.http.routers.reach-http.middlewares=redirect-to-https
-      - traefik.http.routers.reach-https.rule=Host(`devs.reachsdk.online`)
+      - traefik.http.routers.reach-https.rule=Host(`api.reachx.dev`)
       - traefik.http.routers.reach-https.entrypoints=websecure
       - traefik.http.routers.reach-https.tls=true
       - traefik.http.routers.reach-https.tls.certresolver=cloudflare
