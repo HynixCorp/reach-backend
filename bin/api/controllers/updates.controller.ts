@@ -67,7 +67,9 @@ export async function checkForUpdates(req: Request, res: Response) {
         }
 
         // Build the download URL
-        const baseUrl = `${req.protocol}://${req.get("host")}`;
+        // Use X-Forwarded-Proto if available (for reverse proxies like Traefik)
+        const protocol = req.headers['x-forwarded-proto'] || req.protocol;
+        const baseUrl = `${protocol}://${req.get("host")}`;
         let downloadUrl = platformData.url;
 
         if (!downloadUrl || !downloadUrl.startsWith("http")) {
@@ -107,7 +109,9 @@ export async function getLatestVersion(req: Request, res: Response) {
         }
 
         const latestData: TauriUpdateManifest = await fs.readJson(latestPath);
-        const baseUrl = `${req.protocol}://${req.get("host")}`;
+        // Use X-Forwarded-Proto if available (for reverse proxies like Traefik)
+        const protocol = req.headers['x-forwarded-proto'] || req.protocol;
+        const baseUrl = `${protocol}://${req.get("host")}`;
 
         // Transform URLs to absolute
         const platforms: TauriUpdateManifest["platforms"] = {};
@@ -178,6 +182,14 @@ export async function publishUpdate(req: Request, res: Response) {
             }
             if (!platformData.filename && !platformData.url) {
                 return res.status(400).json(createErrorResponse(`Missing filename or url for platform: ${platform}`, 400));
+            }
+
+            // Sanitize filename/url in the manifest to match storage (no spaces)
+            if (platformData.filename) {
+                platformData.filename = platformData.filename.replace(/\s+/g, '_');
+            }
+            if (platformData.url && !platformData.url.startsWith("http")) {
+                platformData.url = platformData.url.replace(/\s+/g, '_');
             }
         }
 

@@ -55,6 +55,9 @@ if (missingEnvVars.length > 0) {
 const PORT = process.env.PORT || 3000;
 const app = express();
 
+// Trust proxy (Traefik) for correct protocol/IP detection
+app.set("trust proxy", 1);
+
 // Health check and root endpoint (before any middleware)
 app.get("/", asyncHandler(rootInfo));
 app.get("/health", asyncHandler(health));
