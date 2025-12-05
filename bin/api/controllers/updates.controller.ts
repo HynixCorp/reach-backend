@@ -68,9 +68,11 @@ export async function checkForUpdates(req: Request, res: Response) {
 
         // Build the download URL
         const baseUrl = `${req.protocol}://${req.get("host")}`;
-        const downloadUrl = platformData.url.startsWith("http") 
-            ? platformData.url 
-            : `${baseUrl}/cdn/updates/${platformData.filename || platformData.url}`;
+        let downloadUrl = platformData.url;
+
+        if (!downloadUrl || !downloadUrl.startsWith("http")) {
+            downloadUrl = `${baseUrl}/cdn/updates/${platformData.filename || platformData.url}`;
+        }
 
         // Return Tauri v2 compatible response
         return res.json({
@@ -108,11 +110,15 @@ export async function getLatestVersion(req: Request, res: Response) {
         // Transform URLs to absolute
         const platforms: TauriUpdateManifest["platforms"] = {};
         for (const [platform, data] of Object.entries(latestData.platforms)) {
+            let downloadUrl = data.url;
+
+            if (!downloadUrl || !downloadUrl.startsWith("http")) {
+                downloadUrl = `${baseUrl}/cdn/updates/${data.filename || data.url}`;
+            }
+
             platforms[platform] = {
                 signature: data.signature,
-                url: data.url.startsWith("http") 
-                    ? data.url 
-                    : `${baseUrl}/cdn/updates/${data.filename || data.url}`
+                url: downloadUrl
             };
         }
 
