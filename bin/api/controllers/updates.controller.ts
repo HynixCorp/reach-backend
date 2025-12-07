@@ -51,7 +51,7 @@ export async function checkForUpdates(req: Request, res: Response) {
         const latestPath = path.join(CDN_DIR, "latest.json");
         
         if (!await fs.pathExists(latestPath)) {
-            return res.status(404).json(createErrorResponse("No updates available", 404));
+            return res.status(204).json(createErrorResponse("No updates available", 204));
         }
 
         const latestData: TauriUpdateManifest = await fs.readJson(latestPath);
