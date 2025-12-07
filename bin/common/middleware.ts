@@ -33,15 +33,19 @@ function reachLogger(req: Request, res: Response, next: NextFunction): void {
 
     // Para la vista tomar la respuesta del body, intentar parsearla si es JSON y tomar la clave status o message
     let resultPreview = "";
-    try {
-      const parsedBody = JSON.parse(body);
-      resultPreview = parsedBody.status
-        ? parsedBody.status.toString()
-        : parsedBody.message
-        ? parsedBody.message.toString()
-        : body.toString();
-    } catch {
-      resultPreview = body.toString();
+    if (body === undefined || body === null) {
+      resultPreview = "Empty Body";
+    } else {
+      try {
+        const parsedBody = JSON.parse(body);
+        resultPreview = parsedBody.status
+          ? parsedBody.status.toString()
+          : parsedBody.message
+          ? parsedBody.message.toString()
+          : body.toString();
+      } catch {
+        resultPreview = body.toString();
+      }
     }
 
     // Mostrar línea formateada
