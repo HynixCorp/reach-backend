@@ -5,12 +5,36 @@ This is a Node.js/TypeScript backend service for the Reach SDK platform, which m
 
 ## Architecture Overview
 - **Framework**: Express.js with TypeScript
-- **Database**: MongoDB with multiple databases (reach, reachauth)
+- **Database**: MongoDB with 4 databases for separation of concerns
 - **Real-time**: Socket.IO for client communication
 - **File Handling**: Multer for uploads, custom CDN middleware
 - **Payments**: Polar.sh integration
 - **Email**: Resend service
 - **Validation**: Zod schemas and custom validation service
+
+## Database Architecture
+The platform uses 4 separate MongoDB databases:
+
+1. **reach_developers** - Developer accounts (Better-Auth managed)
+   - `users`, `accounts`, `sessions`, `verifications` (Better-Auth)
+   - `organizations`, `organizationLinks`
+   - `payments`, `usage`
+   - `linkedXboxAccounts` (for linking developer accounts to Xbox)
+
+2. **reach_players** - Player accounts (Xbox/Microsoft Auth)
+   - `players` - Xbox/Minecraft player profiles
+   - `inventory` - Games owned by players
+   - `achievements` - Player unlocked achievements
+   - `bans` - Player bans (global or per-experience)
+   - `sessions` - Xbox auth sessions
+
+3. **reach_experiences** - Game content and instances
+   - `instances` - Experiences/modpacks
+   - `instanceVersions`, `instanceCodes`, `instanceLogs`
+   - `marketplace`, `status`
+
+4. **reach_overlay** - Real-time overlay service
+   - `presences`, `achievements`, `notifications`
 
 ## Key Components
 - `bin/api/controllers/`: Business logic for each API endpoint
@@ -49,13 +73,26 @@ async function exampleController(req: Request, res: Response): Promise<Response>
 ```
 
 ### Database Operations
-Use the centralized `DatabaseService` and `MongoDB` class:
+Use the centralized `DatabaseService` with specific database accessors:
 ```typescript
-import { getReachDB } from "../../common/services/database.service";
+import { 
+  getDevelopersDB,  // reach_developers - Better-Auth, orgs, payments
+  getPlayersDB,     // reach_players - Xbox players, inventory, bans
+  getExperiencesDB, // reach_experiences - instances, marketplace
+  getOverlayDB      // reach_overlay - presences, achievements
+} from "../../common/services/database.service";
 
-const db = getReachDB();
-const users = await db.findDocuments("users", { uuid });
-await db.insertDocument("users", userData);
+// Example: Working with developer accounts
+const developersDB = getDevelopersDB();
+const orgs = await developersDB.findDocuments("organizations", { ownerId });
+
+// Example: Working with player data
+const playersDB = getPlayersDB();
+const player = await playersDB.findDocuments("players", { minecraftUuid });
+
+// Example: Working with instances
+const experiencesDB = getExperiencesDB();
+const instances = await experiencesDB.findDocuments("instances", { id });
 ```
 
 ### Validation
@@ -100,11 +137,14 @@ console.error("[REACH - Component] Error".red);
 ```
 
 ## Data Models
-- **Users**: Minecraft UUID-based with ban states (none/temporal/permanent)
-- **Instances**: Minecraft servers/modpacks with providers (reach/curseforge/modrinth)
-- **Organizations**: Multi-user workspaces
-- **Payments**: Polar.sh integration for subscriptions
-- **Storage**: Cloud file management with decompilation features
+- **PlayerProfile**: Xbox/Microsoft authenticated players with Minecraft UUID
+- **PlayerInventory**: Games owned by players (free/purchased)
+- **PlayerBan**: Ban entries (global or per-experience, temporal or permanent)
+- **DeveloperUser**: Better-Auth managed developer accounts
+- **Instances**: Minecraft experiences/modpacks with providers (reach/curseforge/modrinth)
+- **Organizations**: Multi-user developer workspaces
+- **Payments**: Polar.sh integration for developer subscriptions
+- **LinkedXboxAccounts**: Links between developer and player accounts
 
 ## Security Considerations
 - User agent validation for API access

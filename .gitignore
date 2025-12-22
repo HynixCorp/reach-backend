@@ -53,3 +53,4 @@ Thumbs.db
 
 # Exclude the entire cdn directory
 cdn/**
+

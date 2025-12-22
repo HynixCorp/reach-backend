@@ -1,15 +1,15 @@
 import { config } from "dotenv";
 import { DateTime } from "luxon";
-import { getReachAuthDB } from "../services/database.service";
+import { getDevelopersDB } from "../services/database.service";
 
 config();
 
-const REACH_SDK_DB = getReachAuthDB();
+const DEVELOPERS_DB = getDevelopersDB();
 
 
 export async function getOrganizationIdFromBID(betterID: string): Promise<string>{
     try{
-        const documentOrg = await REACH_SDK_DB.findDocuments("organizations", {
+        const documentOrg = await DEVELOPERS_DB.findDocuments("organizations", {
             $or: [
                 { members: betterID },
                 { members: { $elemMatch: { userId: betterID } } },

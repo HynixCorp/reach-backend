@@ -11,19 +11,18 @@ function reachLogger(req: Request, res: Response, next: NextFunction): void {
 
   res.send = function (body) {
     const diff = process.hrtime(start);
-    const responseTime = (diff[0] * 1e3 + diff[1] / 1e6).toFixed(2) + "ms";
+    const responseTime = `${(diff[0] * 1e3 + diff[1] / 1e6).toFixed(2)}ms`;
     const timestamp = new Date().toLocaleTimeString("es-MX", { hour12: false });
 
-    // Colores dinámicos
-    const methodColor =
-      req.method === "GET"
-        ? req.method.green
-        : req.method === "POST"
-        ? req.method.cyan
-        : req.method === "DELETE"
-        ? req.method.red
-        : req.method.yellow;
+    const methodColors: Record<string, string> = {
+      GET: req.method.green,
+      POST: req.method.cyan,
+      PUT: req.method.yellow,
+      PATCH: req.method.magenta,
+      DELETE: req.method.red,
+    };
 
+    const methodColor = methodColors[req.method] || req.method.yellow;
     const statusColor =
       res.statusCode >= 500
         ? res.statusCode.toString().red
@@ -31,26 +30,18 @@ function reachLogger(req: Request, res: Response, next: NextFunction): void {
         ? res.statusCode.toString().yellow
         : res.statusCode.toString().green;
 
-    // Para la vista tomar la respuesta del body, intentar parsearla si es JSON y tomar la clave status o message
-    let resultPreview = "";
-    if (body === undefined || body === null) {
-      resultPreview = "Empty Body";
-    } else {
+    let resultPreview = "Empty Body";
+    if (body) {
       try {
         const parsedBody = JSON.parse(body);
-        resultPreview = parsedBody.status
-          ? parsedBody.status.toString()
-          : parsedBody.message
-          ? parsedBody.message.toString()
-          : body.toString();
+        resultPreview = parsedBody.status?.toString() || parsedBody.message?.toString() || body.toString();
       } catch {
         resultPreview = body.toString();
       }
     }
 
-    // Mostrar línea formateada
     console.log(
-      `[${timestamp.gray}] ${statusColor} | ${responseTime.blue} | ${methodColor} | ${req.originalUrl.white} | Response Code: ${resultPreview.dim}`
+      `[${timestamp.gray}] ${statusColor} | ${responseTime.blue} | ${methodColor} | ${req.originalUrl.white} | Body Code: ${resultPreview.dim}`
     );
 
     return originalSend.call(this, body);
@@ -68,83 +59,80 @@ function reachCondorErrorHandler(
   res: Response,
   next: NextFunction
 ): void {
-  console.error(
-    `[REACH - Condor]: An error occurred - ${err.message.toUpperCase()}`.red
+  console.error(`[REACH - Condor]: An error occurred - ${err.message.toUpperCase()}`.red);
+  res.status(500).json(
+    createErrorResponse("An internal server error occurred.", 500)
   );
-  res
-    .status(500)
-    .json(
-      createErrorResponse(
-        "[REACH - Condor]: An internal server error occurred."
-      )
-    );
 }
 
 /* =========================
    🚨 EMPTY BODY HANDLER
 ========================= */
+const EMPTY_BODY_BYPASS_PATHS = ["/api/payments/v0"];
+
 function reachEmptyBodyHandler(
   req: Request,
   res: Response,
   next: NextFunction
 ): void {
-  if (req.path.startsWith("/api/payments/v0")) return next();
+  // Skip for non-POST requests
+  if (req.method !== "POST") {
+    return next();
+  }
 
-  if (req.method === "POST") {
-    const contentType = req.headers["content-type"];
-    if (contentType?.includes("multipart/form-data")) return next();
+  // Skip for bypassed paths
+  if (EMPTY_BODY_BYPASS_PATHS.some((path) => req.path.startsWith(path))) {
+    return next();
+  }
 
-    if (req.body === undefined || req.body === null) {
-      res
-        .status(400)
-        .json(
-          createErrorResponse("[REACH - Condor]: Request body cannot be empty.")
-        );
-      return;
-    }
+  // Skip for multipart/form-data
+  const contentType = req.headers["content-type"];
+  if (contentType?.includes("multipart/form-data")) {
+    return next();
+  }
 
-    if (Object.keys(req.body).length === 0) {
-      console.warn(
-        `[REACH - Condor]: Empty request body detected at ${new Date().toLocaleString()}`.yellow
-      );
-      res
-        .status(400)
-        .json(
-          createErrorResponse("[REACH - Condor]: Request body cannot be empty.")
-        );
-    } else next();
-  } else next();
+  // Check for empty body
+  if (!req.body || Object.keys(req.body).length === 0) {
+    console.warn(`[REACH - Condor]: Empty request body detected at ${new Date().toLocaleString()}`.yellow);
+    res.status(400).json(createErrorResponse("Request body cannot be empty.", 400));
+    return;
+  }
+
+  next();
 }
 
 /* =========================
    🧠 USER AGENT HANDLER
 ========================= */
+const USER_AGENT_BYPASS_PATHS = [
+  "/api/athenas/v0",
+  "/api/updates/v0",
+  "/api/payments/v0",
+  "/api/cloud/v0",
+  "/cdn",
+  "/assets",
+];
+
 function reachUserAgentMiddleware(
   req: Request,
   res: Response,
   next: NextFunction
 ): void {
-  if (
-    req.path.startsWith("/api/athenas/v0") ||
-    req.path.startsWith("/api/updates/v0") ||
-    req.path.startsWith("/cdn") ||
-    req.path.startsWith("/assets") ||
-    req.path.startsWith("/api/payments/v0") ||
-    req.path.startsWith("/api/cloud/v0")
-  )
+  // Skip for bypassed paths
+  if (USER_AGENT_BYPASS_PATHS.some((path) => req.path.startsWith(path))) {
     return next();
+  }
 
   const userAgent = req.headers["user-agent"];
-  if (userAgent?.includes("ReachXClient/1.0")) next();
-  else {
-    res
-      .status(400)
-      .json(
-        createErrorResponse(
-          "[REACH - UserAgent]: Unsupported User-Agent. Please use the correct one."
-        )
-      );
+  
+  if (!userAgent?.includes("ReachXClient/1.0")) {
+    res.status(400).json(
+      createErrorResponse("Unsupported User-Agent. Please use the correct one.", 400)
+    );
+    return;
   }
+
+  next();
 }
 
 /* =========================

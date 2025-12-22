@@ -1,16 +1,17 @@
 import { Request, Response } from "express";
 import { config } from "dotenv";
 import { createGenericResponse } from "../../common/utils";
-import { getReachDB } from "../../common/services/database.service";
+import { getExperiencesDB } from "../../common/services/database.service";
 import { ResponseHandler } from "../../common/services/response.service";
 
 config();
 
-const REACH_SDK_DB = getReachDB();
+// reach_experiences - Status info is part of the experiences/platform config
+const EXPERIENCES_DB = getExperiencesDB();
 
 async function get_status(req: Request, res: Response): Promise<Response> {
     try {
-        const athenasStatus = await REACH_SDK_DB.findDocuments("status", {});
+        const athenasStatus = await EXPERIENCES_DB.findDocuments("status", {});
         if (athenasStatus.length === 0) {
             return ResponseHandler.notFound(res, "Athenas status");
         }

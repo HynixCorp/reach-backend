@@ -1,9 +1,11 @@
-import { getReachDB } from "../../common/services/database.service";
+import { getDevelopersDB } from "../../common/services/database.service";
 import { resendService } from "../../common/resend/service";
 import { buildInvoiceEmail } from "../../common/resend/templates/invoiceTemplate";
+import { formatAddress } from "../../common/polar/utils";
 import { nanoid } from "nanoid";
 
-const REACH_DB = getReachDB();
+// reach_developers - Payments belong to developer accounts
+const DEVELOPERS_DB = getDevelopersDB();
 
 export async function handlePolarPayload(payload: any) {
     const eventType = payload.type;
@@ -49,13 +51,13 @@ async function handleSubscriptionUpdate(data: any) {
         updateData.endDate = new Date(currentPeriodEnd);
     }
 
-    await REACH_DB.updateDocument("payments", { subscriptionId }, { $set: updateData });
+    await DEVELOPERS_DB.updateDocument("payments", { subscriptionId }, { $set: updateData });
     console.log(`[REACH - Webhooks]: Updated subscription ${subscriptionId} to status ${dbStatus}`);
 }
 
 async function handleSubscriptionCancellation(data: any) {
     const subscriptionId = data.id;
-    await REACH_DB.updateDocument("payments", { subscriptionId }, { $set: { status: "expired" } });
+    await DEVELOPERS_DB.updateDocument("payments", { subscriptionId }, { $set: { status: "expired" } });
     console.log(`[REACH - Webhooks]: Canceled subscription ${subscriptionId}`);
 }
 
@@ -68,7 +70,7 @@ async function handleOrderCreated(order: any) {
     }
 
     // Check if we have this subscription
-    const existingSub = await REACH_DB.findDocuments("payments", { subscriptionId: order.subscription_id });
+    const existingSub = await DEVELOPERS_DB.findDocuments("payments", { subscriptionId: order.subscription_id });
     
     if (existingSub.length === 0) {
         console.log(`[REACH - Webhooks]: Order created for unknown subscription ${order.subscription_id}`);
@@ -136,30 +138,3 @@ async function handleOrderCreated(order: any) {
         console.error("[REACH - Webhooks]: Failed to send invoice email.", error);
     }
 }
-
-function formatAddress(address?: {
-    line1: string | null;
-    line2: string | null;
-    postal_code: string | null;
-    city: string | null;
-    state: string | null;
-    country: string | null;
-  }): string | undefined {
-    if (!address) {
-      return undefined;
-    }
-  
-    const parts = [
-      address.line1,
-      address.line2,
-      [address.city, address.state].filter(Boolean).join(", "),
-      address.postal_code,
-      address.country,
-    ].filter((segment) => Boolean(segment && segment.toString().trim().length > 0));
-  
-    if (parts.length === 0) {
-      return undefined;
-    }
-  
-    return parts.join(", ");
-  }

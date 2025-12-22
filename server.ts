@@ -3,7 +3,6 @@ import express from "express";
 import { createServer } from "node:http";
 import dotenv from "dotenv";
 import cors from "cors";
-import bodyparser from "body-parser";
 
 import {
   reachCondorErrorHandler,
@@ -91,8 +90,10 @@ app.use(
     credentials: true,
   })
 );
-app.use(bodyparser.json());
-app.use(bodyparser.urlencoded({ extended: true }));
+
+// JSON and URL-encoded body parsing with size limits (1GB for large uploads)
+app.use(express.json({ limit: "1gb" }));
+app.use(express.urlencoded({ limit: "1gb", extended: true }));
 
 app.use(
   "/assets/resources",
@@ -137,10 +138,6 @@ app.use(reachEmptyBodyHandler);
 app.use(reachUserAgentMiddleware);
 app.use(API_ROUTER);
 
-// Limit the size of incoming requests to 1gb
-app.use(express.json({ limit: "1gb" }));
-app.use(express.urlencoded({ limit: "1gb", extended: true }));
-
 // Create SocketIO server
 const server = createServer(app);
 const socketIOClient = new SocketIOClient(server);
@@ -150,7 +147,7 @@ registerSocketClient(socketIOClient);
 
 server
   .listen(PORT, () => {
-    console.log(`[REACH - Server] 🚀 Server running on port ${PORT}`.green);
+    console.log(`[REACH - Server] Server running on port ${PORT}`.green);
     console.log(`[REACH - Server] Environment: ${process.env.NODE_ENV || 'development'}`.blue);
   })
   .on("error", (error) => {

@@ -13,6 +13,8 @@
   "description": "",
   "dependencies": {
     "@polar-sh/express": "^0.3.7",
+    "axios": "^1.13.2",
+    "better-auth": "^1.4.7",
     "body-parser": "^2.2.0",
     "colorts": "^0.1.63",
     "cors": "^2.8.5",

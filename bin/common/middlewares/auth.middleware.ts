@@ -2,7 +2,12 @@ import { Request, Response, NextFunction } from "express";
 import { extractAuthToken } from "../services/validation.service";
 import { ResponseHandler } from "../services/response.service";
 import { generateToken } from "../reach/x-reach";
-import { getReachAuthDB } from "../services/database.service";
+import { getDevelopersDB, getExperiencesDB } from "../services/database.service";
+
+// reach_developers - For organizations and developer accounts
+const DEVELOPERS_DB = getDevelopersDB();
+// reach_experiences - For instances
+const EXPERIENCES_DB = getExperiencesDB();
 
 /**
  * Middleware to validate x-reach-token header
@@ -60,9 +65,8 @@ export async function validateOrganizationOwner(
     
     // If organizationId is provided, verify ownership
     if (organizationId) {
-      const db = getReachAuthDB();
-      const organizations = await db.findDocuments("organizations", {
-        _id: db.createObjectId(organizationId as string),
+      const organizations = await DEVELOPERS_DB.findDocuments("organizations", {
+        _id: DEVELOPERS_DB.createObjectId(organizationId as string),
         ownerId: ownerId as string
       });
       
@@ -107,9 +111,8 @@ export async function validateOrganizationMember(
       return;
     }
     
-    const db = getReachAuthDB();
-    const organizations = await db.findDocuments("organizations", {
-      _id: db.createObjectId(organizationId as string),
+    const organizations = await DEVELOPERS_DB.findDocuments("organizations", {
+      _id: DEVELOPERS_DB.createObjectId(organizationId as string),
       members: { $elemMatch: { $eq: userId } }
     });
     
@@ -148,8 +151,8 @@ export async function validateInstanceAccess(
       return;
     }
     
-    const db = getReachAuthDB();
-    const instances = await db.findDocuments("instances", { id: instanceId });
+    // BUG FIX: Instances are in reach_experiences, not reach_developers!
+    const instances = await EXPERIENCES_DB.findDocuments("instances", { id: instanceId });
     
     if (instances.length === 0) {
       ResponseHandler.notFound(res, "Instance");

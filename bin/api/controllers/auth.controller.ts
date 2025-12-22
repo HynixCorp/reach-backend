@@ -1,22 +1,18 @@
 import { Request, Response } from "express";
 import { v4 as uuidv4 } from "uuid";
-import { config } from "dotenv";
-import { createErrorResponse, createSuccessResponse } from "../../common/utils";
+import { createSuccessResponse } from "../../common/utils";
 import { UserPacket } from "../../types/auth";
 import getMinecraftUUID from "../../common/mcResources/uuid";
-import { getReachDB, getReachAuthDB } from "../../common/services/database.service";
+import { getDevelopersDB, getPlayersDB } from "../../common/services/database.service";
 import { validateRequest } from "../../common/services/validation.service";
-import { ResponseHandler, asyncHandler } from "../../common/services/response.service";
+import { ResponseHandler } from "../../common/services/response.service";
 
-config();
+// reach_players - For Xbox/Minecraft player profiles
+const PLAYERS_DB = getPlayersDB();
+// reach_developers - For Better-Auth developer accounts
+const DEVELOPERS_DB = getDevelopersDB();
 
-const REACH_SDK_DB = getReachDB();
-const REACH_AUTH_DB = getReachAuthDB();
-
-async function createNewUserData(
-  req: Request,
-  res: Response
-): Promise<Response<any, Record<string, any>>> {
+async function createNewUserData(req: Request, res: Response): Promise<Response> {
   const validation = validateRequest(req, {
     requiredBody: ["username", "uuid"],
     requiredHeaders: ["machine-id", "device-id"]
@@ -31,29 +27,26 @@ async function createNewUserData(
   const headerDeviceId = req.headers["device-id"] as string;
 
   const uuidAPI = await getMinecraftUUID(username);
-  const existingUser = await REACH_SDK_DB.findDocuments("users", {
-    uuid: uuidAPI,
-  });
+  
+  if (!uuidAPI) {
+    return ResponseHandler.notFound(res, `User with username ${username}`);
+  }
 
   if (uuid !== uuidAPI) {
     return ResponseHandler.badRequest(res, "UUID is invalid or not found.");
   }
 
-  if (existingUser.length > 0) {
-    return res
-      .status(200)
-      .json(
-        createSuccessResponse(null, "[REACH - Auth]: User already exists.")
-      );
-  }
+  const existingUser = await PLAYERS_DB.findDocuments("players", { minecraftUuid: uuidAPI });
 
-  if (!uuidAPI) {
-    return ResponseHandler.notFound(res, `User with username ${username}`);
+  if (existingUser.length > 0) {
+    return res.status(200).json(
+      createSuccessResponse(null, "[REACH - Auth]: User already exists.")
+    );
   }
   
   const createPacket: UserPacket = {
     id: uuidv4(),
-    username: username,
+    username,
     banned: "none",
     uuid: uuidAPI,
     createdAt: new Date(),
@@ -61,126 +54,68 @@ async function createNewUserData(
     deviceId: headerDeviceId,
   };
 
-  try {
-    await REACH_SDK_DB.insertDocument("users", createPacket);
-  } catch (error) {
-    return ResponseHandler.serverError(res, error as Error);
-  }
+  await PLAYERS_DB.insertDocument("players", createPacket);
 
-  return res
-    .status(201)
-    .json(
-      createSuccessResponse(
-        createPacket,
-        "[REACH - Auth]: User created successfully."
-      )
-    );
+  return res.status(201).json(
+    createSuccessResponse(createPacket, "[REACH - Auth]: User created successfully.")
+  );
 }
 
-async function getUserData(
-  req: Request,
-  res: Response
-): Promise<Response<any, Record<string, any>>> {
+async function getUserData(req: Request, res: Response): Promise<Response> {
+  const validation = validateRequest(req, { requiredQuery: ["uuid"] });
+  
+  if (!validation.isValid) {
+    return ResponseHandler.validationError(res, validation.errors);
+  }
+
   const { uuid } = req.query;
-  if (!uuid) {
-    return res
-      .status(400)
-      .json(createErrorResponse("[REACH - Auth]: UUID is required.", 400));
+  const user = await PLAYERS_DB.findDocuments("players", { minecraftUuid: uuid });
+
+  if (user.length === 0) {
+    return ResponseHandler.notFound(res, "User");
   }
 
-  try {
-    const user = await REACH_SDK_DB.findDocuments("users", { uuid });
-
-    if (user.length === 0) {
-      return res
-        .status(404)
-        .json(createErrorResponse("[REACH - Auth]: User not found.", 404));
-    }
-
-    const { createdAt, machineId, deviceId, ...userData } = user[0];
-    return res
-      .status(200)
-      .json(
-        createSuccessResponse(
-          userData,
-          "[REACH - Auth]: User data retrieved successfully."
-        )
-      );
-  } catch (error) {
-    console.error("[REACH - Auth]: Error fetching user data:", error);
-    return res
-      .status(500)
-      .json(
-        createErrorResponse("[REACH - Auth]: Failed to fetch user data.", 500)
-      );
-  }
+  const { createdAt, machineId, deviceId, ...userData } = user[0];
+  return res.status(200).json(
+    createSuccessResponse(userData, "[REACH - Auth]: User data retrieved successfully.")
+  );
 }
 
-async function setupComplete(
-  req: Request,
-  res: Response
-): Promise<Response<any, Record<string, any>>> {
+async function setupComplete(req: Request, res: Response): Promise<Response> {
+  const validation = validateRequest(req, { requiredQuery: ["baId"] });
+  
+  if (!validation.isValid) {
+    return ResponseHandler.validationError(res, validation.errors);
+  }
+
   const { baId } = req.query;
 
-  if (!baId) {
-    return res
-      .status(400)
-      .json(createErrorResponse("[REACH - Auth]: baID is required.", 400));
-  }
+  const user = await DEVELOPERS_DB.findDocuments("users", {
+    _id: DEVELOPERS_DB.createObjectId(baId as string),
+  });
 
-  try {
-    const user = await REACH_AUTH_DB.findDocuments("user", {
-      _id: REACH_AUTH_DB.createObjectId(baId as string),
-    });
-
-    if (user.length !== 1) {
-      return res
-        .status(400)
-        .json(
-          createErrorResponse(
-            "[REACH - Auth]: Error while modifying users. There are duplicates, similarities or not exist.",
-            400
-          )
-        );
-    }
-
-    if(!user[0].newaccount){
-      return res
-      .status(200)
-      .json(
-        createSuccessResponse(
-          null,
-          "[REACH - Auth]: User finished."
-        )
-      );
-    }
-
-    await REACH_AUTH_DB.updateDocument(
-      "user",
-      {
-        _id: REACH_AUTH_DB.createObjectId(baId as string),
-      },
-      {
-        newaccount: false,
-      }
+  if (user.length !== 1) {
+    return ResponseHandler.badRequest(
+      res, 
+      "Error while modifying users. There are duplicates, similarities or not exist."
     );
-
-    return res
-      .status(200)
-      .json(
-        createSuccessResponse(
-          null,
-          "[REACH - Auth]: User data retrieved successfully."
-        )
-      );
-  } catch (error) {
-    console.error("[REACH - Auth]: Error modifying user data:", error);
-    return res
-      .status(500)
-      .json(
-        createErrorResponse("[REACH - Auth]: Failed to modify user data.", 500)
-      );
   }
+
+  if (!user[0].newaccount) {
+    return res.status(200).json(
+      createSuccessResponse(null, "[REACH - Auth]: User finished.")
+    );
+  }
+
+  await DEVELOPERS_DB.updateDocument(
+    "users",
+    { _id: DEVELOPERS_DB.createObjectId(baId as string) },
+    { newaccount: false }
+  );
+
+  return res.status(200).json(
+    createSuccessResponse(null, "[REACH - Auth]: User data retrieved successfully.")
+  );
 }
 
 export { createNewUserData, getUserData, setupComplete };

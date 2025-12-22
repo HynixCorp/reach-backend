@@ -1,24 +1,44 @@
 import { config } from "dotenv";
 import { MongoDB } from "../mongodb/mongodb";
+import { initializeDatabases, checkDatabaseHealth } from "./database.init";
 
 config();
 
 /**
- * Centralized database service to provide singleton instances
- * and better connection management across the application
+ * Database Architecture for Reach Platform
+ * =========================================
+ * 
+ * reach_developers - Developer accounts (Better-Auth managed)
+ *   Collections: users, accounts, sessions, verifications, 
+ *                organizations, organizationLinks, payments, usage, linkedXboxAccounts
+ * 
+ * reach_players - Player accounts (Xbox/Microsoft Auth)
+ *   Collections: players, inventory, achievements, bans, sessions
+ * 
+ * reach_experiences - Game content and instances
+ *   Collections: instances, instanceVersions, instanceCodes, instanceLogs, marketplace
+ * 
+ * reach_overlay - Real-time overlay service
+ *   Collections: presences, achievements, notifications
  */
 class DatabaseService {
   private static instance: DatabaseService;
-  private reachDB: MongoDB;
-  private reachAuthDB: MongoDB;
-  private reachSDKDB: MongoDB;
+  
+  // New architecture databases
+  private developersDB: MongoDB;
+  private playersDB: MongoDB;
+  private experiencesDB: MongoDB;
+  private overlayDB: MongoDB;
+  private dbUri: string;
   
   private constructor() {
-    const dbUri = process.env.DB_URI as string;
+    this.dbUri = process.env.DB_URI as string;
     
-    this.reachDB = new MongoDB(dbUri, "reach");
-    this.reachAuthDB = new MongoDB(dbUri, "reachauth");
-    this.reachSDKDB = new MongoDB(dbUri, "reach");
+    // New database structure
+    this.developersDB = new MongoDB(this.dbUri, "reach_developers");
+    this.playersDB = new MongoDB(this.dbUri, "reach_players");
+    this.experiencesDB = new MongoDB(this.dbUri, "reach_experiences");
+    this.overlayDB = new MongoDB(this.dbUri, "reach_overlay");
   }
   
   /**
@@ -31,39 +51,93 @@ class DatabaseService {
     return DatabaseService.instance;
   }
   
+  // ============ New Architecture Methods ============
+  
   /**
-   * Get reach database instance
+   * Get developers database (Better-Auth accounts, organizations, payments)
+   * Collections: users, accounts, sessions, verifications, organizations, 
+   *              organizationLinks, payments, usage, linkedXboxAccounts
+   */
+  public getDevelopersDB(): MongoDB {
+    return this.developersDB;
+  }
+  
+  /**
+   * Get players database (Xbox/Microsoft authenticated players)
+   * Collections: players, inventory, achievements, bans, sessions
+   */
+  public getPlayersDB(): MongoDB {
+    return this.playersDB;
+  }
+  
+  /**
+   * Get experiences database (instances/content)
+   * Collections: instances, instanceVersions, instanceCodes, instanceLogs, marketplace
+   */
+  public getExperiencesDB(): MongoDB {
+    return this.experiencesDB;
+  }
+  
+  /**
+   * Get overlay database (real-time overlay service)
+   * Collections: presences, achievements, notifications
+   */
+  public getOverlayDB(): MongoDB {
+    return this.overlayDB;
+  }
+  
+  // ============ Legacy Aliases (for backwards compatibility during migration) ============
+  
+  /**
+   * @deprecated Use getDevelopersDB() for auth/org data or getExperiencesDB() for instances
    */
   public getReachDB(): MongoDB {
-    return this.reachDB;
+    console.warn("[Database Service] getReachDB() is deprecated. Use getExperiencesDB() or getPlayersDB()");
+    return this.experiencesDB;
   }
   
   /**
-   * Get reachauth database instance
+   * @deprecated Use getDevelopersDB() instead
    */
   public getReachAuthDB(): MongoDB {
-    return this.reachAuthDB;
+    console.warn("[Database Service] getReachAuthDB() is deprecated. Use getDevelopersDB()");
+    return this.developersDB;
   }
   
   /**
-   * Get reach SDK database instance (alias for reach)
+   * @deprecated Use getExperiencesDB() instead
    */
   public getReachSDKDB(): MongoDB {
-    return this.reachSDKDB;
+    console.warn("[Database Service] getReachSDKDB() is deprecated. Use getExperiencesDB()");
+    return this.experiencesDB;
   }
   
   /**
    * Initialize all database connections
+   * Automatically creates databases and collections if they don't exist
    */
   public async connectAll(): Promise<void> {
     try {
+      console.log("[Database Service] Checking database health...".cyan);
+      
+      // Check if databases need initialization
+      const health = await checkDatabaseHealth(this.dbUri);
+      
+      if (!health.healthy) {
+        console.log("[Database Service] Initializing missing databases/collections...".yellow);
+        await initializeDatabases(this.dbUri);
+      }
+      
+      console.log("[Database Service] Connecting to databases...".cyan);
       await Promise.all([
-        this.reachDB.connect(),
-        this.reachAuthDB.connect(),
-        this.reachSDKDB.connect()
+        this.developersDB.connect(),
+        this.playersDB.connect(),
+        this.experiencesDB.connect(),
+        this.overlayDB.connect()
       ]);
+      console.log("[Database Service] All databases connected successfully".green);
     } catch (error) {
-      console.error("[Database Service]: Failed to connect to databases:", error);
+      console.error("[Database Service] Failed to connect to databases:".red, error);
       throw error;
     }
   }
@@ -73,9 +147,10 @@ class DatabaseService {
    */
   public async closeAll(): Promise<void> {
     await Promise.all([
-      this.reachDB.close(),
-      this.reachAuthDB.close(),
-      this.reachSDKDB.close()
+      this.developersDB.close(),
+      this.playersDB.close(),
+      this.experiencesDB.close(),
+      this.overlayDB.close()
     ]);
   }
 }
@@ -83,7 +158,16 @@ class DatabaseService {
 // Export singleton instance getter
 export const getDatabaseService = () => DatabaseService.getInstance();
 
-// Export convenience methods for direct access
+// ============ New Architecture Exports ============
+export const getDevelopersDB = () => getDatabaseService().getDevelopersDB();
+export const getPlayersDB = () => getDatabaseService().getPlayersDB();
+export const getExperiencesDB = () => getDatabaseService().getExperiencesDB();
+export const getOverlayDB = () => getDatabaseService().getOverlayDB();
+
+// ============ Legacy Exports (deprecated) ============
+/** @deprecated Use getDevelopersDB() for auth or getExperiencesDB() for instances */
 export const getReachDB = () => getDatabaseService().getReachDB();
+/** @deprecated Use getDevelopersDB() instead */
 export const getReachAuthDB = () => getDatabaseService().getReachAuthDB();
+/** @deprecated Use getExperiencesDB() instead */
 export const getReachSDKDB = () => getDatabaseService().getReachSDKDB();

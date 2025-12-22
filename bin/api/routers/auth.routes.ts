@@ -1,11 +1,12 @@
 import express from "express";
+import { asyncHandler } from "../../common/services/response.service";
+import { createNewUserData, getUserData, setupComplete } from "../controllers/auth.controller";
 
 const ROUTER = express.Router();
-const CONTROLLER = require("../controllers/auth.controller");
 
-ROUTER.post("/create", CONTROLLER.createNewUserData);
-ROUTER.get("/get", CONTROLLER.getUserData);
-ROUTER.get("/setup/finish", CONTROLLER.setupComplete)
+ROUTER.post("/create", asyncHandler(createNewUserData));
+ROUTER.get("/get", asyncHandler(getUserData));
+ROUTER.get("/setup/finish", asyncHandler(setupComplete));
 
 export { ROUTER as AUTH_ROUTER };
 export default ROUTER;

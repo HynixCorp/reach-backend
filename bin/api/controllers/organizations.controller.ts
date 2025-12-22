@@ -1,28 +1,19 @@
 import { Request, Response } from "express";
-import {
-  createErrorResponse,
-  createGenericResponse,
-  createSuccessResponse,
-} from "../../common/utils";
-import { config } from "dotenv";
+import { createGenericResponse, createSuccessResponse } from "../../common/utils";
 import { generateTemporaryToken } from "../../common/cryptography/temporal";
 import { generateToken } from "../../common/reach/x-reach";
 import { DateTime } from "luxon";
 import { verifyTokenDate } from "../../common/reach/orgs.provider";
-import { getReachAuthDB } from "../../common/services/database.service";
+import { getDevelopersDB } from "../../common/services/database.service";
 import { validateRequiredFields, validateRequest, isValidObjectId } from "../../common/services/validation.service";
-import { ResponseHandler, asyncHandler } from "../../common/services/response.service";
+import { ResponseHandler } from "../../common/services/response.service";
 
-config();
-
-const REACH_DB = getReachAuthDB();
+// reach_developers - Organizations belong to developer accounts
+const DEVELOPERS_DB = getDevelopersDB();
 
 type OrganizationMemberEntry =
   | string
-  | {
-      userId: string;
-      role: string;
-    };
+  | { userId: string; role: string };
 
 const normalizeMembers = (
   members: OrganizationMemberEntry[],
@@ -52,7 +43,7 @@ export async function create_organization(req: Request, res: Response) {
 
   const { name, description, supportEmail, supportWebsite, ownerId } = req.body;
 
-  const nameExistes = await REACH_DB.findDocuments("organizations", { name });
+  const nameExistes = await DEVELOPERS_DB.findDocuments("organizations", { name });
 
   if (nameExistes.length > 0) {
     return ResponseHandler.conflict(
@@ -74,7 +65,7 @@ export async function create_organization(req: Request, res: Response) {
     },
   };
 
-  await REACH_DB.insertDocument("organizations", organizationPackage);
+  await DEVELOPERS_DB.insertDocument("organizations", organizationPackage);
 
   return res
     .status(200)
@@ -113,7 +104,7 @@ export async function create_organization_link(req: Request, res: Response) {
       return ResponseHandler.forbidden(res, "Invalid header. Access denied.");
     }
 
-    const organizationByOwner = await REACH_DB.findDocuments("organizations", {
+    const organizationByOwner = await DEVELOPERS_DB.findDocuments("organizations", {
       ownerId: ownerId,
     });
 
@@ -139,7 +130,7 @@ export async function create_organization_link(req: Request, res: Response) {
       temporaryToken,
     };
 
-    await REACH_DB.insertDocument("organizationLinks", allNewPackage);
+    await DEVELOPERS_DB.insertDocument("organizationLinks", allNewPackage);
 
     return res.status(200).json(
       createSuccessResponse(
@@ -171,8 +162,8 @@ export async function get_organization_info_by_id(req: Request, res: Response) {
     return ResponseHandler.badRequest(res, "Invalid organization ID format.");
   }
 
-  const organization = await REACH_DB.findDocuments("organizations", {
-    _id: REACH_DB.createObjectId(organizationId),
+  const organization = await DEVELOPERS_DB.findDocuments("organizations", {
+    _id: DEVELOPERS_DB.createObjectId(organizationId),
   });
 
   if (organization.length === 0) {
@@ -201,49 +192,29 @@ export async function get_organization_info_by_id(req: Request, res: Response) {
 }
 
 export async function get_organization_info_by_tk(req: Request, res: Response) {
-  const { key } = req.params;
-
-  if (!key) {
-    return res
-      .status(400)
-      .json(
-        createErrorResponse(
-          "[REACH - Organizations]: Missing required fields. Please see the documentation for more information.",
-          400
-        )
-      );
+  const validation = validateRequest(req, { requiredParams: ["key"] });
+  
+  if (!validation.isValid) {
+    return ResponseHandler.validationError(res, validation.errors);
   }
 
-  const packageLink = await REACH_DB.findDocuments("organizationLinks", {
+  const { key } = req.params;
+
+  const packageLink = await DEVELOPERS_DB.findDocuments("organizationLinks", {
     temporaryToken: key as string,
   });
 
   if (packageLink.length === 0) {
-    return res
-      .status(404)
-      .json(
-        createErrorResponse(
-          "[REACH - Organizations]: Link not found or expired. Please generate a new link.",
-          404
-        )
-      );
+    return ResponseHandler.notFound(res, "Organization link (expired or not found)");
   }
 
   const organizationId = packageLink[0].organizationId;
-
-  const organization = await REACH_DB.findDocuments("organizations", {
-    _id: REACH_DB.createObjectId(organizationId),
+  const organization = await DEVELOPERS_DB.findDocuments("organizations", {
+    _id: DEVELOPERS_DB.createObjectId(organizationId),
   });
 
   if (organization.length === 0) {
-    return res
-      .status(404)
-      .json(
-        createErrorResponse(
-          "[REACH - Organizations]: Organization not found. Please check the ID and try again.",
-          404
-        )
-      );
+    return ResponseHandler.notFound(res, "Organization");
   }
 
   return res.status(200).json(
@@ -261,297 +232,185 @@ export async function get_organization_info_by_tk(req: Request, res: Response) {
 }
 
 export async function join_organization(req: Request, res: Response) {
-  const { key, userId } = req.body;
-
-  if (!key || !userId) {
-    return res
-      .status(400)
-      .json(
-        createErrorResponse(
-          "[REACH - Organizations]: Missing required fields. Please see the documentation for more information.",
-          400
-        )
-      );
+  const validation = validateRequest(req, { requiredBody: ["key", "userId"] });
+  
+  if (!validation.isValid) {
+    return ResponseHandler.validationError(res, validation.errors);
   }
 
-  const packageLink = await REACH_DB.findDocuments("organizationLinks", {
+  const { key, userId } = req.body;
+
+  const packageLink = await DEVELOPERS_DB.findDocuments("organizationLinks", {
     temporaryToken: key as string,
   });
 
   if (packageLink.length === 0) {
-    return res
-      .status(404)
-      .json(
-        createErrorResponse(
-          "[REACH - Organizations]: Link not found or expired. Please generate a new link.",
-          404
-        )
-      );
+    return ResponseHandler.notFound(res, "Organization link (expired or not found)");
   }
 
   const tokenDate = DateTime.fromISO(packageLink[0].createdAt);
   const isTokenValid = await verifyTokenDate(tokenDate);
 
   if (!isTokenValid) {
-    return res
-      .status(400)
-      .json(
-        createErrorResponse(
-          "[REACH - Organizations]: Link has expired. Please request a new link.",
-          400
-        )
-      );
+    return ResponseHandler.badRequest(res, "Link has expired. Please request a new link.");
   }
 
   const organizationId = packageLink[0].organizationId;
-
-  const organization = await REACH_DB.findDocuments("organizations", {
-    _id: REACH_DB.createObjectId(organizationId),
+  const organization = await DEVELOPERS_DB.findDocuments("organizations", {
+    _id: DEVELOPERS_DB.createObjectId(organizationId),
   });
 
   if (organization.length === 0) {
-    return res
-      .status(404)
-      .json(
-        createErrorResponse(
-          "[REACH - Organizations]: Organization not found. Please check the ID and try again.",
-          404
-        )
-      );
+    return ResponseHandler.notFound(res, "Organization");
   }
 
   const currentMembers = (organization[0].members ?? []) as OrganizationMemberEntry[];
 
   if (currentMembers.some((member) => memberMatchesUser(member, userId))) {
-    return res
-      .status(200)
-      .json(
-        createGenericResponse(
-          false,
-          null,
-          "[REACH - Organizations]: User is already a member of the organization.",
-          400
-        )
-      );
+    return res.status(200).json(
+      createGenericResponse(
+        false,
+        null,
+        "User is already a member of the organization.",
+        400
+      )
+    );
   }
 
-  await REACH_DB.updateDocument(
+  await DEVELOPERS_DB.updateDocument(
     "organizations",
-    { _id: REACH_DB.createObjectId(organizationId) },
+    { _id: DEVELOPERS_DB.createObjectId(organizationId) },
     { $push: { members: { userId, role: "member" } } }
   );
 
-  await REACH_DB.deleteDocument("organizationLinks", {
+  await DEVELOPERS_DB.deleteDocument("organizationLinks", {
     temporaryToken: key as string,
   });
 
-  return res
-    .status(200)
-    .json(
-      createSuccessResponse(null, "User added to organization successfully.")
-    );
+  return res.status(200).json(
+    createSuccessResponse(null, "User added to organization successfully.")
+  );
 }
 
 export async function decline_invite(req: Request, res: Response) {
-  const { key } = req.body;
-  if (!key) {
-    return res
-      .status(400)
-      .json(
-        createErrorResponse(
-          "[REACH - Organizations]: Missing required fields. Please see the documentation for more information.",
-          400
-        )
-      );
+  const validation = validateRequest(req, { requiredBody: ["key"] });
+  
+  if (!validation.isValid) {
+    return ResponseHandler.validationError(res, validation.errors);
   }
 
-  const packageLink = await REACH_DB.findDocuments("organizationLinks", {
+  const { key } = req.body;
+
+  const packageLink = await DEVELOPERS_DB.findDocuments("organizationLinks", {
     temporaryToken: key as string,
   });
 
   if (packageLink.length === 0) {
-    return res
-      .status(200)
-      .json(
-        createGenericResponse(
-          true,
-          null,
-          "[REACH - Organizations]: Already declined or expired.",
-          200
-        )
-      );
+    return res.status(200).json(
+      createGenericResponse(true, null, "Already declined or expired.", 200)
+    );
   }
 
   const tokenDate = DateTime.fromISO(packageLink[0].createdAt);
   const isTokenValid = await verifyTokenDate(tokenDate);
 
   if (!isTokenValid) {
-    return res
-      .status(200)
-      .json(
-        createGenericResponse(
-          true,
-          null,
-          "[REACH - Organizations]: Link has expired. Please request a new link.",
-          200
-        )
-      );
+    return res.status(200).json(
+      createGenericResponse(true, null, "Link has expired. Please request a new link.", 200)
+    );
   }
 
-  await REACH_DB.deleteDocument("organizationLinks", {
+  await DEVELOPERS_DB.deleteDocument("organizationLinks", {
     temporaryToken: key as string,
   });
 
-  return res
-    .status(200)
-    .json(createSuccessResponse(null, "Invite declined successfully."));
+  return res.status(200).json(
+    createSuccessResponse(null, "Invite declined successfully.")
+  );
 }
 
 export async function get_organizations_by_user(req: Request, res: Response) {
-  const { userId } = req.params;
-
-  if (!userId) {
-    return res
-      .status(400)
-      .json(
-        createErrorResponse(
-          "[REACH - Organizations]: Missing required fields. Please see the documentation for more information.",
-          400
-        )
-      );
+  const validation = validateRequest(req, { requiredParams: ["userId"] });
+  
+  if (!validation.isValid) {
+    return ResponseHandler.validationError(res, validation.errors);
   }
 
-  const organizations = await REACH_DB.findDocuments("organizations", {
+  const { userId } = req.params;
+
+  const organizations = await DEVELOPERS_DB.findDocuments("organizations", {
     $or: [
-      { members: { $elemMatch: { userId: userId } } },
+      { members: { $elemMatch: { userId } } },
       { members: userId },
     ],
   });
 
   if (organizations.length === 0) {
-    return res
-      .status(200)
-      .json(
-        createGenericResponse(
-          true,
-          null,
-          "[REACH - Organizations]: No organizations found for this user.",
-          404
-        )
-      );
+    return res.status(200).json(
+      createGenericResponse(true, null, "No organizations found for this user.", 404)
+    );
   }
 
   const organizationsWithoutMembers = organizations.map((org: any) => {
     const { members, ownerId, ...rest } = org;
-    return rest;
+    return {
+      ...rest,
+      name: org.name.replace(/\b\w/g, (char: string) => char.toUpperCase()),
+    };
   });
 
-  const organizationWithNameUppercaseInAnyNewWord =
-    organizationsWithoutMembers.map((org: any) => {
-      return {
-        ...org,
-        name: org.name.replace(/\b\w/g, (char: string) => char.toUpperCase()),
-      };
-    });
-
-  return res
-    .status(200)
-    .json(
-      createSuccessResponse(
-        organizationWithNameUppercaseInAnyNewWord,
-        "Organizations retrieved successfully."
-      )
-    );
+  return res.status(200).json(
+    createSuccessResponse(organizationsWithoutMembers, "Organizations retrieved successfully.")
+  );
 }
 
 export async function get_all_info_organization(req: Request, res: Response) {
+  const validation = validateRequest(req, {
+    requiredQuery: ["organizationId"],
+    requiredHeaders: ["x-reach-token"],
+  });
+
+  if (!validation.isValid) {
+    return ResponseHandler.validationError(res, validation.errors);
+  }
+
   const { organizationId } = req.query;
   const x_reach_token = req.headers["x-reach-token"];
 
-  if (!x_reach_token || x_reach_token.length === 0) {
-    return res
-      .status(400)
-      .json(
-        createErrorResponse(
-          "[REACH - Organizations]: Missing header. Please provide a valid token.",
-          400
-        )
-      );
-  }
-
-  if (
-    !organizationId ||
-    organizationId.length === 0 ||
-    typeof organizationId !== "string"
-  ) {
-    return res
-      .status(400)
-      .json(
-        createErrorResponse(
-          "[REACH - Organizations]: Missing required fields. Please see the documentation for more information.",
-          400
-        )
-      );
-  }
-
-  const organization = await REACH_DB.findDocuments("organizations", {
-    _id: REACH_DB.createObjectId(organizationId),
+  const organization = await DEVELOPERS_DB.findDocuments("organizations", {
+    _id: DEVELOPERS_DB.createObjectId(organizationId as string),
   });
 
   if (organization.length === 0) {
-    return res
-      .status(404)
-      .json(
-        createErrorResponse(
-          "[REACH - Organizations]: Organization not found. Please check the ID and try again.",
-          404
-        )
-      );
+    return ResponseHandler.notFound(res, "Organization");
   }
 
   const isValid = generateToken(organization[0].ownerId) === x_reach_token;
 
   if (!isValid) {
-    return res
-      .status(403)
-      .json(
-        createErrorResponse(
-          "[REACH - Organizations]: Invalid X-Reach-Token. Access denied.",
-          403
-        )
-      );
+    return ResponseHandler.forbidden(res, "Invalid X-Reach-Token. Access denied.");
   }
 
-  // create member list for fetching user data
   const existingMembers = (organization[0].members ?? []) as OrganizationMemberEntry[];
-  const normalizedMembers = normalizeMembers(
-    existingMembers,
-    organization[0].ownerId
-  );
+  const normalizedMembers = normalizeMembers(existingMembers, organization[0].ownerId);
 
   const membersList = normalizedMembers.map((member) =>
-    REACH_DB.findDocuments("user", {
-      _id: REACH_DB.createObjectId(member.userId),
+    DEVELOPERS_DB.findDocuments("user", {
+      _id: DEVELOPERS_DB.createObjectId(member.userId),
     })
   );
 
   const membersInfo = await Promise.all(membersList);
-
-  // now, get all organization invites (expired and non-expired) for this organization
-  const organizationInvites = await REACH_DB.findDocuments(
+  const organizationInvites = await DEVELOPERS_DB.findDocuments(
     "organizationLinks",
-    { organizationId: organizationId }
+    { organizationId: organizationId as string }
   );
 
-  // attach membersInfo and organizationInvites to organization object
   organization[0].members = normalizedMembers;
   organization[0].membersInfo = membersInfo
     .map((memberArray, index) => {
       const memberDocument = memberArray[0];
-      if (!memberDocument) {
-        return null;
-      }
-
+      if (!memberDocument) return null;
       return {
         ...memberDocument,
         role: normalizedMembers[index]?.role ?? "member",
@@ -560,71 +419,49 @@ export async function get_all_info_organization(req: Request, res: Response) {
     .filter((member): member is Record<string, unknown> => member !== null);
   organization[0].organizationInvites = organizationInvites;
 
-  // finally, return the organization object with all info
-  return res
-    .status(200)
-    .json(
-      createSuccessResponse(
-        organization[0],
-        "Organization retrieved successfully."
-      )
-    );
+  return res.status(200).json(
+    createSuccessResponse(organization[0], "Organization retrieved successfully.")
+  );
 }
 
 export async function renew_organization_link(req: Request, res: Response) {
-  const { key } = req.body;
-
-  if (!key) {
-    return res
-      .status(400)
-      .json(
-        createErrorResponse(
-          "[REACH - Organizations]: Missing required fields. Please see the documentation for more information.",
-          400
-        )
-      );
+  const validation = validateRequest(req, { requiredBody: ["key"] });
+  
+  if (!validation.isValid) {
+    return ResponseHandler.validationError(res, validation.errors);
   }
 
-  const packageLink = await REACH_DB.findDocuments("organizationLinks", {
+  const { key } = req.body;
+
+  const packageLink = await DEVELOPERS_DB.findDocuments("organizationLinks", {
     temporaryToken: key as string,
   });
 
   if (packageLink.length === 0) {
-    return res
-      .status(404)
-      .json(
-        createErrorResponse(
-          "[REACH - Organizations]: Link not found. Please generate a new link.",
-          404
-        )
-      );
+    return ResponseHandler.notFound(res, "Organization link");
   }
 
   const { organizationId } = packageLink[0];
+  const newTemporaryToken = await generateTemporaryToken(organizationId.toString());
 
-  const newTemporaryToken = await generateTemporaryToken(
-    organizationId.toString()
-  );
-
-  await REACH_DB.updateDocument(
+  await DEVELOPERS_DB.updateDocument(
     "organizationLinks",
     { temporaryToken: key as string },
     {
       $set: {
         temporaryToken: newTemporaryToken,
         date: new Date(),
-        expirationDate: new Date(Date.now() + 1000 * 60 * 60 * 24), // 1 day
+        expirationDate: new Date(Date.now() + 1000 * 60 * 60 * 24),
       },
     }
   );
 
-  //resolve all new package to update in FRONTEND
-  res.status(200).json(
+  return res.status(200).json(
     createSuccessResponse(
       {
         temporaryToken: newTemporaryToken,
         previousToken: key,
-        newExpirationDate: new Date(Date.now() + 1000 * 60 * 60 * 24), // 1 day
+        newExpirationDate: new Date(Date.now() + 1000 * 60 * 60 * 24),
       },
       "Organization link renewed successfully."
     )
@@ -632,108 +469,69 @@ export async function renew_organization_link(req: Request, res: Response) {
 }
 
 export async function revoke_organization_link(req: Request, res: Response) {
-  const { key } = req.body;
-
-  if (!key) {
-    return res
-      .status(400)
-      .json(
-        createErrorResponse(
-          "[REACH - Organizations]: Missing required fields. Please see the documentation for more information.",
-          400
-        )
-      );
+  const validation = validateRequest(req, { requiredBody: ["key"] });
+  
+  if (!validation.isValid) {
+    return ResponseHandler.validationError(res, validation.errors);
   }
 
-  const packageLink = await REACH_DB.findDocuments("organizationLinks", {
+  const { key } = req.body;
+
+  const packageLink = await DEVELOPERS_DB.findDocuments("organizationLinks", {
     temporaryToken: key as string,
   });
 
   if (packageLink.length === 0) {
-    return res
-      .status(404)
-      .json(
-        createErrorResponse(
-          "[REACH - Organizations]: Link not found. Please generate a new link.",
-          404
-        )
-      );
+    return ResponseHandler.notFound(res, "Organization link");
   }
 
-  await REACH_DB.deleteDocument("organizationLinks", {
+  await DEVELOPERS_DB.deleteDocument("organizationLinks", {
     temporaryToken: key as string,
   });
 
-  return res
-    .status(200)
-    .json(
-      createSuccessResponse(null, "Organization link revoked successfully.")
-    );
+  return res.status(200).json(
+    createSuccessResponse(null, "Organization link revoked successfully.")
+  );
 }
 
-export async function delete_member_from_organization(
-  req: Request,
-  res: Response
-) {
-  const { organizationId, memberId } = req.body;
-  if (!organizationId || !memberId) {
-    return res
-      .status(400)
-      .json(
-        createErrorResponse(
-          "[REACH - Organizations]: Missing required fields. Please see the documentation for more information.",
-          400
-        )
-      );
+export async function delete_member_from_organization(req: Request, res: Response) {
+  const validation = validateRequest(req, { requiredBody: ["organizationId", "memberId"] });
+  
+  if (!validation.isValid) {
+    return ResponseHandler.validationError(res, validation.errors);
   }
-  const organization = await REACH_DB.findDocuments("organizations", {
-    _id: REACH_DB.createObjectId(organizationId),
+
+  const { organizationId, memberId } = req.body;
+
+  const organization = await DEVELOPERS_DB.findDocuments("organizations", {
+    _id: DEVELOPERS_DB.createObjectId(organizationId),
   });
 
   if (organization.length === 0) {
-    return res
-      .status(404)
-      .json(
-        createErrorResponse(
-          "[REACH - Organizations]: Organization not found. Please check the ID and try again.",
-          404
-        )
-      );
+    return ResponseHandler.notFound(res, "Organization");
   }
 
   const currentMembers = (organization[0].members ?? []) as OrganizationMemberEntry[];
 
   if (!currentMembers.some((member) => memberMatchesUser(member, memberId))) {
-    return res
-      .status(400)
-      .json(
-        createErrorResponse(
-          "[REACH - Organizations]: Member not found in organization.",
-          400
-        )
-      );
+    return ResponseHandler.badRequest(res, "Member not found in organization.");
   }
 
-  await REACH_DB.updateDocument(
+  await DEVELOPERS_DB.updateDocument(
     "organizations",
-    { _id: REACH_DB.createObjectId(organizationId) },
+    { _id: DEVELOPERS_DB.createObjectId(organizationId) },
     { $pull: { members: { userId: memberId } } }
   );
 
-  await REACH_DB.updateDocument(
+  await DEVELOPERS_DB.updateDocument(
     "organizations",
-    { _id: REACH_DB.createObjectId(organizationId) },
+    { _id: DEVELOPERS_DB.createObjectId(organizationId) },
     { $pull: { members: memberId } }
   );
 
-  return res
-    .status(200)
-    .json(
-      createSuccessResponse(
-        null,
-        "Member removed from organization successfully."
-      )
-    );
+  return res.status(200).json(
+    createSuccessResponse(null, "Member removed from organization successfully.")
+  );
 }
 
 export async function edit_organization_info(req: Request, res: Response) {
@@ -750,8 +548,8 @@ export async function edit_organization_info(req: Request, res: Response) {
     return ResponseHandler.validationError(res, validation.errors);
   }
 
-  await REACH_DB.updateDocument("organizations", {
-    _id: REACH_DB.createObjectId(organizationId),
+  await DEVELOPERS_DB.updateDocument("organizations", {
+    _id: DEVELOPERS_DB.createObjectId(organizationId),
   }, {
     $set: {
       description,

@@ -1,11 +1,12 @@
 import { config } from "dotenv";
 import { PolarOrderDB } from "../../types/polar";
 import { Beneficts } from "../../types/user";
-import { getReachAuthDB } from "../services/database.service";
+import { getDevelopersDB } from "../services/database.service";
 
 config();
 
-const REACH_SDK_DB = getReachAuthDB();
+// reach_developers - Usage belongs to developer accounts
+const DEVELOPERS_DB = getDevelopersDB();
 
 export async function getUsageDocument(
   ownerId: string
@@ -15,7 +16,7 @@ export async function getUsageDocument(
   }
 
   try {
-    const information = await REACH_SDK_DB.findDocuments("usage", {
+    const information = await DEVELOPERS_DB.findDocuments("usage", {
       auth: ownerId.trim(),
     });
 
@@ -91,7 +92,7 @@ export async function usageToken(
       return false;
     }
 
-    await REACH_SDK_DB.updateDocument("usage", {
+    await DEVELOPERS_DB.updateDocument("usage", {
       auth: authID.trim()
     }, usageDocument);
 

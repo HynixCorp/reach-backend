@@ -14,11 +14,11 @@ export class Client {
     // Configurar Socket.IO con CORS
     this.io = new Server(this.server, {
       cors: {
-        origin: [
-          "http://dashboard.reachsdk.local:3001",
-          "http://localhost:3001",
-          "http://localhost:3000"
-        ],
+        // origin: [
+        //   "http://dashboard.reachsdk.local:3001",
+        //   "http://localhost:3001",
+        //   "http://localhost:3000"
+        // ],
         methods: ["GET", "POST"],
         credentials: true
       }
@@ -26,13 +26,12 @@ export class Client {
 
     // Solo una vez
     this.io.on("connection", (socket: any) => {
-      console.log(`Client connected: ${socket.id}`);
 
       // Ejecutar todos los listeners registrados
       this.listeners.forEach((listener) => listener(socket));
 
       socket.on("disconnect", () => {
-        console.log(`Client disconnected: ${socket.id}`);
+        
       });
     });
   }
