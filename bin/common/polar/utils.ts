@@ -80,6 +80,10 @@ export function revokeProducts(products: string[]) {
 }
 
 export async function getCheckoutInfo(checkoutId: string): Promise<PolarCheckoutResponse> {
+  if (!POLAR_URI || !POLAR_TOKEN) {
+    throw new Error("Polar API not configured (missing POLAR_ENDPOINT_URI or POLAR_API_KEY)");
+  }
+
   const response = await fetch(`${POLAR_URI}/checkouts/${checkoutId}`, {
     headers: {
       Authorization: `Bearer ${POLAR_TOKEN}`,
@@ -88,7 +92,9 @@ export async function getCheckoutInfo(checkoutId: string): Promise<PolarCheckout
   });
 
   if (!response.ok) {
-    throw new Error("Failed to get checkout info");
+    const errorBody = await response.text();
+    console.error(`[Polar] getCheckoutInfo failed: ${response.status} - ${errorBody}`);
+    throw new Error(`Polar API error ${response.status}: ${errorBody}`);
   }
 
   return response.json() as Promise<PolarCheckoutResponse>;
@@ -110,6 +116,10 @@ export async function getCustomerID(customerSessionToken: string): Promise<Polar
 }
 
 export async function getCustomerPortalURL(customerSessionToken: string): Promise<PolarCustomerSessionResponse> {
+  if (!POLAR_URI || !POLAR_TOKEN) {
+    throw new Error("Polar API not configured (missing POLAR_ENDPOINT_URI or POLAR_API_KEY)");
+  }
+
   const response = await fetch(`${POLAR_URI}/customer-sessions`, {
     headers: {
       Authorization: `Bearer ${POLAR_TOKEN}`,
@@ -122,7 +132,9 @@ export async function getCustomerPortalURL(customerSessionToken: string): Promis
   });
 
   if (!response.ok) {
-    throw new Error("Failed to get customer portal URL");
+    const errorBody = await response.text();
+    console.error(`[Polar] getCustomerPortalURL failed: ${response.status} - ${errorBody}`);
+    throw new Error(`Polar API error ${response.status}: ${errorBody}`);
   }
 
   return response.json() as Promise<PolarCustomerSessionResponse>;

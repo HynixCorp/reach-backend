@@ -43,10 +43,10 @@ const DATABASE_SCHEMA: DatabaseSchema = {
   reach_developers: {
     collections: [
       // Better-Auth collections
-      { name: "users", indexes: [{ key: { email: 1 }, unique: true }] },
-      { name: "accounts", indexes: [{ key: { userId: 1 } }, { key: { providerId: 1, accountId: 1 } }] },
-      { name: "sessions", indexes: [{ key: { token: 1 }, unique: true }, { key: { userId: 1 } }] },
-      { name: "verifications", indexes: [{ key: { identifier: 1 } }] },
+      { name: "user", indexes: [{ key: { email: 1 }, unique: true }] },
+      { name: "account", indexes: [{ key: { userId: 1 } }, { key: { providerId: 1, accountId: 1 } }] },
+      { name: "session", indexes: [{ key: { token: 1 }, unique: true }, { key: { userId: 1 } }] },
+      { name: "verification", indexes: [{ key: { identifier: 1 } }] },
       
       // Business collections
       { name: "organizations", indexes: [{ key: { ownerId: 1 } }, { key: { name: 1 }, unique: true }] },
