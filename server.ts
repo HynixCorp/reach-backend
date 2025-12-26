@@ -65,6 +65,10 @@ app.get("/health", asyncHandler(health));
   const dbService = getDatabaseService();
   await dbService.connectAll();
   
+  // Initialize Better-Auth MongoDB connections
+  const { initBetterAuthConnections } = await import("./bin/common/auth/better-auth.config");
+  await initBetterAuthConnections();
+  
   // Make database service available to controllers if needed
   app.locals.dbService = dbService;
 

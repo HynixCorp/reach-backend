@@ -23,6 +23,19 @@ import "colorts/lib/string";
 const DB_URI = process.env.DB_URI || "mongodb://localhost:27017/";
 const BASE_URL = process.env.BASE_URL || "http://localhost:8080";
 
+// Microsoft OAuth credentials
+const MICROSOFT_CLIENT_ID = process.env.MICROSOFT_CLIENT_ID || "";
+const MICROSOFT_CLIENT_SECRET = process.env.MICROSOFT_CLIENT_SECRET || "";
+const MICROSOFT_TENANT_ID = process.env.MICROSOFT_TENANT_ID || "consumers";
+
+// Debug: Check if Microsoft credentials are configured
+if (!MICROSOFT_CLIENT_ID || !MICROSOFT_CLIENT_SECRET) {
+  console.warn("[Better-Auth] ⚠️ MICROSOFT_CLIENT_ID or MICROSOFT_CLIENT_SECRET not configured!".yellow);
+  console.warn("[Better-Auth] ⚠️ Player authentication with Microsoft will NOT work.".yellow);
+} else {
+  console.log("[Better-Auth] ✅ Microsoft OAuth credentials configured".green);
+}
+
 // MongoDB clients for Better-Auth (singleton pattern)
 let developersDb: Db | null = null;
 let playersDb: Db | null = null;
@@ -130,17 +143,11 @@ export const playerAuth = betterAuth({
   
   socialProviders: {
     microsoft: {
-      clientId: process.env.MICROSOFT_CLIENT_ID || "",
-      clientSecret: process.env.MICROSOFT_CLIENT_SECRET || "",
-      tenantId: process.env.MICROSOFT_TENANT_ID || "consumers",
-      // Request Xbox Live and Minecraft scopes
-      scope: [
-        "openid",
-        "profile", 
-        "email",
-        "XboxLive.signin",
-        "XboxLive.offline_access"
-      ]
+      clientId: MICROSOFT_CLIENT_ID,
+      clientSecret: MICROSOFT_CLIENT_SECRET,
+      tenantId: MICROSOFT_TENANT_ID,
+      // Use standard scopes first, Xbox scopes will be handled separately
+      scope: ["openid", "profile", "email", "offline_access"]
     }
   },
   
@@ -150,7 +157,6 @@ export const playerAuth = betterAuth({
   },
   
   user: {
-    modelName: "players", // Use 'players' collection instead of 'users'
     additionalFields: {
       xboxGamertag: {
         type: "string",
@@ -182,10 +188,14 @@ export const playerAuth = betterAuth({
   
   trustedOrigins: [
     "http://localhost:3000",
-    "tauri://localhost", // Tauri app
-    "https://tauri.localhost" // Tauri app (Windows)
+    "http://localhost:8080",
+    "tauri://localhost",
+    "https://tauri.localhost"
   ]
 });
+
+// Debug: Log available API endpoints
+console.log("[Better-Auth] Player Auth API available at: /api/auth/player/*".cyan);
 
 /**
  * Initialize Better-Auth MongoDB connections

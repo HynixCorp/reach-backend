@@ -3,17 +3,12 @@ import cron from "node-cron";
 import fs from "fs/promises";
 import path from "path";
 import { config } from "dotenv";
-import { MongoDB } from "../common/mongodb/mongodb";
+import { getExperiencesDB } from "../common/services/database.service";
 import { cleanOldVersionsGlobal } from "../api/controllers/storage.controller";
 
 config();
 
-const DB = new MongoDB(process.env.DB_URI as string, "reach");
 const MAX_AGE_MS = 1000 * 60 * 60 * 48;
-
-(async () => {
-    await DB.connect();
-})();
 
 // const ASSETS_DIR = path.join(__dirname, "..", "..", "files", "uploads", "instances", "assets");
 const TEMP_DIR = path.join(__dirname, "..", "..", "cdn", "temp");
@@ -42,18 +37,19 @@ export function startInstanceManager() {
 
 async function checkWaitingInstances() {
     const now = new Date();
+    const experiencesDB = getExperiencesDB();
 
-    const waitingInstances = await DB.findDocuments("instances", {
+    const waitingInstances = await experiencesDB.findDocuments("instances", {
         status: "waiting",
         waitingUntil: { $lte: now },
     });
 
     for (const instance of waitingInstances) {
-        await DB.updateDocument("instances", { id: instance.id }, {
+        await experiencesDB.updateDocument("instances", { id: instance.id }, {
             status: "active",
         });
 
-        const db = DB.getDb();
+        const db = experiencesDB.getDb();
         await db.collection("instances").updateOne(
             { id: instance.id },
             { $unset: { waitingUntil: "" } }

@@ -73,11 +73,14 @@ jobs:
           CRYPTO_SECRET: ${{ secrets.CRYPTO_SECRET }}
           CDN_SECRET_KEY: ${{ secrets.CDN_SECRET_KEY }}
           UPDATE_SECRET: ${{ secrets.UPDATE_SECRET }}
+          BETTER_AUTH_SECRET: ${{ secrets.BETTER_AUTH_SECRET }}
           DASHBOARD_URL: ${{ secrets.DASHBOARD_URL }}
           POLAR_API_KEY: ${{ secrets.POLAR_API_KEY }}
           POLAR_WEBHOOK_SECRET: ${{ secrets.POLAR_WEBHOOK_SECRET }}
           POLAR_ENDPOINT_URI: ${{ secrets.POLAR_ENDPOINT_URI }}
           RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          MICROSOFT_CLIENT_ID: ${{ secrets.MICROSOFT_CLIENT_ID }}
+          MICROSOFT_CLIENT_SECRET: ${{ secrets.MICROSOFT_CLIENT_SECRET }}
         run: |
           # Create the deployment package
           mkdir -p deploy
@@ -89,11 +92,14 @@ jobs:
           CRYPTO_SECRET=${CRYPTO_SECRET}
           CDN_SECRET_KEY=${CDN_SECRET_KEY}
           UPDATE_SECRET=${UPDATE_SECRET}
+          BETTER_AUTH_SECRET=${BETTER_AUTH_SECRET}
           DASHBOARD_URL=${DASHBOARD_URL}
           POLAR_API_KEY=${POLAR_API_KEY}
           POLAR_WEBHOOK_SECRET=${POLAR_WEBHOOK_SECRET}
           POLAR_ENDPOINT_URI=${POLAR_ENDPOINT_URI}
           RESEND_API_KEY=${RESEND_API_KEY}
+          MICROSOFT_CLIENT_ID=${MICROSOFT_CLIENT_ID}
+          MICROSOFT_CLIENT_SECRET=${MICROSOFT_CLIENT_SECRET}
           EOF
           
           # Create initialization script

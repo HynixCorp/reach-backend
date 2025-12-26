@@ -105,6 +105,7 @@ function reachEmptyBodyHandler(
    🧠 USER AGENT HANDLER
 ========================= */
 const USER_AGENT_BYPASS_PATHS = [
+  "/api/auth/player",
   "/api/athenas/v0",
   "/api/updates/v0",
   "/api/payments/v0",
