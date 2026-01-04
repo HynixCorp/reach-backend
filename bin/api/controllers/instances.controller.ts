@@ -113,7 +113,7 @@ async function createInstanceCode(req: Request, res: Response) {
   }
 
   // Verify owner exists in developers DB
-  const ownerExists = await DEVELOPERS_DB.findDocuments("accounts", {
+  const ownerExists = await DEVELOPERS_DB.findDocuments("account", {
     userId: ownerID,
   });
 

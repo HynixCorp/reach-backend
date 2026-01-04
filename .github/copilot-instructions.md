@@ -16,7 +16,7 @@ This is a Node.js/TypeScript backend service for the Reach SDK platform, which m
 The platform uses 4 separate MongoDB databases:
 
 1. **reach_developers** - Developer accounts (Better-Auth managed)
-   - `users`, `accounts`, `sessions`, `verifications` (Better-Auth)
+   - `user`, `account`, `session`, `verification` (Better-Auth)
    - `organizations`, `organizationLinks`
    - `payments`, `usage`
    - `linkedXboxAccounts` (for linking developer accounts to Xbox)

@@ -9,7 +9,7 @@ config();
  * =========================================
  * 
  * reach_developers - Developer accounts (Better-Auth managed)
- *   Collections: users, accounts, sessions, verifications, 
+ *   Collections: user, account, sessions, verifications, 
  *                organizations, organizationLinks, payments, usage, linkedXboxAccounts
  * 
  * reach_players - Player accounts (Xbox/Microsoft Auth)
@@ -55,7 +55,7 @@ class DatabaseService {
   
   /**
    * Get developers database (Better-Auth accounts, organizations, payments)
-   * Collections: users, accounts, sessions, verifications, organizations, 
+   * Collections: user, account, sessions, verifications, organizations, 
    *              organizationLinks, payments, usage, linkedXboxAccounts
    */
   public getDevelopersDB(): MongoDB {

@@ -78,7 +78,7 @@ const playersClient = new MongoClient(DB_URI);
  * - Organization support (handled separately)
  * 
  * Database: reach_developers
- * Collections: users, accounts, sessions, verifications
+ * Collections: user, account, sessions, verifications
  */
 export const developerAuth = betterAuth({
   baseURL: BASE_URL,

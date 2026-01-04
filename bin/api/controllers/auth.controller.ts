@@ -90,7 +90,7 @@ async function setupComplete(req: Request, res: Response): Promise<Response> {
 
   const { baId } = req.query;
 
-  const user = await DEVELOPERS_DB.findDocuments("users", {
+  const user = await DEVELOPERS_DB.findDocuments("user", {
     _id: DEVELOPERS_DB.createObjectId(baId as string),
   });
 
@@ -108,7 +108,7 @@ async function setupComplete(req: Request, res: Response): Promise<Response> {
   }
 
   await DEVELOPERS_DB.updateDocument(
-    "users",
+    "user",
     { _id: DEVELOPERS_DB.createObjectId(baId as string) },
     { newaccount: false }
   );
