@@ -346,7 +346,7 @@ export async function get_organizations_by_user(req: Request, res: Response) {
   });
 
   if (organizations.length === 0) {
-    return res.status(200).json(
+    return res.status(404).json(
       createGenericResponse(true, null, "No organizations found for this user.", 404)
     );
   }

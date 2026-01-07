@@ -3,6 +3,7 @@ import express from "express";
 import { createServer } from "node:http";
 import dotenv from "dotenv";
 import cors from "cors";
+import path from "node:path";
 
 import {
   reachCondorErrorHandler,
@@ -23,7 +24,6 @@ import { startInstanceManager } from "./bin/tasks/instanceManager";
 import { startTempCleaner } from "./bin/tasks/tempCleaner";
 
 import { getDatabaseService } from "./bin/common/services/database.service";
-import path from "node:path";
 import { reachCDNProtection } from "./bin/common/cdnMiddleware";
 import { health, rootInfo } from "./bin/api/controllers/athenas.controller";
 import { asyncHandler } from "./bin/common/services/response.service";
