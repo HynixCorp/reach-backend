@@ -92,7 +92,7 @@ class DatabaseService {
    * @deprecated Use getDevelopersDB() for auth/org data or getExperiencesDB() for instances
    */
   public getReachDB(): MongoDB {
-    console.warn("[Database Service] getReachDB() is deprecated. Use getExperiencesDB() or getPlayersDB()");
+    console.warn("[REACHX - DB Service] getReachDB() is deprecated. Use getExperiencesDB() or getPlayersDB()");
     return this.experiencesDB;
   }
   
@@ -100,7 +100,7 @@ class DatabaseService {
    * @deprecated Use getDevelopersDB() instead
    */
   public getReachAuthDB(): MongoDB {
-    console.warn("[Database Service] getReachAuthDB() is deprecated. Use getDevelopersDB()");
+    console.warn("[REACHX - DB Service] getReachAuthDB() is deprecated. Use getDevelopersDB()");
     return this.developersDB;
   }
   
@@ -108,7 +108,7 @@ class DatabaseService {
    * @deprecated Use getExperiencesDB() instead
    */
   public getReachSDKDB(): MongoDB {
-    console.warn("[Database Service] getReachSDKDB() is deprecated. Use getExperiencesDB()");
+    console.warn("[REACHX - DB Service] getReachSDKDB() is deprecated. Use getExperiencesDB()");
     return this.experiencesDB;
   }
   
@@ -118,26 +118,26 @@ class DatabaseService {
    */
   public async connectAll(): Promise<void> {
     try {
-      console.log("[Database Service] Checking database health...".cyan);
+      console.log("[REACHX - DB Service] Checking database health...".cyan);
       
       // Check if databases need initialization
       const health = await checkDatabaseHealth(this.dbUri);
       
       if (!health.healthy) {
-        console.log("[Database Service] Initializing missing databases/collections...".yellow);
+        console.log("[REACHX - DB Service] Initializing missing databases/collections...".yellow);
         await initializeDatabases(this.dbUri);
       }
       
-      console.log("[Database Service] Connecting to databases...".cyan);
+      console.log("[REACHX - DB Service] Connecting to databases...".cyan);
       await Promise.all([
         this.developersDB.connect(),
         this.playersDB.connect(),
         this.experiencesDB.connect(),
         this.overlayDB.connect()
       ]);
-      console.log("[Database Service] All databases connected successfully".green);
+      console.log("[REACHX - DB Service] All databases connected successfully".green);
     } catch (error) {
-      console.error("[Database Service] Failed to connect to databases:".red, error);
+      console.error("[REACHX - DB Service] Failed to connect to databases:".red, error);
       throw error;
     }
   }

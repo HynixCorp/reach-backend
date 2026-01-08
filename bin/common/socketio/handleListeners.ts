@@ -30,11 +30,11 @@ const generateDevUserId = (socketId: string): string => {
 export function setupListeners(socketIOClient: SocketIOClient) {
   // Legacy listeners for backwards compatibility
   socketIOClient.listenEvent("message", (socket, message) => {
-    console.log(`[REACH - Socket] Received message from ${socket.id}: ${message}`.blue);
+    console.log(`[REACHX - Socket] Received message from ${socket.id}: ${message}`.blue);
   });
 
   socketIOClient.listenEvent("custom_event", (socket, data) => {
-    console.log(`[REACH - Socket] Custom event from ${socket.id}:`.blue, data);
+    console.log(`[REACHX - Socket] Custom event from ${socket.id}:`.blue, data);
   });
 
   // ============ Overlay Authentication ============
@@ -66,7 +66,7 @@ export function setupListeners(socketIOClient: SocketIOClient) {
     else {
       if (!data || !data.userId) {
         userId = generateDevUserId(socket.id);
-        console.log(`[REACH - Overlay] DEV MODE: Auto-generated userId: ${userId}`.yellow);
+        console.log(`[REACHX - Overlay] DEV MODE: Auto-generated userId: ${userId}`.yellow);
       } else {
         userId = data.userId;
       }
@@ -93,7 +93,7 @@ export function setupListeners(socketIOClient: SocketIOClient) {
       }
     });
     
-    console.log(`[REACH - Overlay] User ${userId} authenticated on socket ${socket.id}${experienceId ? ` (experience: ${experienceId})` : ''}${isDevelopment() ? ' [DEV]' : ''}`.green);
+    console.log(`[REACHX - Overlay] User ${userId} authenticated on socket ${socket.id}${experienceId ? ` (experience: ${experienceId})` : ''}${isDevelopment() ? ' [DEV]' : ''}`.green);
   });
 
   // ============ Development Mode: Auto-connect without auth ============
@@ -122,7 +122,7 @@ export function setupListeners(socketIOClient: SocketIOClient) {
         }
       });
       
-      console.log(`[REACH - Overlay] DEV: Quick connect for ${userId}`.yellow);
+      console.log(`[REACHX - Overlay] DEV: Quick connect for ${userId}`.yellow);
     });
   }
 
@@ -150,7 +150,7 @@ export function setupListeners(socketIOClient: SocketIOClient) {
     if (!userId && isDevelopment()) {
       userId = generateDevUserId(socket.id);
       registerConnection(socket.id, userId);
-      console.log(`[REACH - Overlay] DEV: Auto-registered ${userId} on message`.yellow);
+      console.log(`[REACHX - Overlay] DEV: Auto-registered ${userId} on message`.yellow);
     }
     
     // === PRODUCTION MODE: Require authentication ===
@@ -188,7 +188,7 @@ export function setupListeners(socketIOClient: SocketIOClient) {
         break;
         
       default:
-        console.log(`[REACH - Overlay] Unknown message type from ${userId}: ${message.type}`.yellow);
+        console.log(`[REACHX - Overlay] Unknown message type from ${userId}: ${message.type}`.yellow);
     }
   });
 
@@ -201,17 +201,17 @@ export function setupListeners(socketIOClient: SocketIOClient) {
   socketIOClient.listenEvent("disconnect", (socket) => {
     const userId = getUserIdBySocket(socket.id);
     if (userId) {
-      console.log(`[REACH - Overlay] User ${userId} disconnecting from socket ${socket.id}`.yellow);
+      console.log(`[REACHX - Overlay] User ${userId} disconnecting from socket ${socket.id}`.yellow);
     }
     unregisterConnection(socket.id);
   });
   
   // Log mode on setup
   if (isDevelopment()) {
-    console.log(`[REACH - Overlay] ⚠️  DEVELOPMENT MODE: Client authentication is relaxed`.yellow);
-    console.log(`[REACH - Overlay] ⚠️  Use 'overlay_dev_connect' for quick testing`.yellow);
+    console.log(`[REACHX - Overlay] ⚠️  DEVELOPMENT MODE: Client authentication is relaxed`.yellow);
+    console.log(`[REACHX - Overlay] ⚠️  Use 'overlay_dev_connect' for quick testing`.yellow);
   } else {
-    console.log(`[REACH - Overlay] 🔒 PRODUCTION MODE: Client authentication required`.green);
+    console.log(`[REACHX - Overlay] 🔒 PRODUCTION MODE: Client authentication required`.green);
   }
 }
 

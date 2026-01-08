@@ -132,8 +132,8 @@ return res.status(400).json(createErrorResponse("Invalid input", 400));
 ### Logging
 Use `colorts` for colored console output:
 ```typescript
-console.log("[REACH - Component] Message".green);
-console.error("[REACH - Component] Error".red);
+console.log("[REACHX - Component] Message".green);
+console.error("[REACHX - Component] Error".red);
 ```
 
 ## Data Models

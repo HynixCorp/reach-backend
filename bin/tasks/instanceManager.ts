@@ -20,17 +20,17 @@ export function startInstanceManager() {
             // await cleanUnusedAssets();
             await cleanOldTempFiles();
         } catch (err) {
-            console.error("[REACH - InstanceManager] Error in the automatic task schedule:".red, err);
+            console.error("[REACHX - InstanceManager] Error in the automatic task schedule:".red, err);
         }
     });
     
     // Run version cleanup every 6 hours
     cron.schedule("0 */6 * * *", async () => {
         try {
-            console.log("[REACH - InstanceManager] Starting global version cleanup...".cyan);
+            console.log("[REACHX - InstanceManager] Starting global version cleanup...".cyan);
             await cleanInstanceVersionsGlobal();
         } catch (err) {
-            console.error("[REACH - InstanceManager] Error in version cleanup task:".red, err);
+            console.error("[REACHX - InstanceManager] Error in version cleanup task:".red, err);
         }
     });
 }
@@ -55,41 +55,9 @@ async function checkWaitingInstances() {
             { $unset: { waitingUntil: "" } }
         );
 
-        console.log(`[REACH - InstanceManager] Updated pending instance: ${instance.name} (${instance.id})`.green);
+        console.log(`[REACHX - InstanceManager] Updated pending instance: ${instance.name} (${instance.id})`.green);
     }
 }
-
-// async function cleanUnusedAssets() {
-//     const now = Date.now();
-
-//     const allInstances = await DB.findDocuments("instances");
-//     const usedFiles = new Set<string>();
-
-//     for (const instance of allInstances) {
-//         const app = instance.application || {};
-//         if (app.thumbnail) usedFiles.add(app.thumbnail);
-//         if (app.logo) usedFiles.add(app.logo);
-//     }
-
-//     const allFiles = await fs.readdir(ASSETS_DIR);
-
-//     for (const file of allFiles) {
-//         if (usedFiles.has(file)) continue;
-
-//         const filePath = path.join(ASSETS_DIR, file);
-//         try {
-//             const stats = await fs.stat(filePath);
-//             const age = now - stats.birthtimeMs;
-
-//             if (age > MAX_AGE_MS) {
-//                 await fs.unlink(filePath);
-//                 console.log(`[REACH - InstanceManager] Unused asset deleted (old): ${file}`.yellow);
-//             }
-//         } catch (err) {
-//             console.warn(`[REACH - InstanceManager] Could not be deleted ${file}:`.red, err);
-//         }
-//     }
-// }
 
 async function cleanOldTempFiles() {
     const now = Date.now();
@@ -97,7 +65,7 @@ async function cleanOldTempFiles() {
     try {
         files = await fs.readdir(TEMP_DIR);
     } catch (err: any) {
-        console.warn(`[REACH - InstanceManager] Could not read temp dir ${TEMP_DIR}:`.red, err);
+        console.warn(`[REACHX - InstanceManager] Could not read temp dir ${TEMP_DIR}:`.red, err);
         return;
     }
 
@@ -110,7 +78,7 @@ async function cleanOldTempFiles() {
             } catch (statErr: any) {
                 // File might have been removed by another process (TempCleaner). Ignore ENOENT.
                 if (statErr && statErr.code === "ENOENT") continue;
-                console.warn(`[REACH - InstanceManager] Could not stat ${file}:`.red, statErr);
+                console.warn(`[REACHX - InstanceManager] Could not stat ${file}:`.red, statErr);
                 continue;
             }
 
@@ -119,15 +87,15 @@ async function cleanOldTempFiles() {
             if (age > MAX_AGE_MS) {
                 try {
                     await fs.unlink(filePath);
-                    console.log(`[REACH - InstanceManager] Old .zip deleted: ${file}`.magenta);
+                    console.log(`[REACHX - InstanceManager] Old .zip deleted: ${file}`.magenta);
                 } catch (unlinkErr: any) {
                     // If the file was removed between stat and unlink, ignore it.
                     if (unlinkErr && unlinkErr.code === 'ENOENT') continue;
-                    console.warn(`[REACH - InstanceManager] Failed to delete ${file}:`.red, unlinkErr);
+                    console.warn(`[REACHX - InstanceManager] Failed to delete ${file}:`.red, unlinkErr);
                 }
             }
         } catch (err) {
-            console.warn(`[REACH - InstanceManager] Cannot review/delete ${file}:`.red, err);
+            console.warn(`[REACHX - InstanceManager] Cannot review/delete ${file}:`.red, err);
         }
     }
 }
@@ -135,8 +103,8 @@ async function cleanOldTempFiles() {
 async function cleanInstanceVersionsGlobal() {
     try {
         await cleanOldVersionsGlobal();
-        console.log("[REACH - InstanceManager] Version cleanup completed successfully".green);
+        console.log("[REACHX - InstanceManager] Version cleanup completed successfully".green);
     } catch (err) {
-        console.error("[REACH - InstanceManager] Error in cleanInstanceVersionsGlobal:".red, err);
+        console.error("[REACHX - InstanceManager] Error in cleanInstanceVersionsGlobal:".red, err);
     }
 }

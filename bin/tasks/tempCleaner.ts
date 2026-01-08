@@ -48,10 +48,10 @@ async function removeStaleTempFiles(): Promise<void> {
         }
 
         await fs.unlink(entryPath);
-        console.log(`[REACH - TempCleaner] Deleted stale temp file: ${entry}`.cyan);
+        console.log(`[REACHX - Falcon] Deleted stale temp file: ${entry}`.cyan);
       } catch (error) {
         console.warn(
-          `[REACH - TempCleaner] Failed to evaluate temp entry ${entry}:`.yellow,
+          `[REACHX - Falcon] Failed to evaluate temp entry ${entry}:`.yellow,
           error
         );
       }
@@ -69,11 +69,11 @@ export function startTempCleaner(): void {
     try {
       await removeStaleTempFiles();
     } catch (error) {
-      console.error("[REACH - TempCleaner] Cleanup task failed:".red, error);
+      console.error("[REACHX - Falcon] Cleanup task failed:".red, error);
     } finally {
       isRunning = false;
     }
   });
 
-  console.log("[REACH - TempCleaner] Scheduled temp directory cleanup every 10 minutes.".green);
+  console.log("[REACHX - Falcon] Scheduled temp directory cleanup every 10 minutes.".green);
 }

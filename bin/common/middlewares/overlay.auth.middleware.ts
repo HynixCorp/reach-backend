@@ -38,8 +38,8 @@ if (isDevelopment()) {
     name: "Demo Test Server",
     createdAt: new Date(),
   });
-  console.log(`[REACH - Overlay Auth] Development mode: Demo token registered`.yellow);
-  console.log(`[REACH - Overlay Auth] Demo Token: ${DEMO_SERVER_TOKEN}`.cyan);
+  console.log(`[REACHX - Overlay Auth] Development mode: Demo token registered`.yellow);
+  console.log(`[REACHX - Overlay Auth] Demo Token: ${DEMO_SERVER_TOKEN}`.cyan);
 }
 
 // ============ Token Management ============
@@ -53,7 +53,7 @@ export function registerServerToken(token: string, serverId: string, name: strin
     name,
     createdAt: new Date(),
   });
-  console.log(`[REACH - Overlay Auth] Registered token for server: ${name} (${serverId})`.green);
+  console.log(`[REACHX - Overlay Auth] Registered token for server: ${name} (${serverId})`.green);
 }
 
 /**
@@ -62,7 +62,7 @@ export function registerServerToken(token: string, serverId: string, name: strin
 export function revokeServerToken(token: string): boolean {
   const deleted = validServerTokens.delete(token);
   if (deleted) {
-    console.log(`[REACH - Overlay Auth] Revoked token`.yellow);
+    console.log(`[REACHX - Overlay Auth] Revoked token`.yellow);
   }
   return deleted;
 }
@@ -100,7 +100,7 @@ export function overlayServerAuth(req: Request, res: Response, next: NextFunctio
   // Development mode: Allow requests without token but log warning
   if (isDevelopment()) {
     if (!token) {
-      console.log(`[REACH - Overlay Auth] DEV: Request without token from ${req.ip} - ${req.method} ${req.path}`.yellow);
+      console.log(`[REACHX - Overlay Auth] DEV: Request without token from ${req.ip} - ${req.method} ${req.path}`.yellow);
       // Attach a dev flag to request
       (req as any).overlayAuth = { 
         authenticated: false, 
@@ -114,7 +114,7 @@ export function overlayServerAuth(req: Request, res: Response, next: NextFunctio
   
   // No token in production = error
   if (!token) {
-    console.log(`[REACH - Overlay Auth] Rejected: Missing token - ${req.method} ${req.path}`.red);
+    console.log(`[REACHX - Overlay Auth] Rejected: Missing token - ${req.method} ${req.path}`.red);
     return res.status(401).json(
       createErrorResponse("Missing authentication token. Include 'x-overlay-token' header.", 401)
     );
@@ -124,7 +124,7 @@ export function overlayServerAuth(req: Request, res: Response, next: NextFunctio
   const validation = validateServerToken(token);
   
   if (!validation.valid) {
-    console.log(`[REACH - Overlay Auth] Rejected: Invalid token - ${req.method} ${req.path}`.red);
+    console.log(`[REACHX - Overlay Auth] Rejected: Invalid token - ${req.method} ${req.path}`.red);
     return res.status(403).json(
       createErrorResponse("Invalid server token.", 403)
     );
@@ -138,7 +138,7 @@ export function overlayServerAuth(req: Request, res: Response, next: NextFunctio
     isDev: isDevelopment(),
   };
   
-  console.log(`[REACH - Overlay Auth] Authenticated: ${validation.name} (${validation.serverId}) - ${req.method} ${req.path}`.green);
+  console.log(`[REACHX - Overlay Auth] Authenticated: ${validation.name} (${validation.serverId}) - ${req.method} ${req.path}`.green);
   
   next();
 }

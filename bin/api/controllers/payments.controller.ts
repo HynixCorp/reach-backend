@@ -143,7 +143,7 @@ export async function success_payment(req: Request, res: Response) {
       invoiceHTML
     );
   } catch (emailError) {
-    console.error("[REACH - Payments]: Failed to send invoice email.", emailError);
+    console.error("[REACHX - Payments]: Failed to send invoice email.", emailError);
   }
 
   res.redirect(

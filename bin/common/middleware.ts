@@ -59,7 +59,7 @@ function reachCondorErrorHandler(
   res: Response,
   next: NextFunction
 ): void {
-  console.error(`[REACH - Condor]: An error occurred - ${err.message.toUpperCase()}`.red);
+  console.error(`[REACHX - Condor]: An error occurred - ${err.message.toUpperCase()}`.red);
   res.status(500).json(
     createErrorResponse("An internal server error occurred.", 500)
   );
@@ -93,7 +93,7 @@ function reachEmptyBodyHandler(
 
   // Check for empty body
   if (!req.body || Object.keys(req.body).length === 0) {
-    console.warn(`[REACH - Condor]: Empty request body detected at ${new Date().toLocaleString()}`.yellow);
+    console.warn(`[REACHX - Condor]: Empty request body detected at ${new Date().toLocaleString()}`.yellow);
     res.status(400).json(createErrorResponse("Request body cannot be empty.", 400));
     return;
   }

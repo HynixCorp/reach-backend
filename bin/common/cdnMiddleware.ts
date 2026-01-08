@@ -57,7 +57,7 @@ export function reachCDNProtection(
       .status(403)
       .json(
         createErrorResponse(
-          "[REACH - CDN]: Access denied. Signed URL required."
+          "[REACHX - CDN]: Access denied. Signed URL required."
         )
       );
     return;
@@ -74,7 +74,7 @@ export function reachCDNProtection(
     res
       .status(403)
       .json(
-        createErrorResponse("[REACH - CDN]: URL has expired.")
+        createErrorResponse("[REACHX - CDN]: URL has expired.")
       );
     return;
   }
@@ -93,7 +93,7 @@ export function reachCDNProtection(
     res
       .status(403)
       .json(
-        createErrorResponse("[REACH - CDN]: Invalid signature.")
+        createErrorResponse("[REACHX - CDN]: Invalid signature.")
       );
     return;
   }

@@ -42,12 +42,12 @@ const missingEnvVars = requiredEnvVars.filter((key) => !process.env[key]);
 
 if (missingEnvVars.length > 0) {
   console.warn(
-    `[REACH - Warning] Missing critical environment variables: ${missingEnvVars.join(
+    `[REACHX - Warning] Missing critical environment variables: ${missingEnvVars.join(
       ", "
     )}`.yellow
   );
   console.warn(
-    `[REACH - Warning] Some features may not work correctly.`.yellow
+    `[REACHX - Warning] Some features may not work correctly.`.yellow
   );
 }
 
@@ -75,7 +75,7 @@ app.get("/health", asyncHandler(health));
   startInstanceManager();
   startTempCleaner();
   
-  console.log("[REACH - Server] Database connected and tasks started".green);
+  console.log("[REACHX - Server] Database connected and tasks started.".green);
 })();
 
 
@@ -151,10 +151,10 @@ registerSocketClient(socketIOClient);
 
 server
   .listen(PORT, () => {
-    console.log(`[REACH - Server] Server running on port ${PORT}`.green);
-    console.log(`[REACH - Server] Environment: ${process.env.NODE_ENV || 'development'}`.blue);
+    console.log(`[REACHX - Server] Server running on port ${PORT}`.green);
+    console.log(`[REACHX - Server] Environment: ${process.env.NODE_ENV || 'development'}`.blue);
   })
   .on("error", (error) => {
-    console.error(`[REACH - Server] Failed to start: ${error.message}`.red);
+    console.error(`[REACHX - Server] Failed to start: ${error.message}`.red);
     throw new Error(error.message);
   });

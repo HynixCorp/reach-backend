@@ -22,7 +22,7 @@ async function get_status(req: Request, res: Response): Promise<Response> {
 
         return res.status(200).json(createGenericResponse(true, athenasStatus[0], "ok"));
     } catch (error) {
-        console.error("[REACH - Athena]: Error retrieving Athena status:", error);
+        console.error("[REACHX - Athena]: Error retrieving Athena status:", error);
         return ResponseHandler.serverError(res, error as Error);
     }
 }

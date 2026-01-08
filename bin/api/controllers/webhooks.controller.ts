@@ -11,7 +11,7 @@ export async function handlePolarPayload(payload: any) {
     const eventType = payload.type;
     const data = payload.data;
 
-    console.log(`[REACH - Webhooks]: Received event ${eventType}`);
+    console.log(`[REACHX - Webhooks]: Received event ${eventType}`);
 
     switch (eventType) {
         case "subscription.updated":
@@ -27,7 +27,7 @@ export async function handlePolarPayload(payload: any) {
             await handleOrderCreated(data);
             break;
         default:
-            // console.log(`[REACH - Webhooks]: Unhandled event type ${eventType}`);
+            console.log(`[REACHX - Webhooks]: Unhandled event type ${eventType}`);
             break;
     }
 }
@@ -52,13 +52,13 @@ async function handleSubscriptionUpdate(data: any) {
     }
 
     await DEVELOPERS_DB.updateDocument("payments", { subscriptionId }, { $set: updateData });
-    console.log(`[REACH - Webhooks]: Updated subscription ${subscriptionId} to status ${dbStatus}`);
+    console.log(`[REACHX - Webhooks]: Updated subscription ${subscriptionId} to status ${dbStatus}`);
 }
 
 async function handleSubscriptionCancellation(data: any) {
     const subscriptionId = data.id;
     await DEVELOPERS_DB.updateDocument("payments", { subscriptionId }, { $set: { status: "expired" } });
-    console.log(`[REACH - Webhooks]: Canceled subscription ${subscriptionId}`);
+    console.log(`[REACHX - Webhooks]: Canceled subscription ${subscriptionId}`);
 }
 
 async function handleOrderCreated(order: any) {
@@ -73,14 +73,14 @@ async function handleOrderCreated(order: any) {
     const existingSub = await DEVELOPERS_DB.findDocuments("payments", { subscriptionId: order.subscription_id });
     
     if (existingSub.length === 0) {
-        console.log(`[REACH - Webhooks]: Order created for unknown subscription ${order.subscription_id}`);
+        console.log(`[REACHX - Webhooks]: Order created for unknown subscription ${order.subscription_id}`);
         return;
     }
 
     // Avoid duplicate emails for the initial order (handled by success_payment)
     // We assume the initial order has the same checkout_id as the subscription record
     if (order.checkout_id && order.checkout_id === existingSub[0].checkoutId) {
-        console.log(`[REACH - Webhooks]: Skipping invoice for initial order ${order.id} (handled by success_payment).`);
+        console.log(`[REACHX - Webhooks]: Skipping invoice for initial order ${order.id} (handled by success_payment).`);
         return;
     }
 
@@ -132,9 +132,9 @@ async function handleOrderCreated(order: any) {
             `Invoice ${invoiceNumber}`,
             invoiceHTML
         );
-        console.log(`[REACH - Webhooks]: Sent invoice email for order ${order.id}`);
+        console.log(`[REACHX - Webhooks]: Sent invoice email for order ${order.id}`);
 
     } catch (error) {
-        console.error("[REACH - Webhooks]: Failed to send invoice email.", error);
+        console.error("[REACHX - Webhooks]: Failed to send invoice email.", error);
     }
 }

@@ -91,7 +91,7 @@ export async function checkForUpdates(req: Request, res: Response) {
             }
         });
     } catch (error) {
-        console.error("[REACH - Updates] Error checking for updates:".red, error);
+        console.error("[REACHX - Updates] Error checking for updates:".red, error);
         return res.status(500).json(createErrorResponse("Internal server error", 500));
     }
 }
@@ -137,7 +137,7 @@ export async function getLatestVersion(req: Request, res: Response) {
             platforms
         });
     } catch (error) {
-        console.error("[REACH - Updates] Error getting latest version:".red, error);
+        console.error("[REACHX - Updates] Error getting latest version:".red, error);
         return res.status(500).json(createErrorResponse("Internal server error", 500));
     }
 }
@@ -208,11 +208,11 @@ export async function publishUpdate(req: Request, res: Response) {
         await fs.ensureDir(archiveDir);
         await fs.writeJson(path.join(archiveDir, `${version}.json`), manifest, { spaces: 2 });
 
-        console.log(`[REACH - Updates] Published update v${version}`.green);
+        console.log(`[REACHX - Updates] Published update v${version}`.green);
 
         return res.json(createSuccessResponse({ version, platforms: Object.keys(platforms) }, "Update published successfully"));
     } catch (error) {
-        console.error("[REACH - Updates] Error publishing update:".red, error);
+        console.error("[REACHX - Updates] Error publishing update:".red, error);
         return res.status(500).json(createErrorResponse("Internal server error", 500));
     }
 }
@@ -257,7 +257,7 @@ export async function uploadUpdateFile(req: Request, res: Response) {
         
         await fs.move(file.path, destPath, { overwrite: true });
 
-        console.log(`[REACH - Updates] Uploaded file: ${filename} for platform: ${platform}`.green);
+        console.log(`[REACHX - Updates] Uploaded file: ${filename} for platform: ${platform}`.green);
 
         return res.json(createSuccessResponse({ 
             filename,
@@ -265,7 +265,7 @@ export async function uploadUpdateFile(req: Request, res: Response) {
             path: `/cdn/updates/${filename}`
         }, "File uploaded successfully"));
     } catch (error) {
-        console.error("[REACH - Updates] Error uploading file:".red, error);
+        console.error("[REACHX - Updates] Error uploading file:".red, error);
         return res.status(500).json(createErrorResponse("Internal server error", 500));
     }
 }
@@ -299,14 +299,14 @@ export async function uploadUpdateFiles(req: Request, res: Response) {
             uploaded.push(filename);
         }
 
-        console.log(`[REACH - Updates] Batch uploaded ${uploaded.length} files`.green);
+        console.log(`[REACHX - Updates] Batch uploaded ${uploaded.length} files`.green);
 
         return res.json(createSuccessResponse({ 
             files: uploaded,
             count: uploaded.length
         }, "Files uploaded successfully"));
     } catch (error) {
-        console.error("[REACH - Updates] Error batch uploading files:".red, error);
+        console.error("[REACHX - Updates] Error batch uploading files:".red, error);
         return res.status(500).json(createErrorResponse("Internal server error", 500));
     }
 }
@@ -331,7 +331,7 @@ export async function getVersionHistory(req: Request, res: Response) {
 
         return res.json(createSuccessResponse({ versions }, "Version history retrieved"));
     } catch (error) {
-        console.error("[REACH - Updates] Error getting version history:".red, error);
+        console.error("[REACHX - Updates] Error getting version history:".red, error);
         return res.status(500).json(createErrorResponse("Internal server error", 500));
     }
 }
@@ -355,11 +355,11 @@ export async function deleteVersion(req: Request, res: Response) {
         }
 
         await fs.remove(archivePath);
-        console.log(`[REACH - Updates] Deleted version: ${version}`.yellow);
+        console.log(`[REACHX - Updates] Deleted version: ${version}`.yellow);
 
         return res.json(createSuccessResponse({ version }, "Version deleted"));
     } catch (error) {
-        console.error("[REACH - Updates] Error deleting version:".red, error);
+        console.error("[REACHX - Updates] Error deleting version:".red, error);
         return res.status(500).json(createErrorResponse("Internal server error", 500));
     }
 }
@@ -402,11 +402,11 @@ export async function purgeUpdates(req: Request, res: Response) {
         // Dangerous operation: remove everything in CDN_DIR
         await fs.emptyDir(CDN_DIR);
         
-        console.log("[REACH - Updates] PURGED all update data".red.bold);
+        console.log("[REACHX - Updates] PURGED all update data".red.bold);
 
         return res.json(createSuccessResponse({}, "All update data has been purged"));
     } catch (error) {
-        console.error("[REACH - Updates] Error purging updates:".red, error);
+        console.error("[REACHX - Updates] Error purging updates:".red, error);
         return res.status(500).json(createErrorResponse("Internal server error", 500));
     }
 }

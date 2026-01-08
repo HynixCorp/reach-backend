@@ -80,7 +80,7 @@ export function registerConnection(socketId: string, userId: string): void {
     });
   }
   
-  console.log(`[REACH - Overlay] User ${userId} connected (socket: ${socketId})`.green);
+  console.log(`[REACHX - Overlay] User ${userId} connected (socket: ${socketId})`.green);
 }
 
 /**
@@ -110,12 +110,12 @@ export function unregisterConnection(socketId: string): void {
     // Save last presence to database
     if (presence) {
       savePresenceToDatabase(userId, presence).catch(err => {
-        console.error(`[REACH - Overlay] Failed to save presence for ${userId}:`, err);
+        console.error(`[REACHX - Overlay] Failed to save presence for ${userId}:`, err);
       });
     }
     
     activePresences.delete(userId);
-    console.log(`[REACH - Overlay] User ${userId} disconnected (all connections closed)`.yellow);
+    console.log(`[REACHX - Overlay] User ${userId} disconnected (all connections closed)`.yellow);
   } else {
     // Still has other connections
     userToSockets.set(userId, filteredSockets);
@@ -123,7 +123,7 @@ export function unregisterConnection(socketId: string): void {
     if (presence) {
       presence.socketId = filteredSockets[filteredSockets.length - 1]; // Use latest socket
     }
-    console.log(`[REACH - Overlay] User ${userId} closed one connection (${filteredSockets.length} remaining)`.blue);
+    console.log(`[REACHX - Overlay] User ${userId} closed one connection (${filteredSockets.length} remaining)`.blue);
   }
 }
 
@@ -155,7 +155,7 @@ export function isUserConnected(userId: string): boolean {
  */
 export function joinExperience(userId: string, experienceId: string): boolean {
   if (!isUserConnected(userId)) {
-    console.warn(`[REACH - Overlay] Cannot join experience: user ${userId} not connected`.yellow);
+    console.warn(`[REACHX - Overlay] Cannot join experience: user ${userId} not connected`.yellow);
     return false;
   }
   
@@ -182,7 +182,7 @@ export function joinExperience(userId: string, experienceId: string): boolean {
     presence.lastUpdate = new Date();
   }
   
-  console.log(`[REACH - Overlay] User ${userId} joined experience ${experienceId}`.green);
+  console.log(`[REACHX - Overlay] User ${userId} joined experience ${experienceId}`.green);
   return true;
 }
 
@@ -213,7 +213,7 @@ export function leaveExperience(userId: string): boolean {
     presence.lastUpdate = new Date();
   }
   
-  console.log(`[REACH - Overlay] User ${userId} left experience ${experienceId}`.yellow);
+  console.log(`[REACHX - Overlay] User ${userId} left experience ${experienceId}`.yellow);
   return true;
 }
 
@@ -258,7 +258,7 @@ export function getAllExperiences(): { experienceId: string; userCount: number }
 export function updatePresence(userId: string, payload: PresencePayload): boolean {
   const presence = activePresences.get(userId);
   if (!presence) {
-    console.warn(`[REACH - Overlay] Cannot update presence for disconnected user: ${userId}`.yellow);
+    console.warn(`[REACHX - Overlay] Cannot update presence for disconnected user: ${userId}`.yellow);
     return false;
   }
   
@@ -273,7 +273,7 @@ export function updatePresence(userId: string, payload: PresencePayload): boolea
     leaveExperience(userId);
   }
   
-  console.log(`[REACH - Overlay] Updated presence for ${userId}: ${payload.status} - ${payload.details || 'N/A'} (experience: ${presence.experienceId || 'none'})`.cyan);
+  console.log(`[REACHX - Overlay] Updated presence for ${userId}: ${payload.status} - ${payload.details || 'N/A'} (experience: ${presence.experienceId || 'none'})`.cyan);
   return true;
 }
 
@@ -341,7 +341,7 @@ async function savePresenceToDatabase(userId: string, presence: UserPresence): P
 export function sendToUser(userId: string, message: WebSocketMessage): boolean {
   const sockets = getSocketsByUserId(userId);
   if (sockets.length === 0) {
-    console.warn(`[REACH - Overlay] Cannot send message to disconnected user: ${userId}`.yellow);
+    console.warn(`[REACHX - Overlay] Cannot send message to disconnected user: ${userId}`.yellow);
     return false;
   }
   
@@ -350,10 +350,10 @@ export function sendToUser(userId: string, message: WebSocketMessage): boolean {
     sockets.forEach(socketId => {
       io.to(socketId).emit("overlay_message", message);
     });
-    console.log(`[REACH - Overlay] Sent ${message.type} to user ${userId}`.blue);
+    console.log(`[REACHX - Overlay] Sent ${message.type} to user ${userId}`.blue);
     return true;
   } catch (error) {
-    console.error(`[REACH - Overlay] Failed to send message to user ${userId}:`, error);
+    console.error(`[REACHX - Overlay] Failed to send message to user ${userId}:`, error);
     return false;
   }
 }
@@ -364,7 +364,7 @@ export function sendToUser(userId: string, message: WebSocketMessage): boolean {
 export function sendToExperience(experienceId: string, message: WebSocketMessage): number {
   const users = getUsersInExperience(experienceId);
   if (users.length === 0) {
-    console.warn(`[REACH - Overlay] No users in experience ${experienceId}`.yellow);
+    console.warn(`[REACHX - Overlay] No users in experience ${experienceId}`.yellow);
     return 0;
   }
   
@@ -378,9 +378,9 @@ export function sendToExperience(experienceId: string, message: WebSocketMessage
       });
       sentCount++;
     });
-    console.log(`[REACH - Overlay] Sent ${message.type} to ${sentCount} users in experience ${experienceId}`.magenta);
+    console.log(`[REACHX - Overlay] Sent ${message.type} to ${sentCount} users in experience ${experienceId}`.magenta);
   } catch (error) {
-    console.error(`[REACH - Overlay] Failed to send message to experience ${experienceId}:`, error);
+    console.error(`[REACHX - Overlay] Failed to send message to experience ${experienceId}:`, error);
   }
   
   return sentCount;
@@ -394,10 +394,10 @@ export function sendToAll(message: WebSocketMessage): number {
     const io = socketBridge.getIO();
     io.emit("overlay_message", message);
     const count = activePresences.size;
-    console.log(`[REACH - Overlay] Broadcast ${message.type} to ${count} users (global)`.magenta);
+    console.log(`[REACHX - Overlay] Broadcast ${message.type} to ${count} users (global)`.magenta);
     return count;
   } catch (error) {
-    console.error(`[REACH - Overlay] Failed to broadcast message:`, error);
+    console.error(`[REACHX - Overlay] Failed to broadcast message:`, error);
     return 0;
   }
 }
@@ -412,7 +412,7 @@ export function sendToTarget(target: MessageTarget, message: WebSocketMessage): 
   switch (target.type) {
     case "user":
       if (!target.id) {
-        console.error(`[REACH - Overlay] User target requires id (Minecraft UUID)`.red);
+        console.error(`[REACHX - Overlay] User target requires id (Minecraft UUID)`.red);
         return { success: false, recipients: 0 };
       }
       const userSuccess = sendToUser(target.id, message);
@@ -420,7 +420,7 @@ export function sendToTarget(target: MessageTarget, message: WebSocketMessage): 
       
     case "experience":
       if (!target.id) {
-        console.error(`[REACH - Overlay] Experience target requires id (experienceId)`.red);
+        console.error(`[REACHX - Overlay] Experience target requires id (experienceId)`.red);
         return { success: false, recipients: 0 };
       }
       const experienceCount = sendToExperience(target.id, message);
@@ -431,7 +431,7 @@ export function sendToTarget(target: MessageTarget, message: WebSocketMessage): 
       return { success: globalCount > 0, recipients: globalCount };
       
     default:
-      console.error(`[REACH - Overlay] Unknown target type: ${(target as any).type}`.red);
+      console.error(`[REACHX - Overlay] Unknown target type: ${(target as any).type}`.red);
       return { success: false, recipients: 0 };
   }
 }
@@ -523,7 +523,7 @@ export async function createAchievement(achievement: Omit<AchievementDocument, "
   };
   
   await db.insertDocument("achievements", newAchievement);
-  console.log(`[REACH - Overlay] Created achievement: ${achievement.title}`.green);
+  console.log(`[REACHX - Overlay] Created achievement: ${achievement.title}`.green);
   
   return newAchievement;
 }
@@ -541,14 +541,14 @@ export async function unlockAchievement(userId: string, achievementId: string, s
   });
   
   if (existing.length > 0) {
-    console.log(`[REACH - Overlay] Achievement ${achievementId} already unlocked for user ${userId}`.yellow);
+    console.log(`[REACHX - Overlay] Achievement ${achievementId} already unlocked for user ${userId}`.yellow);
     return false;
   }
   
   // Get achievement details
   const achievement = await getAchievementById(achievementId);
   if (!achievement) {
-    console.error(`[REACH - Overlay] Achievement ${achievementId} not found`.red);
+    console.error(`[REACHX - Overlay] Achievement ${achievementId} not found`.red);
     return false;
   }
   
@@ -572,7 +572,7 @@ export async function unlockAchievement(userId: string, achievementId: string, s
     });
   }
   
-  console.log(`[REACH - Overlay] Achievement ${achievement.title} unlocked for user ${userId}`.green);
+  console.log(`[REACHX - Overlay] Achievement ${achievement.title} unlocked for user ${userId}`.green);
   return true;
 }
 

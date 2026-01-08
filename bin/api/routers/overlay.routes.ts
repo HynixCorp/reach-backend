@@ -27,7 +27,7 @@ const CONTROLLER = require("../controllers/overlay.controller");
 
 // Log demo token on startup for development
 if (process.env.NODE_ENV !== "production") {
-  console.log(`[REACH - Overlay Routes] 🔑 Demo Token for testing: ${DEMO_SERVER_TOKEN}`.cyan);
+  console.log(`[REACHX - Overlay Routes] Demo Token for testing: ${DEMO_SERVER_TOKEN}`.cyan);
 }
 
 // ============ Public Endpoints (No Auth Required) ============

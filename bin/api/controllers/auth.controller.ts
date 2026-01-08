@@ -40,7 +40,7 @@ async function createNewUserData(req: Request, res: Response): Promise<Response>
 
   if (existingUser.length > 0) {
     return res.status(200).json(
-      createSuccessResponse(null, "[REACH - Auth]: User already exists.")
+      createSuccessResponse(null, "[REACHX - Auth]: User already exists.")
     );
   }
   
@@ -57,7 +57,7 @@ async function createNewUserData(req: Request, res: Response): Promise<Response>
   await PLAYERS_DB.insertDocument("players", createPacket);
 
   return res.status(201).json(
-    createSuccessResponse(createPacket, "[REACH - Auth]: User created successfully.")
+    createSuccessResponse(createPacket, "[REACHX - Auth]: User created successfully.")
   );
 }
 
@@ -77,7 +77,7 @@ async function getUserData(req: Request, res: Response): Promise<Response> {
 
   const { createdAt, machineId, deviceId, ...userData } = user[0];
   return res.status(200).json(
-    createSuccessResponse(userData, "[REACH - Auth]: User data retrieved successfully.")
+    createSuccessResponse(userData, "[REACHX - Auth]: User data retrieved successfully.")
   );
 }
 
@@ -103,7 +103,7 @@ async function setupComplete(req: Request, res: Response): Promise<Response> {
 
   if (!user[0].newaccount) {
     return res.status(200).json(
-      createSuccessResponse(null, "[REACH - Auth]: User finished.")
+      createSuccessResponse(null, "[REACHX - Auth]: User finished.")
     );
   }
 
@@ -114,7 +114,7 @@ async function setupComplete(req: Request, res: Response): Promise<Response> {
   );
 
   return res.status(200).json(
-    createSuccessResponse(null, "[REACH - Auth]: User data retrieved successfully.")
+    createSuccessResponse(null, "[REACHX - Auth]: User data retrieved successfully.")
   );
 }
 

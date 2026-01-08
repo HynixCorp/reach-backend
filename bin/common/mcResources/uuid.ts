@@ -5,12 +5,12 @@ export default async function getMinecraftUUID(username: string): Promise<string
     try {
         const response = await fetch(`https://api.mojang.com/users/profiles/minecraft/${username}`);
         if (!response.ok) {
-            throw new Error(`[REACH - mcResources] Error fetching UUID for ${username}: ${response.statusText}`.red);
+            throw new Error(`[REACHX - mcResources] Error fetching UUID for ${username}: ${response.statusText}`.red);
         }
         const data = await response.json();
         return data.id;
     } catch (error) {
-        console.error(`[REACH - mcResources] Failed to fetch UUID for ${username}:`.red, error);
+        console.error(`[REACHX - mcResources] Failed to fetch UUID for ${username}:`.red, error);
         return null;
     }
 }
