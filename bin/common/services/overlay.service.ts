@@ -3,7 +3,6 @@
  * Handles presence management, achievements, and overlay notifications
  * Supports targeting: user (Minecraft UUID), experience (instance), or global (all Reach users)
  */
-import "colorts/lib/string";
 import { getOverlayDB, getPlayersDB } from "./database.service";
 import {
   UserPresence,
@@ -20,6 +19,7 @@ import {
   MessageTargetType,
 } from "../../types/overlay";
 import { socketBridge } from "../socketio/bridge";
+import { logger } from "./logger.service";
 
 /**
  * In-memory storage for active user presences
@@ -80,7 +80,7 @@ export function registerConnection(socketId: string, userId: string): void {
     });
   }
   
-  console.log(`[REACHX - Overlay] User ${userId} connected (socket: ${socketId})`.green);
+  logger.info("Overlay", `User ${userId} connected (socket: ${socketId})`);
 }
 
 /**
@@ -110,12 +110,12 @@ export function unregisterConnection(socketId: string): void {
     // Save last presence to database
     if (presence) {
       savePresenceToDatabase(userId, presence).catch(err => {
-        console.error(`[REACHX - Overlay] Failed to save presence for ${userId}:`, err);
+        logger.error("Overlay", `Failed to save presence for ${userId}: ${err}`);
       });
     }
     
     activePresences.delete(userId);
-    console.log(`[REACHX - Overlay] User ${userId} disconnected (all connections closed)`.yellow);
+    logger.info("Overlay", `User ${userId} disconnected (all connections closed)`);
   } else {
     // Still has other connections
     userToSockets.set(userId, filteredSockets);
@@ -123,7 +123,7 @@ export function unregisterConnection(socketId: string): void {
     if (presence) {
       presence.socketId = filteredSockets[filteredSockets.length - 1]; // Use latest socket
     }
-    console.log(`[REACHX - Overlay] User ${userId} closed one connection (${filteredSockets.length} remaining)`.blue);
+    logger.debug("Overlay", `User ${userId} closed one connection (${filteredSockets.length} remaining)`);
   }
 }
 
@@ -155,7 +155,7 @@ export function isUserConnected(userId: string): boolean {
  */
 export function joinExperience(userId: string, experienceId: string): boolean {
   if (!isUserConnected(userId)) {
-    console.warn(`[REACHX - Overlay] Cannot join experience: user ${userId} not connected`.yellow);
+    logger.warn("Overlay", `Cannot join experience: user ${userId} not connected`);
     return false;
   }
   
@@ -182,7 +182,7 @@ export function joinExperience(userId: string, experienceId: string): boolean {
     presence.lastUpdate = new Date();
   }
   
-  console.log(`[REACHX - Overlay] User ${userId} joined experience ${experienceId}`.green);
+  logger.info("Overlay", `User ${userId} joined experience ${experienceId}`);
   return true;
 }
 
@@ -213,7 +213,7 @@ export function leaveExperience(userId: string): boolean {
     presence.lastUpdate = new Date();
   }
   
-  console.log(`[REACHX - Overlay] User ${userId} left experience ${experienceId}`.yellow);
+  logger.debug("Overlay", `User ${userId} left experience ${experienceId}`);
   return true;
 }
 
@@ -258,7 +258,7 @@ export function getAllExperiences(): { experienceId: string; userCount: number }
 export function updatePresence(userId: string, payload: PresencePayload): boolean {
   const presence = activePresences.get(userId);
   if (!presence) {
-    console.warn(`[REACHX - Overlay] Cannot update presence for disconnected user: ${userId}`.yellow);
+    logger.warn("Overlay", `Cannot update presence for disconnected user: ${userId}`);
     return false;
   }
   
@@ -273,7 +273,7 @@ export function updatePresence(userId: string, payload: PresencePayload): boolea
     leaveExperience(userId);
   }
   
-  console.log(`[REACHX - Overlay] Updated presence for ${userId}: ${payload.status} - ${payload.details || 'N/A'} (experience: ${presence.experienceId || 'none'})`.cyan);
+  logger.debug("Overlay", `Updated presence for ${userId}: ${payload.status} - ${payload.details || 'N/A'} (experience: ${presence.experienceId || 'none'})`);
   return true;
 }
 
@@ -341,7 +341,7 @@ async function savePresenceToDatabase(userId: string, presence: UserPresence): P
 export function sendToUser(userId: string, message: WebSocketMessage): boolean {
   const sockets = getSocketsByUserId(userId);
   if (sockets.length === 0) {
-    console.warn(`[REACHX - Overlay] Cannot send message to disconnected user: ${userId}`.yellow);
+    logger.warn("Overlay", `Cannot send message to disconnected user: ${userId}`);
     return false;
   }
   
@@ -350,10 +350,10 @@ export function sendToUser(userId: string, message: WebSocketMessage): boolean {
     sockets.forEach(socketId => {
       io.to(socketId).emit("overlay_message", message);
     });
-    console.log(`[REACHX - Overlay] Sent ${message.type} to user ${userId}`.blue);
+    logger.debug("Overlay", `Sent ${message.type} to user ${userId}`);
     return true;
   } catch (error) {
-    console.error(`[REACHX - Overlay] Failed to send message to user ${userId}:`, error);
+    logger.error("Overlay", `Failed to send message to user ${userId}: ${error}`);
     return false;
   }
 }
@@ -364,7 +364,7 @@ export function sendToUser(userId: string, message: WebSocketMessage): boolean {
 export function sendToExperience(experienceId: string, message: WebSocketMessage): number {
   const users = getUsersInExperience(experienceId);
   if (users.length === 0) {
-    console.warn(`[REACHX - Overlay] No users in experience ${experienceId}`.yellow);
+    logger.warn("Overlay", `No users in experience ${experienceId}`);
     return 0;
   }
   
@@ -378,9 +378,9 @@ export function sendToExperience(experienceId: string, message: WebSocketMessage
       });
       sentCount++;
     });
-    console.log(`[REACHX - Overlay] Sent ${message.type} to ${sentCount} users in experience ${experienceId}`.magenta);
+    logger.debug("Overlay", `Sent ${message.type} to ${sentCount} users in experience ${experienceId}`);
   } catch (error) {
-    console.error(`[REACHX - Overlay] Failed to send message to experience ${experienceId}:`, error);
+    logger.error("Overlay", `Failed to send message to experience ${experienceId}: ${error}`);
   }
   
   return sentCount;
@@ -394,10 +394,10 @@ export function sendToAll(message: WebSocketMessage): number {
     const io = socketBridge.getIO();
     io.emit("overlay_message", message);
     const count = activePresences.size;
-    console.log(`[REACHX - Overlay] Broadcast ${message.type} to ${count} users (global)`.magenta);
+    logger.debug("Overlay", `Broadcast ${message.type} to ${count} users (global)`);
     return count;
   } catch (error) {
-    console.error(`[REACHX - Overlay] Failed to broadcast message:`, error);
+    logger.error("Overlay", `Failed to broadcast message: ${error}`);
     return 0;
   }
 }
@@ -412,7 +412,7 @@ export function sendToTarget(target: MessageTarget, message: WebSocketMessage): 
   switch (target.type) {
     case "user":
       if (!target.id) {
-        console.error(`[REACHX - Overlay] User target requires id (Minecraft UUID)`.red);
+        logger.error("Overlay", "User target requires id (Minecraft UUID)");
         return { success: false, recipients: 0 };
       }
       const userSuccess = sendToUser(target.id, message);
@@ -420,7 +420,7 @@ export function sendToTarget(target: MessageTarget, message: WebSocketMessage): 
       
     case "experience":
       if (!target.id) {
-        console.error(`[REACHX - Overlay] Experience target requires id (experienceId)`.red);
+        logger.error("Overlay", "Experience target requires id (experienceId)");
         return { success: false, recipients: 0 };
       }
       const experienceCount = sendToExperience(target.id, message);
@@ -431,7 +431,7 @@ export function sendToTarget(target: MessageTarget, message: WebSocketMessage): 
       return { success: globalCount > 0, recipients: globalCount };
       
     default:
-      console.error(`[REACHX - Overlay] Unknown target type: ${(target as any).type}`.red);
+      logger.error("Overlay", `Unknown target type: ${(target as any).type}`);
       return { success: false, recipients: 0 };
   }
 }
@@ -523,7 +523,7 @@ export async function createAchievement(achievement: Omit<AchievementDocument, "
   };
   
   await db.insertDocument("achievements", newAchievement);
-  console.log(`[REACHX - Overlay] Created achievement: ${achievement.title}`.green);
+  logger.info("Overlay", `Created achievement: ${achievement.title}`);
   
   return newAchievement;
 }
@@ -541,14 +541,14 @@ export async function unlockAchievement(userId: string, achievementId: string, s
   });
   
   if (existing.length > 0) {
-    console.log(`[REACHX - Overlay] Achievement ${achievementId} already unlocked for user ${userId}`.yellow);
+    logger.debug("Overlay", `Achievement ${achievementId} already unlocked for user ${userId}`);
     return false;
   }
   
   // Get achievement details
   const achievement = await getAchievementById(achievementId);
   if (!achievement) {
-    console.error(`[REACHX - Overlay] Achievement ${achievementId} not found`.red);
+    logger.error("Overlay", `Achievement ${achievementId} not found`);
     return false;
   }
   
@@ -572,7 +572,7 @@ export async function unlockAchievement(userId: string, achievementId: string, s
     });
   }
   
-  console.log(`[REACHX - Overlay] Achievement ${achievement.title} unlocked for user ${userId}`.green);
+  logger.info("Overlay", `Achievement ${achievement.title} unlocked for user ${userId}`);
   return true;
 }
 

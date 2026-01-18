@@ -1,9 +1,8 @@
-import "colorts/lib/string";
 import cron from "node-cron";
 import path from "path";
 import fs from "fs/promises";
-import { pathExists } from "fs-extra";
 import { multerDirSafe } from "../common/utils";
+import { logger } from "../common/services/logger.service";
 
 const SCHEDULE_EVERY_TEN_MINUTES = "*/10 * * * *";
 const ttlFromEnv = Number(process.env.TEMP_FILE_TTL_MINUTES);
@@ -14,10 +13,8 @@ const TEMP_DIR = path.join(multerDirSafe(), "temp");
 let isRunning = false;
 
 async function removeStaleTempFiles(): Promise<void> {
-  const exists = await pathExists(TEMP_DIR);
-  if (!exists) {
-    return;
-  }
+  // Ensure temp directory exists
+  await fs.mkdir(TEMP_DIR, { recursive: true });
 
   const entries = await fs.readdir(TEMP_DIR);
   const now = Date.now();
@@ -48,12 +45,9 @@ async function removeStaleTempFiles(): Promise<void> {
         }
 
         await fs.unlink(entryPath);
-        console.log(`[REACHX - Falcon] Deleted stale temp file: ${entry}`.cyan);
+        logger.debug("TempCleaner", `Deleted stale temp file: ${entry}`);
       } catch (error) {
-        console.warn(
-          `[REACHX - Falcon] Failed to evaluate temp entry ${entry}:`.yellow,
-          error
-        );
+        logger.warn("TempCleaner", `Failed to evaluate temp entry ${entry}: ${error}`);
       }
     })
   );
@@ -69,11 +63,11 @@ export function startTempCleaner(): void {
     try {
       await removeStaleTempFiles();
     } catch (error) {
-      console.error("[REACHX - Falcon] Cleanup task failed:".red, error);
+      logger.error("TempCleaner", `Cleanup task failed: ${error}`);
     } finally {
       isRunning = false;
     }
   });
 
-  console.log("[REACHX - Falcon] Scheduled temp directory cleanup every 10 minutes.".green);
+  logger.info("TempCleaner", "Scheduled temp directory cleanup every 10 minutes.");
 }

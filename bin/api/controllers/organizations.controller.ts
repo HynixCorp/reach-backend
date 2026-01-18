@@ -7,6 +7,7 @@ import { verifyTokenDate } from "../../common/reach/orgs.provider";
 import { getDevelopersDB } from "../../common/services/database.service";
 import { validateRequiredFields, validateRequest, isValidObjectId } from "../../common/services/validation.service";
 import { ResponseHandler } from "../../common/services/response.service";
+import { logger } from "../../common/services/logger.service";
 
 // reach_developers - Organizations belong to developer accounts
 const DEVELOPERS_DB = getDevelopersDB();
@@ -142,7 +143,7 @@ export async function create_organization_link(req: Request, res: Response) {
       )
     );
   } catch (error) {
-    console.log(error);
+    logger.error("Organizations", `${error}`);
     return ResponseHandler.serverError(res, error as Error);
   }
 }

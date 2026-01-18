@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import { createErrorResponse } from "../utils";
+import { logger } from "./logger.service";
 
 /**
  * Centralized async error handler wrapper
@@ -10,7 +11,7 @@ export function asyncHandler(
 ) {
   return (req: Request, res: Response, next: NextFunction) => {
     Promise.resolve(fn(req, res, next)).catch((error) => {
-      console.error(`[Controller Error]: ${error.message}`, error);
+      logger.error("Controller", `${error.message}`);
       
       // Send error response
       res.status(500).json(

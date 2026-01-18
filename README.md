@@ -25,11 +25,63 @@ cp .env.sample .env
 npx ts-node server.ts
 # or for development with auto-reload
 npm run dev
+# or clean start (removes lock files)
+npm run dev:clean
 ```
 
 ---
 
+## Process Management
+
+The server includes a robust process manager that prevents infinite restart loops and zombie processes:
+
+### Development Mode (`npm run dev`)
+- Uses `ts-node-dev` for auto-restart on file changes
+- Process manager monitors for crashes but lets `ts-node-dev` handle restarts
+- Lock files prevent multiple instances
+
+### Production Mode (Docker)
+- Container exits on crash (Docker/Kubernetes handles restart)
+- Maximum 5 restart attempts with backoff
+- Lock files and port checks prevent conflicts
+- Memory limits prevent overflow
+
+### Troubleshooting
+
+If the server fails to start:
+
+```sh
+# Clean lock files and crash state
+npm run clean:locks
+
+# Check port availability
+netstat -tlnp | grep :3000
+
+# View recent logs
+tail -f logs/reach-$(date +%Y-%m-%d).log
+```
+
+Common issues:
+- **"Port already in use"**: Another process is using the port, or stale lock file
+- **"Lock file exists"**: Previous instance didn't shut down cleanly
+- **"Max crashes exceeded"**: Server crashed repeatedly, manual intervention required
+
+---
+
 ## Docker / Production
+
+Before deploying, run the pre-deployment checklist:
+
+```sh
+npm run pre-deploy-check
+```
+
+This will verify:
+- Environment variables are set
+- TypeScript compilation succeeds
+- Docker build works
+- No stale lock files exist
+- Working directory is clean
 
 Build the Docker image locally:
 
@@ -68,6 +120,19 @@ Optional (enable features):
 - `POLAR_API_KEY`, `POLAR_WEBHOOK_SECRET`, `POLAR_ENDPOINT_URI` - Payments (Polar)
 - `RESEND_API_KEY` - Email delivery (Resend)
 - `DASHBOARD_URL` - Dashboard trusted origin
+
+Process Manager (optional, sensible defaults):
+
+- `MAX_CRASHES_BEFORE_EXIT=3` - Max crashes before requiring manual restart
+- `CRASH_WINDOW_MS=60000` - Time window for crash counting (1 minute)
+- `GRACEFUL_SHUTDOWN_TIMEOUT_MS=10000` - Shutdown timeout (10 seconds)
+
+Logging (optional):
+
+- `LOG_LEVEL=INFO` - Log level (DEBUG, INFO, WARN, ERROR, FATAL)
+- `LOG_DIR=./logs` - Log directory
+- `MAX_LOG_SIZE=10485760` - Max log file size (10MB)
+- `MAX_LOG_FILES=30` - Max number of log files to keep
 
 Secrets required by CI / Deployment (set in GitHub Actions secrets):
 

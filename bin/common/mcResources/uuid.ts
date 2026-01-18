@@ -1,16 +1,16 @@
 import fetch from 'cross-fetch';
-import 'colorts/lib/string';
+import { logger } from '../services/logger.service';
 
 export default async function getMinecraftUUID(username: string): Promise<string | null> {
     try {
         const response = await fetch(`https://api.mojang.com/users/profiles/minecraft/${username}`);
         if (!response.ok) {
-            throw new Error(`[REACHX - mcResources] Error fetching UUID for ${username}: ${response.statusText}`.red);
+            throw new Error(`Error fetching UUID for ${username}: ${response.statusText}`);
         }
         const data = await response.json();
         return data.id;
     } catch (error) {
-        console.error(`[REACHX - mcResources] Failed to fetch UUID for ${username}:`.red, error);
+        logger.error("mcResources", `Failed to fetch UUID for ${username}: ${error}`);
         return null;
     }
 }

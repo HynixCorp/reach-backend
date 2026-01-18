@@ -12,7 +12,7 @@
  */
 
 import axios from "axios";
-import "colorts/lib/string";
+import { logger } from "../services/logger.service";
 
 // Xbox Live API endpoints
 const XBOX_USER_AUTH_URL = "https://user.auth.xboxlive.com/user/authenticate";
@@ -82,7 +82,7 @@ export interface XboxAuthResult {
  * Exchange Microsoft OAuth token for Xbox Live token
  */
 export async function getXboxLiveToken(msAccessToken: string): Promise<XboxLiveToken> {
-  console.log("[Xbox Auth] Exchanging Microsoft token for Xbox Live token...".cyan);
+  logger.debug("XboxAuth", "Exchanging Microsoft token for Xbox Live token...");
   
   try {
     const response = await axios.post(XBOX_USER_AUTH_URL, {
@@ -107,7 +107,7 @@ export async function getXboxLiveToken(msAccessToken: string): Promise<XboxLiveT
       expiresOn: new Date(data.NotAfter)
     };
   } catch (error: any) {
-    console.error("[Xbox Auth] Failed to get Xbox Live token:".red, error.response?.data || error.message);
+    logger.error("XboxAuth", `Failed to get Xbox Live token: ${error.response?.data || error.message}`);
     throw new Error(`Xbox Live authentication failed: ${error.response?.data?.XErr || error.message}`);
   }
 }
@@ -116,7 +116,7 @@ export async function getXboxLiveToken(msAccessToken: string): Promise<XboxLiveT
  * Exchange Xbox Live token for XSTS token
  */
 export async function getXSTSToken(xboxLiveToken: XboxLiveToken): Promise<XSTSToken> {
-  console.log("[Xbox Auth] Exchanging Xbox Live token for XSTS token...".cyan);
+  logger.debug("XboxAuth", "Exchanging Xbox Live token for XSTS token...");
   
   try {
     const response = await axios.post(XBOX_XSTS_AUTH_URL, {
@@ -164,7 +164,7 @@ export async function getXSTSToken(xboxLiveToken: XboxLiveToken): Promise<XSTSTo
         break;
     }
     
-    console.error("[Xbox Auth] XSTS authentication failed:".red, errorMessage);
+    logger.error("XboxAuth", `XSTS authentication failed: ${errorMessage}`);
     throw new Error(errorMessage);
   }
 }
@@ -173,7 +173,7 @@ export async function getXSTSToken(xboxLiveToken: XboxLiveToken): Promise<XSTSTo
  * Exchange XSTS token for Minecraft access token
  */
 export async function getMinecraftToken(xstsToken: XSTSToken): Promise<MinecraftToken> {
-  console.log("[Xbox Auth] Exchanging XSTS token for Minecraft token...".cyan);
+  logger.debug("XboxAuth", "Exchanging XSTS token for Minecraft token...");
   
   try {
     const response = await axios.post(MINECRAFT_AUTH_URL, {
@@ -193,7 +193,7 @@ export async function getMinecraftToken(xstsToken: XSTSToken): Promise<Minecraft
       expiresOn: new Date(Date.now() + data.expires_in * 1000)
     };
   } catch (error: any) {
-    console.error("[Xbox Auth] Failed to get Minecraft token:".red, error.response?.data || error.message);
+    logger.error("XboxAuth", `Failed to get Minecraft token: ${error.response?.data || error.message}`);
     throw new Error("Minecraft authentication failed. Please try again.");
   }
 }
@@ -202,7 +202,7 @@ export async function getMinecraftToken(xstsToken: XSTSToken): Promise<Minecraft
  * Get Minecraft profile (UUID and username)
  */
 export async function getMinecraftProfile(minecraftToken: MinecraftToken): Promise<MinecraftProfile> {
-  console.log("[Xbox Auth] Fetching Minecraft profile...".cyan);
+  logger.debug("XboxAuth", "Fetching Minecraft profile...");
   
   try {
     const response = await axios.get(MINECRAFT_PROFILE_URL, {
@@ -217,7 +217,7 @@ export async function getMinecraftProfile(minecraftToken: MinecraftToken): Promi
     if (error.response?.status === 404) {
       throw new Error("This Microsoft account does not own Minecraft Java Edition.");
     }
-    console.error("[Xbox Auth] Failed to get Minecraft profile:".red, error.response?.data || error.message);
+    logger.error("XboxAuth", `Failed to get Minecraft profile: ${error.response?.data || error.message}`);
     throw new Error("Failed to retrieve Minecraft profile.");
   }
 }
@@ -226,7 +226,7 @@ export async function getMinecraftProfile(minecraftToken: MinecraftToken): Promi
  * Check if account owns Minecraft
  */
 export async function checkMinecraftOwnership(minecraftToken: MinecraftToken): Promise<boolean> {
-  console.log("[Xbox Auth] Checking Minecraft ownership...".cyan);
+  logger.debug("XboxAuth", "Checking Minecraft ownership...");
   
   try {
     const response = await axios.get(MINECRAFT_ENTITLEMENTS_URL, {
@@ -245,7 +245,7 @@ export async function checkMinecraftOwnership(minecraftToken: MinecraftToken): P
     
     return ownsGame;
   } catch (error: any) {
-    console.error("[Xbox Auth] Failed to check Minecraft ownership:".red, error.response?.data || error.message);
+    logger.error("XboxAuth", `Failed to check Minecraft ownership: ${error.response?.data || error.message}`);
     return false;
   }
 }
@@ -276,7 +276,7 @@ export async function authenticateWithXbox(msAccessToken: string): Promise<XboxA
       profile = await getMinecraftProfile(minecraftToken);
     }
     
-    console.log(`[Xbox Auth] Authentication successful for ${xstsToken.gamertag}`.green);
+    logger.info("XboxAuth", `Authentication successful for ${xstsToken.gamertag}`);
     
     return {
       success: true,
@@ -287,7 +287,7 @@ export async function authenticateWithXbox(msAccessToken: string): Promise<XboxA
       ownsMinecraft
     };
   } catch (error: any) {
-    console.error("[Xbox Auth] Authentication flow failed:".red, error.message);
+    logger.error("XboxAuth", `Authentication flow failed: ${error.message}`);
     return {
       success: false,
       error: error.message

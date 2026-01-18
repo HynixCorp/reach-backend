@@ -2,6 +2,7 @@ import { config } from "dotenv";
 import { PolarOrderDB } from "../../types/polar";
 import { Beneficts } from "../../types/user";
 import { getDevelopersDB } from "../services/database.service";
+import { logger } from "../services/logger.service";
 
 config();
 
@@ -30,17 +31,14 @@ export async function getUsageDocument(
 
     const document = information[0];
     if (!document || !document.auth || !document._udoc) {
-      console.warn(`[Usage] Corrupted document: ${ownerId}`);
+      logger.warn("Usage", `Corrupted document: ${ownerId}`);
       return null;
     }
 
     return document as { auth: string; _udoc: Beneficts };
   } catch (error) {
     // Manejo de errores más específico y logging
-    console.error(
-      `[Usage] Error obtaining usage document for ownerId: ${ownerId}`,
-      error
-    );
+    logger.error("Usage", `Error obtaining usage document for ownerId: ${ownerId} - ${error}`);
 
     // Re-lanzar con información más específica
     if (error instanceof Error) {
@@ -75,14 +73,14 @@ export async function usageToken(
     // Obtener el documento de uso
     const usageDocument = await getUsageDocument(authID.trim());
     if (!usageDocument) {
-      console.warn(`[Usage] No usage document found for: ${authID}`);
+      logger.warn("Usage", `No usage document found for: ${authID}`);
       return false;
     }
 
     const { _udoc: document } = usageDocument;
     
     if (!document || !document.instances) {
-      console.warn(`[Usage] Corrupted document or no instances for: ${authID}`);
+      logger.warn("Usage", `Corrupted document or no instances for: ${authID}`);
       return false;
     }
 
@@ -99,7 +97,7 @@ export async function usageToken(
     return true;
 
   } catch (error) {
-    console.error(`[Usage] Error consuming ${type} token for ${authID}:`, error);
+    logger.error("Usage", `Error consuming ${type} token for ${authID}: ${error}`);
 
     if (error instanceof Error) {
       throw new Error(`Error consuming usage token: ${error.message}`);
@@ -124,12 +122,12 @@ function consumeInstanceToken(
   const currentCount = instances[type];
   
   if (currentCount === undefined || currentCount === null || typeof currentCount !== "number") {
-    console.warn(`[Usage] Instance counter '${type}' not available or invalid for: ${authID}`);
+    logger.warn("Usage", `Instance counter '${type}' not available or invalid for: ${authID}`);
     return false;
   }
 
   if (currentCount <= 0) {
-    console.warn(`[Usage] No tokens available for instance '${type}' for: ${authID} (available: ${currentCount})`);
+    logger.warn("Usage", `No tokens available for instance '${type}' for: ${authID} (available: ${currentCount})`);
     return false;
   }
 

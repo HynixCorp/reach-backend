@@ -21,6 +21,52 @@ export class MongoDB {
         return this.client.db(this.dbName);
     }
 
+    /**
+     * Ping the database to check connectivity
+     * @returns Promise that resolves if ping is successful
+     */
+    async ping(): Promise<boolean> {
+        try {
+            const db = this.getDb();
+            await db.command({ ping: 1 });
+            return true;
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    /**
+     * Get database statistics
+     * @returns Database stats including collection count
+     */
+    async getStats(): Promise<{ collections: number; dataSize: number; storageSize: number }> {
+        try {
+            const db = this.getDb();
+            const stats = await db.stats();
+            return {
+                collections: stats.collections || 0,
+                dataSize: stats.dataSize || 0,
+                storageSize: stats.storageSize || 0,
+            };
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    /**
+     * List all collections in the database
+     * @returns Array of collection names
+     */
+    async listCollections(): Promise<string[]> {
+        try {
+            const db = this.getDb();
+            const collections = await db.listCollections().toArray();
+            return collections.map(c => c.name);
+        } catch (error) {
+            throw error;
+        }
+    }
+
     async insertDocument(collectionName: string, document: object): Promise<any> {
         const db = this.getDb();
         const collection = db.collection(collectionName);

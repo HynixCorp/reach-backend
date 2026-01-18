@@ -19,6 +19,7 @@ import {
   getUsageDocument,
 } from "../../common/reach/usage";
 import { getDevelopersDB } from "../../common/services/database.service";
+import { logger } from "../../common/services/logger.service";
 import { nanoid } from "nanoid";
 import { resendService } from "../../common/resend/service";
 import { buildInvoiceEmail } from "../../common/resend/templates/invoiceTemplate";
@@ -143,7 +144,7 @@ export async function success_payment(req: Request, res: Response) {
       invoiceHTML
     );
   } catch (emailError) {
-    console.error("[REACHX - Payments]: Failed to send invoice email.", emailError);
+    logger.error("Payments", `Failed to send invoice email: ${emailError}`);
   }
 
   res.redirect(
@@ -153,7 +154,7 @@ export async function success_payment(req: Request, res: Response) {
 
 export async function cancel_payment(req: Request, res: Response) {
   // TODO: Implement cancel payment logic
-  console.log("Cancel payment: ", req.query);
+  logger.debug("Payments", `Cancel payment: ${JSON.stringify(req.query)}`);
   return res.status(200).json(createSuccessResponse(null, "Payment cancelled"));
 }
 

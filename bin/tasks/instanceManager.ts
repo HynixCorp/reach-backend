@@ -1,10 +1,10 @@
-import "colorts/lib/string";
 import cron from "node-cron";
 import fs from "fs/promises";
 import path from "path";
 import { config } from "dotenv";
 import { getExperiencesDB } from "../common/services/database.service";
 import { cleanOldVersionsGlobal } from "../api/controllers/storage.controller";
+import { logger } from "../common/services/logger.service";
 
 config();
 
@@ -20,17 +20,17 @@ export function startInstanceManager() {
             // await cleanUnusedAssets();
             await cleanOldTempFiles();
         } catch (err) {
-            console.error("[REACHX - InstanceManager] Error in the automatic task schedule:".red, err);
+            logger.error("InstanceManager", `Error in the automatic task schedule: ${err}`);
         }
     });
     
     // Run version cleanup every 6 hours
     cron.schedule("0 */6 * * *", async () => {
         try {
-            console.log("[REACHX - InstanceManager] Starting global version cleanup...".cyan);
+            logger.info("InstanceManager", "Starting global version cleanup...");
             await cleanInstanceVersionsGlobal();
         } catch (err) {
-            console.error("[REACHX - InstanceManager] Error in version cleanup task:".red, err);
+            logger.error("InstanceManager", `Error in version cleanup task: ${err}`);
         }
     });
 }
@@ -55,7 +55,7 @@ async function checkWaitingInstances() {
             { $unset: { waitingUntil: "" } }
         );
 
-        console.log(`[REACHX - InstanceManager] Updated pending instance: ${instance.name} (${instance.id})`.green);
+        logger.info("InstanceManager", `Updated pending instance: ${instance.name} (${instance.id})`);
     }
 }
 
@@ -63,9 +63,11 @@ async function cleanOldTempFiles() {
     const now = Date.now();
     let files: string[] = [];
     try {
+        // Ensure temp directory exists before reading
+        await fs.mkdir(TEMP_DIR, { recursive: true });
         files = await fs.readdir(TEMP_DIR);
     } catch (err: any) {
-        console.warn(`[REACHX - InstanceManager] Could not read temp dir ${TEMP_DIR}:`.red, err);
+        logger.warn("InstanceManager", `Could not read temp dir ${TEMP_DIR}: ${err}`);
         return;
     }
 
@@ -78,7 +80,7 @@ async function cleanOldTempFiles() {
             } catch (statErr: any) {
                 // File might have been removed by another process (TempCleaner). Ignore ENOENT.
                 if (statErr && statErr.code === "ENOENT") continue;
-                console.warn(`[REACHX - InstanceManager] Could not stat ${file}:`.red, statErr);
+                logger.warn("InstanceManager", `Could not stat ${file}: ${statErr}`);
                 continue;
             }
 
@@ -87,15 +89,15 @@ async function cleanOldTempFiles() {
             if (age > MAX_AGE_MS) {
                 try {
                     await fs.unlink(filePath);
-                    console.log(`[REACHX - InstanceManager] Old .zip deleted: ${file}`.magenta);
+                    logger.debug("InstanceManager", `Old .zip deleted: ${file}`);
                 } catch (unlinkErr: any) {
                     // If the file was removed between stat and unlink, ignore it.
                     if (unlinkErr && unlinkErr.code === 'ENOENT') continue;
-                    console.warn(`[REACHX - InstanceManager] Failed to delete ${file}:`.red, unlinkErr);
+                    logger.warn("InstanceManager", `Failed to delete ${file}: ${unlinkErr}`);
                 }
             }
         } catch (err) {
-            console.warn(`[REACHX - InstanceManager] Cannot review/delete ${file}:`.red, err);
+            logger.warn("InstanceManager", `Cannot review/delete ${file}: ${err}`);
         }
     }
 }
@@ -103,8 +105,8 @@ async function cleanOldTempFiles() {
 async function cleanInstanceVersionsGlobal() {
     try {
         await cleanOldVersionsGlobal();
-        console.log("[REACHX - InstanceManager] Version cleanup completed successfully".green);
+        logger.info("InstanceManager", "Version cleanup completed successfully");
     } catch (err) {
-        console.error("[REACHX - InstanceManager] Error in cleanInstanceVersionsGlobal:".red, err);
+        logger.error("InstanceManager", `Error in cleanInstanceVersionsGlobal: ${err}`);
     }
 }

@@ -1,5 +1,6 @@
 import { config } from "dotenv";
 import { Resend } from "resend";
+import { logger } from "../services/logger.service";
 
 // Load env vars once when module is imported
 config();
@@ -53,7 +54,7 @@ export class ResendService {
         html: body,
       });
     } catch (error) {
-      console.error("Error sending email:", error);
+      logger.error("Resend", `Error sending email: ${error}`);
       throw new Error("Failed to send email");
     }
   }

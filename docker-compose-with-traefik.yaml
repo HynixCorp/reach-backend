@@ -12,6 +12,11 @@ services:
       - PORT=3000
       - MULTER_DIR=/app/cdn
       - NODE_ENV=production
+      - DOCKER_CONTAINER=true
+      # Process manager config - container restarts handled by Docker
+      - MAX_CRASHES_BEFORE_EXIT=3
+      - CRASH_WINDOW_MS=60000
+      - GRACEFUL_SHUTDOWN_TIMEOUT_MS=10000
     labels:
       # Traefik reverse proxy configuration
       - traefik.enable=true
@@ -32,17 +37,32 @@ services:
     volumes:
       # Persistent storage for CDN files
       - reach-cdn-data:/app/cdn
-    restart: unless-stopped
+      # Persistent storage for logs (crash logs, state, etc.)
+      - reach-logs-data:/app/logs
+    # Restart policy with backoff - prevents infinite restart loops
+    # on-failure: restart only on non-zero exit code, max 5 attempts
+    restart: on-failure:5
     pull_policy: always
+    # Stop grace period - give app time for graceful shutdown
+    stop_grace_period: 15s
     healthcheck:
       test: ["CMD", "wget", "-q", "--spider", "http://localhost:3000/health"]
-      interval: 30s
-      timeout: 10s
+      interval: 15s
+      timeout: 5s
       retries: 3
-      start_period: 20s
+      start_period: 30s
+    # Resource limits to prevent memory overflow
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+        reservations:
+          memory: 512M
 
 volumes:
   reach-cdn-data:
+    driver: local
+  reach-logs-data:
     driver: local
 
 networks:

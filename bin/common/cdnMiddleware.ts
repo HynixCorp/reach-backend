@@ -1,7 +1,7 @@
-import "colorts/lib/string";
 import { NextFunction, Request, Response } from "express";
 import crypto from "crypto";
 import { createErrorResponse } from "./utils";
+import { logger } from "./services/logger.service";
 
 /* =========================
    🔐 CDN SIGNED URL CONFIG
@@ -67,10 +67,7 @@ export function reachCDNProtection(
   const currentTime = Math.floor(Date.now() / 1000);
   
   if (currentTime > expirationTime) {
-    console.log(
-      `%s`,
-      `[${DATE_REQ}] - Expired URL attempt: ${fullPath}`.yellow
-    );
+    logger.warn("CDN", `Expired URL attempt: ${fullPath}`);
     res
       .status(403)
       .json(

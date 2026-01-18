@@ -1,11 +1,12 @@
 import { Request, Response } from "express";
 import { v4 as uuidv4 } from "uuid";
-import { createSuccessResponse } from "../../common/utils";
+import { createSuccessResponse, createGenericResponse } from "../../common/utils";
 import { UserPacket } from "../../types/auth";
 import getMinecraftUUID from "../../common/mcResources/uuid";
 import { getDevelopersDB, getPlayersDB } from "../../common/services/database.service";
 import { validateRequest } from "../../common/services/validation.service";
 import { ResponseHandler } from "../../common/services/response.service";
+import { logger } from "../../common/services/logger.service";
 
 // reach_players - For Xbox/Minecraft player profiles
 const PLAYERS_DB = getPlayersDB();
@@ -118,4 +119,87 @@ async function setupComplete(req: Request, res: Response): Promise<Response> {
   );
 }
 
-export { createNewUserData, getUserData, setupComplete };
+/**
+ * Get current session information
+ * This endpoint retrieves the user's authentication session from Better-Auth
+ * 
+ * Required headers:
+ * - Authorization: Bearer <session_token>
+ * 
+ * @route GET /api/auth/v0/get-session
+ */
+async function getSession(req: Request, res: Response): Promise<Response> {
+  try {
+    // Get session token from Authorization header
+    const authHeader = req.headers.authorization;
+    
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+      return res.status(401).json(
+        createGenericResponse(false, null, "No valid authorization header provided", 401)
+      );
+    }
+
+    const sessionToken = authHeader.substring(7); // Remove "Bearer " prefix
+
+    // Find session in Better-Auth sessions collection
+    const sessions = await DEVELOPERS_DB.findDocuments("session", {
+      token: sessionToken,
+    });
+
+    if (sessions.length === 0) {
+      return res.status(401).json(
+        createGenericResponse(false, null, "Session not found or expired", 401)
+      );
+    }
+
+    const session = sessions[0];
+
+    // Check if session is expired
+    if (session.expiresAt && new Date(session.expiresAt) < new Date()) {
+      return res.status(401).json(
+        createGenericResponse(false, null, "Session has expired", 401)
+      );
+    }
+
+    // Get user information
+    const users = await DEVELOPERS_DB.findDocuments("user", {
+      _id: DEVELOPERS_DB.createObjectId(session.userId),
+    });
+
+    if (users.length === 0) {
+      return res.status(404).json(
+        createGenericResponse(false, null, "User not found", 404)
+      );
+    }
+
+    const user = users[0];
+
+    // Return session info (sanitized)
+    return res.status(200).json(
+      createSuccessResponse(
+        {
+          session: {
+            id: session._id,
+            userId: session.userId,
+            expiresAt: session.expiresAt,
+            createdAt: session.createdAt,
+          },
+          user: {
+            id: user._id,
+            email: user.email,
+            name: user.name,
+            image: user.image,
+            emailVerified: user.emailVerified,
+            newaccount: user.newaccount,
+          },
+        },
+        "Session retrieved successfully"
+      )
+    );
+  } catch (error) {
+    logger.error("Auth", `Failed to get session: ${error}`);
+    return ResponseHandler.serverError(res, error as Error);
+  }
+}
+
+export { createNewUserData, getUserData, setupComplete, getSession };

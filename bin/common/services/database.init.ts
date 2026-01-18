@@ -3,9 +3,9 @@
  * Creates databases and collections if they don't exist
  * Run this after a MongoDB wipe or on fresh installations
  */
-import "colorts/lib/string";
 import { MongoClient, IndexDirection } from "mongodb";
 import { config } from "dotenv";
+import { logger } from "./logger.service";
 
 config();
 
@@ -147,10 +147,10 @@ export async function initializeDatabases(uri: string): Promise<void> {
   
   try {
     await client.connect();
-    console.log("[REACHX - Database Manager] Connected to MongoDB".green);
+    logger.info("Database Manager", "Connected to MongoDB");
     
     for (const [dbName, schema] of Object.entries(DATABASE_SCHEMA)) {
-      console.log(`[REACHX - Database Manager] Initializing database: ${dbName}`.cyan);
+      logger.info("Database Manager", `Initializing database: ${dbName}`);
       const db = client.db(dbName);
       
       // Get existing collections
@@ -163,9 +163,9 @@ export async function initializeDatabases(uri: string): Promise<void> {
         // Create collection if it doesn't exist
         if (!existingNames.includes(name)) {
           await db.createCollection(name);
-          console.log(`[REACHX - Database Manager] Created collection: ${name}`.green);
+          logger.info("Database Manager", `Created collection: ${name}`);
         } else {
-          console.log(`[REACHX - Database Manager] Collection exists: ${name}`.blue);
+          logger.debug("Database Manager", `Collection exists: ${name}`);
         }
         
         // Create indexes
@@ -180,7 +180,7 @@ export async function initializeDatabases(uri: string): Promise<void> {
             } catch (err: any) {
               // Ignore duplicate index errors
               if (!err.message?.includes("already exists")) {
-                console.warn(`[REACHX - Database Manager] Index warning for ${name}: ${err.message}`.yellow);
+                logger.warn("Database Manager", `Index warning for ${name}: ${err.message}`);
               }
             }
           }
@@ -196,16 +196,16 @@ export async function initializeDatabases(uri: string): Promise<void> {
           
           if (count === 0) {
             await collection.insertMany(documents as any[]);
-            console.log(`[REACHX - Database Manager] Seeded ${documents.length} document(s) into ${collectionName}`.green);
+            logger.info("Database Manager", `Seeded ${documents.length} document(s) into ${collectionName}`);
           }
         }
       }
     }
     
-    console.log("[REACHX - Database Manager] All databases initialized successfully".green);
+    logger.info("Database Manager", "All databases initialized successfully");
     
   } catch (error) {
-    console.error("[REACHX - Database Manager] Failed to initialize databases:".red, error);
+    logger.error("Database Manager", `Failed to initialize databases: ${error}`);
     throw error;
   } finally {
     await client.close();
@@ -241,7 +241,7 @@ export async function checkDatabaseHealth(uri: string): Promise<{
       
       if (missingCollections.length > 0) {
         healthy = false;
-        console.warn(`[REACHX - Database Manager] ${dbName} missing collections: ${missingCollections.join(", ")}`.yellow);
+        logger.warn("Database Manager", `${dbName} missing collections: ${missingCollections.join(", ")}`);
       }
     }
     
@@ -260,11 +260,11 @@ if (require.main === module) {
   
   initializeDatabases(uri)
     .then(() => {
-      console.log("\n[REACHX - Database Manager] Initialization complete!".green);
+      logger.info("Database Manager", "Initialization complete!");
       process.exit(0);
     })
     .catch((error) => {
-      console.error("\n[REACHX - Database Manager] Initialization failed:".red, error);
+      logger.error("Database Manager", `Initialization failed: ${error}`);
       process.exit(1);
     });
 }

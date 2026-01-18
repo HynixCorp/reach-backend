@@ -10,6 +10,7 @@ import {
   get_usage 
 } from "../controllers/payments.controller";
 import { handlePolarPayload } from "../controllers/webhooks.controller";
+import { API_ROUTES } from "../../common/constants";
 
 config();
 
@@ -18,21 +19,36 @@ const POLAR_WEBHOOK_SECRET = process.env.POLAR_WEBHOOK_SECRET;
 
 const ROUTER = express.Router();
 
-ROUTER.get("/create", Checkout({
+/**
+ * Payments Routes
+ * 
+ * Handles Polar.sh payment integration for developer subscriptions.
+ */
+
+// Polar checkout (redirects to Polar)
+ROUTER.get(API_ROUTES.PAYMENTS.CREATE, Checkout({
     accessToken: POLAR_TOKEN,
-    successUrl: `${process.env.BASE_URL}/api/payments/v0/success`,
+    successUrl: `${process.env.BASE_URL}${API_ROUTES.PAYMENTS.BASE}${API_ROUTES.PAYMENTS.SUCCESS}`,
     includeCheckoutId: true,
     server: "sandbox",
     theme: "dark"
 })); 
 
-ROUTER.get("/success", asyncHandler(success_payment));
-ROUTER.get("/cancel", asyncHandler(cancel_payment));
-ROUTER.get("/create/portal", asyncHandler(create_portal));
-ROUTER.get("/info", asyncHandler(get_payment_info));
-ROUTER.get("/usage/info", asyncHandler(get_usage));
+// Payment callbacks
+ROUTER.get(API_ROUTES.PAYMENTS.SUCCESS, asyncHandler(success_payment));
+ROUTER.get(API_ROUTES.PAYMENTS.CANCEL, asyncHandler(cancel_payment));
 
-ROUTER.post("/webhook", Webhooks({
+// Customer portal
+ROUTER.get(API_ROUTES.PAYMENTS.CREATE_PORTAL, asyncHandler(create_portal));
+
+// Payment/subscription info
+ROUTER.get(API_ROUTES.PAYMENTS.INFO, asyncHandler(get_payment_info));
+
+// Usage statistics
+ROUTER.get(API_ROUTES.PAYMENTS.USAGE_INFO, asyncHandler(get_usage));
+
+// Polar webhook
+ROUTER.post(API_ROUTES.PAYMENTS.WEBHOOK, Webhooks({
     webhookSecret: POLAR_WEBHOOK_SECRET || "",
     onPayload: handlePolarPayload,
 }));

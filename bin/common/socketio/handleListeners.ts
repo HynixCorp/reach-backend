@@ -1,4 +1,3 @@
-import "colorts/lib/string";
 import { Client as SocketIOClient } from "./client";
 import {
   registerConnection,
@@ -10,6 +9,7 @@ import {
   getUserExperience,
 } from "../services/overlay.service";
 import { PresencePayload, WebSocketMessage } from "../../types/overlay";
+import { logger } from "../services/logger.service";
 
 /**
  * Check if we're in development mode
@@ -30,11 +30,11 @@ const generateDevUserId = (socketId: string): string => {
 export function setupListeners(socketIOClient: SocketIOClient) {
   // Legacy listeners for backwards compatibility
   socketIOClient.listenEvent("message", (socket, message) => {
-    console.log(`[REACHX - Socket] Received message from ${socket.id}: ${message}`.blue);
+    logger.debug("Socket", `Received message from ${socket.id}: ${message}`);
   });
 
   socketIOClient.listenEvent("custom_event", (socket, data) => {
-    console.log(`[REACHX - Socket] Custom event from ${socket.id}:`.blue, data);
+    logger.debug("Socket", `Custom event from ${socket.id}: ${JSON.stringify(data)}`);
   });
 
   // ============ Overlay Authentication ============
@@ -66,7 +66,7 @@ export function setupListeners(socketIOClient: SocketIOClient) {
     else {
       if (!data || !data.userId) {
         userId = generateDevUserId(socket.id);
-        console.log(`[REACHX - Overlay] DEV MODE: Auto-generated userId: ${userId}`.yellow);
+        logger.debug("Overlay", `DEV MODE: Auto-generated userId: ${userId}`);
       } else {
         userId = data.userId;
       }
@@ -93,7 +93,7 @@ export function setupListeners(socketIOClient: SocketIOClient) {
       }
     });
     
-    console.log(`[REACHX - Overlay] User ${userId} authenticated on socket ${socket.id}${experienceId ? ` (experience: ${experienceId})` : ''}${isDevelopment() ? ' [DEV]' : ''}`.green);
+    logger.info("Overlay", `User ${userId} authenticated on socket ${socket.id}${experienceId ? ` (experience: ${experienceId})` : ''}${isDevelopment() ? ' [DEV]' : ''}`);
   });
 
   // ============ Development Mode: Auto-connect without auth ============
@@ -122,7 +122,7 @@ export function setupListeners(socketIOClient: SocketIOClient) {
         }
       });
       
-      console.log(`[REACHX - Overlay] DEV: Quick connect for ${userId}`.yellow);
+      logger.debug("Overlay", `DEV: Quick connect for ${userId}`);
     });
   }
 
@@ -150,7 +150,7 @@ export function setupListeners(socketIOClient: SocketIOClient) {
     if (!userId && isDevelopment()) {
       userId = generateDevUserId(socket.id);
       registerConnection(socket.id, userId);
-      console.log(`[REACHX - Overlay] DEV: Auto-registered ${userId} on message`.yellow);
+      logger.debug("Overlay", `DEV: Auto-registered ${userId} on message`);
     }
     
     // === PRODUCTION MODE: Require authentication ===
@@ -188,7 +188,7 @@ export function setupListeners(socketIOClient: SocketIOClient) {
         break;
         
       default:
-        console.log(`[REACHX - Overlay] Unknown message type from ${userId}: ${message.type}`.yellow);
+        logger.warn("Overlay", `Unknown message type from ${userId}: ${message.type}`);
     }
   });
 
@@ -201,17 +201,17 @@ export function setupListeners(socketIOClient: SocketIOClient) {
   socketIOClient.listenEvent("disconnect", (socket) => {
     const userId = getUserIdBySocket(socket.id);
     if (userId) {
-      console.log(`[REACHX - Overlay] User ${userId} disconnecting from socket ${socket.id}`.yellow);
+      logger.debug("Overlay", `User ${userId} disconnecting from socket ${socket.id}`);
     }
     unregisterConnection(socket.id);
   });
   
   // Log mode on setup
   if (isDevelopment()) {
-    console.log(`[REACHX - Overlay] ⚠️  DEVELOPMENT MODE: Client authentication is relaxed`.yellow);
-    console.log(`[REACHX - Overlay] ⚠️  Use 'overlay_dev_connect' for quick testing`.yellow);
+    logger.warn("Overlay", "DEVELOPMENT MODE: Client authentication is relaxed");
+    logger.warn("Overlay", "Use 'overlay_dev_connect' for quick testing");
   } else {
-    console.log(`[REACHX - Overlay] 🔒 PRODUCTION MODE: Client authentication required`.green);
+    logger.info("Overlay", "PRODUCTION MODE: Client authentication required");
   }
 }
 

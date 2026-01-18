@@ -1,0 +1,61 @@
+name: CI - Type Check & Lint
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+jobs:
+  type-check:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci --legacy-peer-deps
+
+      - name: Run TypeScript type check
+        run: npm run typecheck
+
+      - name: Check for TypeScript errors
+        run: |
+          if [ $? -ne 0 ]; then
+            echo "❌ TypeScript compilation failed"
+            exit 1
+          else
+            echo "✅ TypeScript compilation successful"
+          fi
+
+  docker-build-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build Docker image (test only)
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          platforms: linux/arm64
+          push: false
+          tags: test-build
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Test Docker image build
+        run: |
+          echo "✅ Docker build successful!"
+          docker images test-build

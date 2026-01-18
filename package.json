@@ -4,7 +4,11 @@
   "main": "server.ts",
   "scripts": {
     "start": "ts-node server.ts",
-    "dev": "ts-node-dev --respawn --transpile-only server.ts"
+    "dev": "TS_NODE_DEV=true ts-node-dev --respawn --transpile-only --exit-child server.ts",
+    "dev:clean": "npm run clean:locks && npm run dev",
+    "clean:locks": "rm -f logs/state/*.lock logs/state/crash-state.json",
+    "typecheck": "tsc --noEmit",
+    "pre-deploy-check": "./scripts/pre-deploy-check.sh"
   },
   "keywords": [],
   "author": "",

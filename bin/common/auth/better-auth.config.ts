@@ -17,7 +17,7 @@
 import { betterAuth } from "better-auth";
 import { mongodbAdapter } from "better-auth/adapters/mongodb";
 import { MongoClient, Db } from "mongodb";
-import "colorts/lib/string";
+import { logger } from "../services/logger.service";
 
 // Database URIs
 const DB_URI = process.env.DB_URI || "mongodb://localhost:27017/";
@@ -30,10 +30,10 @@ const MICROSOFT_TENANT_ID = process.env.MICROSOFT_TENANT_ID || "consumers";
 
 // Debug: Check if Microsoft credentials are configured
 if (!MICROSOFT_CLIENT_ID || !MICROSOFT_CLIENT_SECRET) {
-  console.warn("[REACHX - Better-Auth] ⚠️ MICROSOFT_CLIENT_ID or MICROSOFT_CLIENT_SECRET not configured!".yellow);
-  console.warn("[REACHX - Better-Auth] ⚠️ Player authentication with Microsoft will NOT work.".yellow);
+  logger.warn("Better-Auth", "MICROSOFT_CLIENT_ID or MICROSOFT_CLIENT_SECRET not configured!");
+  logger.warn("Better-Auth", "Player authentication with Microsoft will NOT work.");
 } else {
-  console.log("[REACHX - Better-Auth] ✅ Microsoft OAuth credentials configured".green);
+  logger.info("Better-Auth", "Microsoft OAuth credentials configured");
 }
 
 // MongoDB clients for Better-Auth (singleton pattern)
@@ -92,8 +92,8 @@ export const developerAuth = betterAuth({
     requireEmailVerification: false, // Set to true in production
     sendResetPassword: async ({ user, url }) => {
       // TODO: Implement password reset email via Resend
-      console.log(`[REACHX - Better-Auth] Password reset requested for ${user.email}`.yellow);
-      console.log(`[REACHX - Better-Auth] Reset URL: ${url}`.cyan);
+      logger.info("Better-Auth", `Password reset requested for ${user.email}`);
+      logger.debug("Better-Auth", `Reset URL: ${url}`);
     }
   },
   
@@ -195,7 +195,7 @@ export const playerAuth = betterAuth({
 });
 
 // Debug: Log available API endpoints
-console.log("[REACHX - Better-Auth] Player Auth API available at: /api/auth/player/*".cyan);
+logger.debug("Better-Auth", "Player Auth API available at: /api/auth/player/*");
 
 /**
  * Initialize Better-Auth MongoDB connections
@@ -205,9 +205,9 @@ export async function initBetterAuthConnections(): Promise<void> {
   try {
     await developersClient.connect();
     await playersClient.connect();
-    console.log("[REACHX - Better-Auth] MongoDB connections established".green);
+    logger.info("Better-Auth", "MongoDB connections established");
   } catch (error) {
-    console.error("[REACHX - Better-Auth] Failed to connect to MongoDB:".red, error);
+    logger.error("Better-Auth", `Failed to connect to MongoDB: ${error}`);
     throw error;
   }
 }
@@ -218,4 +218,4 @@ export async function initBetterAuthConnections(): Promise<void> {
 export const developerAuthHandler = developerAuth.handler;
 export const playerAuthHandler = playerAuth.handler;
 
-console.log("[REACHX - Better-Auth] Configuration loaded".green);
+logger.debug("Better-Auth", "Configuration loaded");

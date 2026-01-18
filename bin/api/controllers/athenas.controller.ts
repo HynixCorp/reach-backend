@@ -3,6 +3,7 @@ import { config } from "dotenv";
 import { createGenericResponse } from "../../common/utils";
 import { getExperiencesDB } from "../../common/services/database.service";
 import { ResponseHandler } from "../../common/services/response.service";
+import { logger } from "../../common/services/logger.service";
 
 config();
 
@@ -22,7 +23,7 @@ async function get_status(req: Request, res: Response): Promise<Response> {
 
         return res.status(200).json(createGenericResponse(true, athenasStatus[0], "ok"));
     } catch (error) {
-        console.error("[REACHX - Athena]: Error retrieving Athena status:", error);
+        logger.error("Athena", `Error retrieving Athena status: ${error}`);
         return ResponseHandler.serverError(res, error as Error);
     }
 }

@@ -89,19 +89,49 @@ jobs:
           
           # Create .env file for the server with actual values
           cat > deploy/.env << EOF
+          # Application Configuration
+          NODE_ENV=production
+          PORT=3000
           BASE_URL=${BASE_URL}
+          
+          # Database Configuration
           DB_URI=${DB_URI}
+          
+          # Security Secrets
           CRYPTO_SECRET=${CRYPTO_SECRET}
           CDN_SECRET_KEY=${CDN_SECRET_KEY}
           UPDATE_SECRET=${UPDATE_SECRET}
           BETTER_AUTH_SECRET=${BETTER_AUTH_SECRET}
+          
+          # External Services
           DASHBOARD_URL=${DASHBOARD_URL}
           POLAR_API_KEY=${POLAR_API_KEY}
           POLAR_WEBHOOK_SECRET=${POLAR_WEBHOOK_SECRET}
           POLAR_ENDPOINT_URI=${POLAR_ENDPOINT_URI}
           RESEND_API_KEY=${RESEND_API_KEY}
+          
+          # Microsoft OAuth
           MICROSOFT_CLIENT_ID=${MICROSOFT_CLIENT_ID}
           MICROSOFT_CLIENT_SECRET=${MICROSOFT_CLIENT_SECRET}
+          
+          # Process Manager Configuration
+          MAX_CRASHES_BEFORE_EXIT=3
+          CRASH_WINDOW_MS=60000
+          GRACEFUL_SHUTDOWN_TIMEOUT_MS=10000
+          DOCKER_CONTAINER=true
+          
+          # Logging Configuration
+          LOG_DIR=./logs
+          LOG_LEVEL=INFO
+          LOG_TO_CONSOLE=true
+          MAX_LOG_SIZE=10485760
+          MAX_LOG_FILES=30
+          
+          # File Upload Configuration
+          MULTER_DIR=/app/cdn
+          
+          # Health Check Configuration
+          HEALTH_CHECK_INTERVAL_MS=30000
           EOF
           
           # Create initialization script
@@ -119,13 +149,57 @@ jobs:
           docker network inspect frontend >/dev/null 2>&1 || \
             docker network create frontend
           
-          # Create named volume for persistent CDN data
+          # Create named volumes for persistent data
           docker volume inspect reach-cdn-data >/dev/null 2>&1 || \
             docker volume create reach-cdn-data
+          
+          docker volume inspect reach-logs-data >/dev/null 2>&1 || \
+            docker volume create reach-logs-data
           
           echo "✅ Server initialization complete!"
           SCRIPT
           chmod +x deploy/init-server.sh
+
+          # Create rollback script
+          cat > deploy/rollback.sh << 'ROLLBACK_SCRIPT'
+          #!/bin/bash
+          set -e
+          
+          echo "🔄 Rolling back Reach Backend deployment..."
+          
+          cd /home/opc/apps/reach-backend
+          
+          # Stop current containers
+          docker compose down --remove-orphans --timeout 30 || true
+          
+          # Find previous working image
+          PREVIOUS_IMAGE=$(docker images registry.reachsdk.online/reach-backend --format "{{.Repository}}:{{.Tag}}" | grep -v "latest" | head -n 1)
+          
+          if [ -n "$PREVIOUS_IMAGE" ]; then
+            echo "📦 Rolling back to: $PREVIOUS_IMAGE"
+            
+            # Update docker-compose to use previous image
+            sed -i "s|image: registry.reachsdk.online/reach-backend:.*|image: $PREVIOUS_IMAGE|" docker-compose.yml
+            
+            # Start with previous image
+            docker compose up -d
+            
+            echo "⏳ Waiting for rollback to complete..."
+            sleep 30
+            
+            # Check health
+            HEALTH=$(docker inspect --format='{{.State.Health.Status}}' reach-backend 2>/dev/null || echo "unknown")
+            if [ "$HEALTH" = "healthy" ]; then
+              echo "✅ Rollback successful!"
+            else
+              echo "⚠️  Rollback completed but health check failed. Manual intervention may be required."
+            fi
+          else
+            echo "❌ No previous image found for rollback"
+            exit 1
+          fi
+          ROLLBACK_SCRIPT
+          chmod +x deploy/rollback.sh
 
       - name: Copy files to server
         uses: appleboy/scp-action@v0.1.7
@@ -165,7 +239,14 @@ jobs:
               --username="$REGISTRY_USERNAME" --password-stdin
             
             echo "⬇️  Stopping current containers..."
-            docker compose down --remove-orphans || true
+            docker compose down --remove-orphans --timeout 30 || true
+            
+            echo "🧹 Cleaning up any stale lock files..."
+            # Remove stale lock files that might prevent startup
+            if [ -d "logs/state" ]; then
+              find logs/state -name "*.lock" -type f -mtime +1 -delete 2>/dev/null || true
+              find logs/state -name "crash-state.json" -type f -mtime +1 -delete 2>/dev/null || true
+            fi
             
             echo "📦 Pulling latest image..."
             docker compose pull
@@ -173,23 +254,54 @@ jobs:
             echo "🚀 Starting with new image..."
             docker compose up -d
             
-            echo "⏳ Waiting for health check..."
-            sleep 15
+            echo "⏳ Waiting for container to start (60 seconds)..."
+            sleep 60
             
-            # Check if container is healthy
-            HEALTH=$(docker inspect --format='{{.State.Health.Status}}' reach-backend 2>/dev/null || echo "unknown")
-            if [ "$HEALTH" = "healthy" ]; then
-              echo "✅ Container is healthy!"
-            elif [ "$HEALTH" = "starting" ]; then
-              echo "⏳ Container is still starting, waiting..."
-              sleep 30
-              HEALTH=$(docker inspect --format='{{.State.Health.Status}}' reach-backend 2>/dev/null || echo "unknown")
-              echo "📊 Health status: $HEALTH"
-            else
-              echo "⚠️  Health status: $HEALTH"
+            # Check container status
+            CONTAINER_STATUS=$(docker inspect --format='{{.State.Status}}' reach-backend 2>/dev/null || echo "not-found")
+            if [ "$CONTAINER_STATUS" != "running" ]; then
+              echo "❌ Container failed to start. Status: $CONTAINER_STATUS"
               echo "📋 Container logs:"
-              docker compose logs --tail=100
+              docker compose logs --tail=200
+              exit 1
             fi
+            
+            echo "🔍 Checking health status..."
+            MAX_ATTEMPTS=12
+            ATTEMPT=1
+            
+            while [ $ATTEMPT -le $MAX_ATTEMPTS ]; do
+              HEALTH=$(docker inspect --format='{{.State.Health.Status}}' reach-backend 2>/dev/null || echo "unknown")
+              
+              case $HEALTH in
+                "healthy")
+                  echo "✅ Container is healthy! (attempt $ATTEMPT/$MAX_ATTEMPTS)"
+                  break
+                  ;;
+                "starting")
+                  echo "⏳ Container is still starting... (attempt $ATTEMPT/$MAX_ATTEMPTS)"
+                  ;;
+                "unhealthy")
+                  echo "❌ Container is unhealthy (attempt $ATTEMPT/$MAX_ATTEMPTS)"
+                  echo "📋 Recent logs:"
+                  docker compose logs --tail=50 --since 2m
+                  exit 1
+                  ;;
+                *)
+                  echo "⚠️  Unknown health status: $HEALTH (attempt $ATTEMPT/$MAX_ATTEMPTS)"
+                  ;;
+              esac
+              
+              if [ $ATTEMPT -eq $MAX_ATTEMPTS ]; then
+                echo "⏰ Health check timeout reached"
+                echo "📋 Full container logs:"
+                docker compose logs --tail=200
+                exit 1
+              fi
+              
+              sleep 10
+              ATTEMPT=$((ATTEMPT + 1))
+            done
             
             echo "🧹 Cleaning up old images..."
             docker image prune -f
@@ -201,4 +313,32 @@ jobs:
             docker compose ps
             echo ""
             echo "📁 Volume info:"
-            docker volume inspect reach-cdn-data --format '{{.Mountpoint}}'
+            docker volume inspect reach-cdn-data --format '{{.Mountpoint}}' 2>/dev/null || echo "Volume not found"
+            
+            echo ""
+            echo "🔍 Final health check via HTTP..."
+            # Test the actual HTTP endpoint
+            if curl -f -s --max-time 10 http://localhost:3000/health > /dev/null; then
+              echo "✅ HTTP health check passed!"
+              
+              # Get version info
+              VERSION_INFO=$(curl -s http://localhost:3000/health | jq -r '.version // "unknown"' 2>/dev/null || echo "unknown")
+              echo "📦 Deployed version: $VERSION_INFO"
+              
+            else
+              echo "❌ HTTP health check failed!"
+              echo "📋 Checking container logs for errors..."
+              docker compose logs --tail=50 reach-backend
+              
+              echo ""
+              echo "🔄 Attempting automatic rollback..."
+              chmod +x rollback.sh
+              ./rollback.sh || echo "⚠️  Rollback failed or not available"
+              
+              exit 1
+            fi
+            
+            echo ""
+            echo "════════════════════════════════════════"
+            echo "✅ Deployment complete and verified!"
+            echo "════════════════════════════════════════"

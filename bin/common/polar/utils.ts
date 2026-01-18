@@ -1,5 +1,6 @@
 import { config } from "dotenv";
 import { PolarCheckoutResponse, PolarCustomerMeResponse, PolarCustomerSessionResponse } from "../../types/polar";
+import { logger } from "../services/logger.service";
 
 config();
 
@@ -93,7 +94,7 @@ export async function getCheckoutInfo(checkoutId: string): Promise<PolarCheckout
 
   if (!response.ok) {
     const errorBody = await response.text();
-    console.error(`[Polar] getCheckoutInfo failed: ${response.status} - ${errorBody}`);
+    logger.error("Polar", `getCheckoutInfo failed: ${response.status} - ${errorBody}`);
     throw new Error(`Polar API error ${response.status}: ${errorBody}`);
   }
 
@@ -133,7 +134,7 @@ export async function getCustomerPortalURL(customerSessionToken: string): Promis
 
   if (!response.ok) {
     const errorBody = await response.text();
-    console.error(`[Polar] getCustomerPortalURL failed: ${response.status} - ${errorBody}`);
+    logger.error("Polar", `getCustomerPortalURL failed: ${response.status} - ${errorBody}`);
     throw new Error(`Polar API error ${response.status}: ${errorBody}`);
   }
 
