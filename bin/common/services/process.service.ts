@@ -148,8 +148,17 @@ class ProcessManagerService {
         const lockContent = await fs.readFile(this.config.lockFilePath, "utf-8");
         const lockData = JSON.parse(lockContent);
         
-        // Check if the PID in lock file is still running
-        if (this.isProcessRunning(lockData.pid)) {
+        // If the lock file has the same PID as current process, it's from a previous
+        // container run (Docker recycles PIDs). Treat as stale.
+        if (lockData.pid === process.pid) {
+          logger.warn("ProcessManager", 
+            `Lock file has same PID as current process (${lockData.pid}). ` +
+            `This is likely from a previous container run. Cleaning up.`
+          );
+          await fs.remove(this.config.lockFilePath);
+        }
+        // Check if the PID in lock file is still running (and it's a different PID)
+        else if (this.isProcessRunning(lockData.pid)) {
           logger.error("ProcessManager", 
             `Another instance is running (PID: ${lockData.pid}). Exiting to prevent conflicts.`
           );
